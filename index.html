@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Joption 功能選單 - 行動優化版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #ffffff;
+            color: #0f172a;
+            /* 避免行動端點擊後的藍色高亮 */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 流體有機形狀容器 */
+        .blob-shape {
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+        }
+
+        /* 自動變換形狀邏輯 */
+        .card-container:nth-child(3n+1) .blob-shape { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+        .card-container:nth-child(3n+2) .blob-shape { border-radius: 40% 60% 70% 30% / 40% 70% 30% 60%; }
+        .card-container:nth-child(3n+3) .blob-shape { border-radius: 50% 50% 30% 70% / 50% 30% 70% 50%; }
+
+        /* 懸停或點擊時的變化 */
+        .card-container:hover .blob-shape, 
+        .card-container:active .blob-shape {
+            border-radius: 50%;
+            transform: scale(1.02);
+            box-shadow: 0 15px 30px -10px rgba(30, 58, 138, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .icon-wrapper {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (min-width: 768px) {
+            .icon-wrapper {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 1.25rem;
+            }
+        }
+
+        /* 正常狀態下的圖示方塊 */
+        .normal-icon-box {
+            transition: all 0.4s ease;
+            opacity: 1;
+            transform: scale(1);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0.75rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .card-container:hover .normal-icon-box,
+        .card-container:active .normal-icon-box {
+            opacity: 0;
+            transform: scale(0.5) rotate(-15deg);
+        }
+
+        /* 懸停時鐘遮罩 */
+        .clock-overlay {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transform: scale(1.5);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card-container:hover .clock-overlay,
+        .card-container:active .clock-overlay {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .clock-face {
+            width: 100%;
+            height: 100%;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .clock-mark {
+            position: absolute;
+            width: 2px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.8);
+            left: calc(50% - 1px);
+            transform-origin: center 28px; /* 根據 60px 圓圈調整 */
+        }
+        
+        @media (min-width: 768px) {
+            .clock-mark { transform-origin: center 40px; }
+        }
+
+        .second-hand {
+            position: absolute;
+            top: 15%;
+            left: calc(50% - 1px);
+            width: 2px;
+            height: 35%;
+            background: #ffffff;
+            border-radius: 2px;
+            transform-origin: bottom;
+            transform: rotate(0deg);
+        }
+
+        .card-container:hover .second-hand,
+        .card-container:active .second-hand {
+            animation: tickRotate 4s infinite linear;
+        }
+
+        @keyframes tickRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .clock-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: #ffffff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* 標題文字優化 */
+        .menu-title {
+            color: #ffffff; 
+            font-weight: 700;
+            font-size: 0.95rem; /* 手機端適中大小 */
+            text-align: center;
+            line-height: 1.3;
+            text-decoration: none;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            width: 100%;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            .menu-title {
+                font-size: 1.125rem;
+                padding: 0 0.5rem;
+            }
+        }
+        
+        .card-container {
+            text-decoration: none;
+            color: inherit;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-8 px-4 md:py-12 md:px-12">
+
+    <div class="w-full max-w-6xl">
+        <!-- 行動端縮小間距，確保滿版感；桌面端保持寬鬆 -->
+        <div id="grid-container" class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-10">
+            <!-- 內容由 JS 動態生成 -->
+        </div>
+    </div>
+
+    <script>
+        const menuData = [
+            { title: 'Joption 是什麼？', icon: 'info', color: '#1e3a8a', url:"https://www.joption.com.tw/選單/joption是什麼"},
+            { title: 'Joption 策略核心', icon: 'zap', color: '#1e40af', url:"https://www.joption.com.tw/選單/joption策略核心" },
+            { title: '操作手冊', icon: 'book-open', color: '#1d4ed8', url: "https://www.joption.com.tw/選單/全策略說明" },
+            { title: '設備要求', icon: 'monitor', color: '#111827', url: "https://www.joption.com.tw/選單/硬體設備建議" },
+            { title: '當沖策略參數介紹', icon: 'sliders', color: '#312e81', url: "https://www.joption.com.tw/選單/參數設定介紹與建議" },
+            { title: '當沖策略說明', icon: 'trending-up', color: '#1e3a8a', url: "https://www.joption.com.tw/faq/當沖策略說明" },
+            { title: '歐大自我介紹', icon: 'user', color: '#172554', url: "https://www.joption.com.tw/選單/歐大的自我介紹" },
+            { title: '訂閱及下載點', icon: 'download-cloud', color: '#1e3a8a', url: "https://www.joption.com.tw/選單/下載及安裝說明" },
+            { title: 'Q & A', icon: 'help-circle', color: '#1e40af', url: "https://www.joption.com.tw/faq" }
+        ];
+
+        function render() {
+            const container = document.getElementById('grid-container');
+            
+            container.innerHTML = menuData.map(item => `
+                <a href="${item.url}" target="_blank" class="card-container group">
+                    <div class="blob-shape aspect-square">
+                        <div class="blob-bg absolute inset-0 -z-10 transition-colors duration-300" style="background-color: ${item.color}"></div>
+                        
+                        <div class="icon-wrapper">
+                            <!-- 正常圖示區塊 -->
+                            <div class="normal-icon-box flex items-center justify-center">
+                                <i data-lucide="${item.icon}" class="w-6 h-6 md:w-8 md:h-8" style="color: ${item.color}"></i>
+                            </div>
+
+                            <!-- 懸停時鐘區塊 -->
+                            <div class="clock-overlay">
+                                <div class="clock-face">
+                                    <div class="clock-mark" style="transform: rotate(0deg) translateY(4px)"></div>
+                                    <div class="clock-mark" style="transform: rotate(90deg) translateY(4px)"></div>
+                                    <div class="clock-mark" style="transform: rotate(180deg) translateY(4px)"></div>
+                                    <div class="clock-mark" style="transform: rotate(270deg) translateY(4px)"></div>
+                                    <div class="second-hand"></div>
+                                    <div class="clock-center"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 標題文字 -->
+                        <span class="menu-title">${item.title}</span>
+                    </div>
+                </a>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        window.onload = render;
+    </script>
+</body>
+</html>
