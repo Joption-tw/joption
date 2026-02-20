@@ -2,247 +2,454 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Joption 功能選單 - 行動優化版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歐大選擇權教室隨堂測驗</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- html2canvas for saving as image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&display=swap');
         
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: #ffffff;
-            color: #0f172a;
-            /* 避免行動端點擊後的藍色高亮 */
-            -webkit-tap-highlight-color: transparent;
+        body { 
+            background-color: #f4f4f2; 
+            font-family: 'Noto Serif TC', serif; 
+            margin: 0; 
+            padding: 0; 
+            min-height: 100vh; 
+            overflow-x: hidden;
         }
 
-        /* 流體有機形狀容器 */
-        .blob-shape {
-            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        /* 證書外框架：固定 A4 比例 700x990 */
+        .certificate-outer {
+            padding: 0;
+            background: #ffffff;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.1);
+            border-radius: 2px;
+            width: 700px;
+            height: 990px;
+            margin: 0 auto;
+            position: relative;
+            box-sizing: border-box;
+            display: block;
+            flex-shrink: 0;
+        }
+        
+        /* 模擬亞麻紙張質感 (毛毛的感覺) */
+        .certificate-container {
+            background-color: #fdf8f1; 
+            background-image: 
+                repeating-linear-gradient(rgba(0,0,0,0.015) 0px, rgba(0,0,0,0.015) 1px, transparent 1px, transparent 3px),
+                repeating-linear-gradient(90deg, rgba(0,0,0,0.015) 0px, rgba(0,0,0,0.015) 1px, transparent 1px, transparent 3px);
+            border: 3.5px solid #a37b45;
             position: relative;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            width: 100%;
-        }
-
-        /* 自動變換形狀邏輯 */
-        .card-container:nth-child(3n+1) .blob-shape { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-        .card-container:nth-child(3n+2) .blob-shape { border-radius: 40% 60% 70% 30% / 40% 70% 30% 60%; }
-        .card-container:nth-child(3n+3) .blob-shape { border-radius: 50% 50% 30% 70% / 50% 30% 70% 50%; }
-
-        /* 懸停或點擊時的變化 */
-        .card-container:hover .blob-shape, 
-        .card-container:active .blob-shape {
-            border-radius: 50%;
-            transform: scale(1.02);
-            box-shadow: 0 15px 30px -10px rgba(30, 58, 138, 0.4);
-            filter: brightness(1.1);
-        }
-
-        .icon-wrapper {
-            position: relative;
-            width: 60px;
-            height: 60px;
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        @media (min-width: 768px) {
-            .icon-wrapper {
-                width: 80px;
-                height: 80px;
-                margin-bottom: 1.25rem;
-            }
-        }
-
-        /* 正常狀態下的圖示方塊 */
-        .normal-icon-box {
-            transition: all 0.4s ease;
-            opacity: 1;
-            transform: scale(1);
-            background: rgba(255, 255, 255, 0.95);
-            padding: 0.75rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-        
-        .card-container:hover .normal-icon-box,
-        .card-container:active .normal-icon-box {
-            opacity: 0;
-            transform: scale(0.5) rotate(-15deg);
-        }
-
-        /* 懸停時鐘遮罩 */
-        .clock-overlay {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            transform: scale(1.5);
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .card-container:hover .clock-overlay,
-        .card-container:active .clock-overlay {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .clock-face {
             width: 100%;
             height: 100%;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            position: relative;
+            box-sizing: border-box;
         }
 
-        .clock-mark {
+        /* Joption 全畫面重複浮水印 */
+        .watermark-overlay {
             position: absolute;
-            width: 2px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.8);
-            left: calc(50% - 1px);
-            transform-origin: center 28px; /* 根據 60px 圓圈調整 */
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg width='160' height='80' viewBox='0 0 160 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50%25' y='50%25' font-family='Arial, sans-serif' font-weight='900' font-size='12' fill='%23a37b45' text-anchor='middle' dominant-baseline='middle' transform='rotate(-25 80 40)'%3EJOPTION%3C/text%3E%3C/svg%3E");
+            background-repeat: repeat;
+        }
+
+        /* 雙線內邊框 */
+        .certificate-inner-border {
+            border: 1px solid #dcd0b9;
+            margin: 12px;
+            height: calc(100% - 24px);
+            position: relative;
+            z-index: 2;
+            box-sizing: border-box;
+            padding: 0;
         }
         
-        @media (min-width: 768px) {
-            .clock-mark { transform-origin: center 40px; }
+        .no-wrap { white-space: nowrap; }
+
+        /* 姓名底線 */
+        .name-underline {
+            width: 350px;
+            height: 1.5px;
+            background-color: #e5e7eb;
+            margin: 8px auto 0;
         }
 
-        .second-hand {
-            position: absolute;
-            top: 15%;
-            left: calc(50% - 1px);
-            width: 2px;
-            height: 35%;
-            background: #ffffff;
-            border-radius: 2px;
-            transform-origin: bottom;
-            transform: rotate(0deg);
-        }
+        /* 勳章特效 */
+        .glow-purple { filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.6)); animation: pulseGlow 2.5s infinite; }
+        .glow-gold { filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.3)); }
+        @keyframes pulseGlow { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.03); opacity: 1; } }
 
-        .card-container:hover .second-hand,
-        .card-container:active .second-hand {
-            animation: tickRotate 4s infinite linear;
-        }
-
-        @keyframes tickRotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .clock-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 4px;
-            height: 4px;
-            background: #ffffff;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        /* 標題文字優化 */
-        .menu-title {
-            color: #ffffff; 
-            font-weight: 700;
-            font-size: 0.95rem; /* 手機端適中大小 */
-            text-align: center;
-            line-height: 1.3;
-            text-decoration: none;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-            width: 100%;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        @media (min-width: 768px) {
-            .menu-title {
-                font-size: 1.125rem;
-                padding: 0 0.5rem;
+        /* 手機端預覽縮放 (不影響截圖) */
+        @media screen and (max-width: 768px) {
+            .certificate-preview-scroll {
+                width: 100%;
+                overflow-x: auto;
+                padding: 20px 0;
+                -webkit-overflow-scrolling: touch;
+            }
+            .certificate-outer {
+                transform: scale(0.5);
+                transform-origin: top left;
+                margin-left: calc(50vw - 175px); /* 居中校準 */
+                margin-bottom: -450px;
             }
         }
-        
-        .card-container {
-            text-decoration: none;
-            color: inherit;
-            width: 100%;
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            backdrop-filter: blur(8px);
         }
+
+        .btn-ghibli {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 99px;
+        }
+        .btn-ghibli:active { transform: scale(0.95); }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center py-8 px-4 md:py-12 md:px-12">
+<body>
+    <div id="root"></div>
 
-    <div class="w-full max-w-6xl">
-        <!-- 行動端縮小間距，確保滿版感；桌面端保持寬鬆 -->
-        <div id="grid-container" class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-10">
-            <!-- 內容由 JS 動態生成 -->
-        </div>
-    </div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-    <script>
-        const menuData = [
-            { title: 'Joption 是什麼？', icon: 'info', color: '#1e3a8a', url:"https://www.joption.com.tw/選單/joption是什麼"},
-            { title: 'Joption 策略核心', icon: 'zap', color: '#1e40af', url:"https://www.joption.com.tw/選單/joption策略核心" },
-            { title: '操作手冊', icon: 'book-open', color: '#1d4ed8', url: "https://www.joption.com.tw/選單/全策略說明" },
-            { title: '設備要求', icon: 'monitor', color: '#111827', url: "https://www.joption.com.tw/選單/硬體設備建議" },
-            { title: '當沖策略參數介紹', icon: 'sliders', color: '#312e81', url: "https://www.joption.com.tw/選單/參數設定介紹與建議" },
-            { title: '當沖策略說明', icon: 'trending-up', color: '#1e3a8a', url: "https://www.joption.com.tw/faq/當沖策略說明" },
-            { title: '歐大自我介紹', icon: 'user', color: '#172554', url: "https://www.joption.com.tw/選單/歐大的自我介紹" },
-            { title: '訂閱及下載點', icon: 'download-cloud', color: '#1e3a8a', url: "https://www.joption.com.tw/選單/下載及安裝說明" },
-            { title: 'Q & A', icon: 'help-circle', color: '#1e40af', url: "https://www.joption.com.tw/faq" }
-        ];
+        const CONFIG = {
+            formActionUrl: "https://docs.google.com/forms/d/e/1FAIpQLSeoBO2Dumc6wTJ32dvoMhe-cfcaBh46DOWCb4EUl9XDPMvLmw/formResponse",
+            nameEntryId: "entry.763113619",
+            scoreEntryId: "entry.236333802",
+            emailEntryId: "emailAddress", 
+            SHEET_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSVeIf30C4q_dI4RAoaNHjItk0F35QdtIvizSyJWbbNfnVxhYj-NyWocq67QknUEFr1_0oBvgJntMbi/pub?output=csv" 
+        };
 
-        function render() {
-            const container = document.getElementById('grid-container');
-            
-            container.innerHTML = menuData.map(item => `
-                <a href="${item.url}" target="_blank" class="card-container group">
-                    <div class="blob-shape aspect-square">
-                        <div class="blob-bg absolute inset-0 -z-10 transition-colors duration-300" style="background-color: ${item.color}"></div>
+        const Trophy = () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline mr-2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>);
+        const Home = () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline mr-2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>);
+        const Download = () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline mr-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>);
+        const Loader = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`animate-spin ${className}`}><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>);
+        const X = () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>);
+
+        function App() {
+            const [view, setView] = useState('home');
+            const [playerName, setPlayerName] = useState('');
+            const [playerEmail, setPlayerEmail] = useState('');
+            const [currentQuestions, setCurrentQuestions] = useState([]);
+            const [currentIndex, setCurrentIndex] = useState(0);
+            const [answers, setAnswers] = useState([]);
+            const [score, setScore] = useState(0);
+            const [submitStatus, setSubmitStatus] = useState('idle');
+            const [leaderboard, setLeaderboard] = useState([]);
+            const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
+            const [errorMessage, setErrorMessage] = useState('');
+            const [isSaving, setIsSaving] = useState(false);
+            const [savedImage, setSavedImage] = useState(null);
+
+            const formRef = useRef(null);
+            const certificateRef = useRef(null);
+
+            const getRankInfo = (s) => {
+                if (s === 100) return { title: "權利金之神", icon: "🟣👑", color: "text-purple-600", glow: "glow-purple" };
+                if (s >= 95) return { title: "策略指揮官", icon: "⚫♟️", color: "text-stone-900", glow: "glow-gold" };
+                if (s >= 90) return { title: "賣方操盤手", icon: "⚫📊", color: "text-stone-800", glow: "" };
+                if (s >= 85) return { title: "風險控管專員", icon: "🟡🛡️", color: "text-amber-800", glow: "" };
+                if (s >= 80) return { title: "策略實習生", icon: "🟡⚖️", color: "text-amber-700", glow: "" };
+                if (s >= 75) return { title: "波動率觀察員", icon: "⚪📈", color: "text-slate-600", glow: "" };
+                if (s >= 70) return { title: "時間價值探索者", icon: "⚪⏳", color: "text-slate-500", glow: "" };
+                if (s >= 65) return { title: "履約價新兵", icon: "🟤🎯", color: "text-orange-900", glow: "" };
+                if (s >= 60) return { title: "權利金學徒", icon: "🟤💰", color: "text-orange-800", glow: "" };
+                return { title: "選擇權小白", icon: "🔰❓", color: "text-stone-400", glow: "" };
+            };
+
+            const parseCSV = (text) => {
+                const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
+                if (lines.length < 2) return [];
+                const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+                let nameIdx = headers.findIndex(h => h.includes("姓名") || h.includes("名稱"));
+                let scoreIdx = headers.findIndex(h => h.includes("分數") || h.includes("成績"));
+                if (nameIdx === -1) nameIdx = 2; if (scoreIdx === -1) scoreIdx = 3;
+                return lines.slice(1).map(line => {
+                    const cols = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+                    const cleanCols = cols.map(c => c.replace(/^"|"$/g, '').trim());
+                    return { name: cleanCols[nameIdx] || "匿名玩家", score: parseInt(cleanCols[scoreIdx]) || 0, date: cleanCols[0]?.split(' ')[0] || '' };
+                }).filter(item => item.name && !item.name.includes("姓名"));
+            };
+
+            const fetchLeaderboard = async () => {
+                setIsLoadingLeaderboard(true);
+                try {
+                    const url = `${CONFIG.SHEET_CSV_URL}&t=${Date.now()}`;
+                    const response = await fetch(url, { cache: 'no-store' });
+                    const text = await response.text();
+                    setLeaderboard(parseCSV(text).sort((a, b) => b.score - a.score));
+                } catch (e) { console.error(e); } finally { setIsLoadingLeaderboard(false); }
+            };
+
+            const startQuiz = () => {
+                if (!playerName.trim()) return setErrorMessage("請輸入冒險者名稱");
+                setErrorMessage('');
+                const qBank = [
+                    { q: "關於選擇權，買方（Buy）與賣方（Sell）的風險敘述何者正確？", a: ["買方風險有限，賣方風險無限", "賣方風險有限，買方風險無限", "兩者風險皆為無限", "兩者風險皆為有限"], correct: 0 },
+                    { q: "當你預期未來行情會「大漲」，最適合的簡單策略是？", a: ["Buy Put", "Sell Call", "Buy Call", "Sell Put"], correct: 2 },
+                    { q: "台指選擇權中，所謂的「週選擇權」通常在每週幾進行結算？", a: ["週一", "週二", "週三", "週五"], correct: 2 },
+                    { q: "歐大常提到的「賣出勒式策略」是指同時做什麼動作？", a: ["買進 Call，買進 Put", "賣出不同履約價的 Call 與 Put", "賣出 Call，買進 Put", "買進 Call，賣出 Put"], correct: 1 },
+                    { q: "在期權交易中，「時間價值」的流逝（Theta）對哪一方最有利？", a: ["買方", "賣方", "證券商", "期交所"], correct: 1 }
+                ];
+                setCurrentQuestions([...qBank].sort(() => 0.5 - Math.random()));
+                setCurrentIndex(0); setAnswers([]); setScore(0); setSubmitStatus('idle'); setView('quiz');
+            };
+
+            const handleAnswer = (idx) => {
+                const newAnswers = [...answers, idx]; setAnswers(newAnswers);
+                if (currentIndex < 4) { setCurrentIndex(currentIndex + 1); } 
+                else {
+                    let s = 0; currentQuestions.forEach((q, i) => { if (q.correct === newAnswers[i]) s += 20; });
+                    setScore(s); setView('result');
+                    setTimeout(() => { if (formRef.current) { formRef.current.submit(); setSubmitStatus('success'); fetchLeaderboard(); } }, 800);
+                }
+            };
+
+            const saveAsImage = async () => {
+                if (!certificateRef.current || isSaving) return;
+                setIsSaving(true);
+                try {
+                    // 強制擷取設定為 700x990
+                    const canvas = await html2canvas(certificateRef.current, {
+                        scale: 2.5,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: "#fdf8f1",
+                        width: 700,
+                        height: 990,
+                        onclone: (clonedDoc) => {
+                            const clonedOuter = clonedDoc.querySelector('.certificate-outer');
+                            if (clonedOuter) {
+                                clonedOuter.style.transform = 'none';
+                                clonedOuter.style.boxShadow = 'none';
+                                clonedOuter.style.margin = '0';
+                                clonedOuter.style.width = '700px';
+                                clonedOuter.style.height = '990px';
+                            }
+                        }
+                    });
+                    const dataUrl = canvas.toDataURL("image/png", 1.0);
+                    setSavedImage(dataUrl);
+                    const link = document.createElement('a');
+                    link.download = `歐大選擇權教室_結業證書_${playerName}.png`;
+                    link.href = dataUrl;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } catch (err) { alert("圖片生成失敗，建議使用螢幕截圖。"); } finally { setIsSaving(false); }
+            };
+
+            const rank = getRankInfo(score);
+
+            return (
+                <div className="min-h-screen p-4 flex flex-col items-center justify-center relative bg-[#f4f4f2]">
+                    <div style={{ display: 'none' }}>
+                        <iframe name="hidden_iframe"></iframe>
+                        <form ref={formRef} action={CONFIG.formActionUrl} method="POST" target="hidden_iframe">
+                            <input type="hidden" name={CONFIG.nameEntryId} value={playerName} />
+                            <input type="hidden" name={CONFIG.scoreEntryId} value={score} />
+                            <input type="hidden" name={CONFIG.emailEntryId} value={playerEmail} />
+                        </form>
+                    </div>
+
+                    <div className="relative w-full max-w-lg z-10 py-4">
                         
-                        <div class="icon-wrapper">
-                            <!-- 正常圖示區塊 -->
-                            <div class="normal-icon-box flex items-center justify-center">
-                                <i data-lucide="${item.icon}" class="w-6 h-6 md:w-8 md:h-8" style="color: ${item.color}"></i>
-                            </div>
-
-                            <!-- 懸停時鐘區塊 -->
-                            <div class="clock-overlay">
-                                <div class="clock-face">
-                                    <div class="clock-mark" style="transform: rotate(0deg) translateY(4px)"></div>
-                                    <div class="clock-mark" style="transform: rotate(90deg) translateY(4px)"></div>
-                                    <div class="clock-mark" style="transform: rotate(180deg) translateY(4px)"></div>
-                                    <div class="clock-mark" style="transform: rotate(270deg) translateY(4px)"></div>
-                                    <div class="second-hand"></div>
-                                    <div class="clock-center"></div>
+                        {view === 'home' && (
+                            <div className="bg-white/90 backdrop-blur-md p-10 rounded-[30px] shadow-2xl border-4 border-white text-center fade-in">
+                                <div className="mb-8"><img src="IP標籤.jpg" alt="Logo" className="w-32 h-auto mx-auto border-4 border-white shadow-lg rounded-2xl" /></div>
+                                <h1 className="text-3xl font-bold text-stone-900 mb-2">歐大選擇權教室</h1>
+                                <p className="text-stone-500 mb-10 italic">隨堂測驗 — 測驗你的期權實力</p>
+                                <div className="space-y-4 mb-8">
+                                    <input type="text" placeholder="您的姓名，例如：歐大" className="w-full px-6 py-4 rounded-full border-2 border-stone-100 focus:border-amber-400 focus:outline-none text-lg bg-stone-50/50" value={playerName} onChange={(e) => setPlayerName(e.target.value)} />
+                                    <input type="email" placeholder="電子信箱，例如：Joption@gmail.com" className="w-full px-6 py-4 rounded-full border-2 border-stone-100 focus:border-amber-400 focus:outline-none text-lg bg-stone-50/50" value={playerEmail} onChange={(e) => setPlayerEmail(e.target.value)} />
+                                    {errorMessage && <p className="text-red-500 text-sm font-bold text-center mt-2">{errorMessage}</p>}
+                                </div>
+                                <div className="space-y-3 px-2">
+                                    <button onClick={startQuiz} className="btn-ghibli w-full bg-[#8baeb2] hover:bg-[#6c8f93] text-white font-bold py-4 shadow-lg text-xl transition-all">開始作答</button>
+                                    <button onClick={() => { setView('leaderboard'); fetchLeaderboard(); }} className="btn-ghibli w-full bg-white text-stone-500 border-2 border-stone-100 font-semibold py-4 hover:bg-stone-50 transition-all">觀看排行榜</button>
                                 </div>
                             </div>
-                        </div>
+                        )}
 
-                        <!-- 標題文字 -->
-                        <span class="menu-title">${item.title}</span>
+                        {view === 'quiz' && (
+                            <div className="bg-white p-8 rounded-[30px] shadow-xl border-4 border-white fade-in">
+                                <div className="flex justify-between items-center mb-10 text-stone-400 font-bold text-[10px] tracking-widest uppercase">
+                                    <span>進度 {currentIndex + 1} / 5</span>
+                                    <div className="w-32 h-1.5 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-[#8baeb2] transition-all duration-500" style={{ width: `${((currentIndex + 1) / 5) * 100}%` }}></div></div>
+                                </div>
+                                <h2 className="text-2xl font-bold mb-10 min-h-[5rem] leading-relaxed text-stone-800">{currentQuestions[currentIndex]?.q}</h2>
+                                <div className="space-y-4">
+                                    {currentQuestions[currentIndex]?.a.map((opt, i) => (
+                                        <button key={i} onClick={() => handleAnswer(i)} className="w-full text-left p-6 border-2 border-stone-50 hover:border-[#8baeb2] hover:bg-[#8baeb2]/5 rounded-3xl group flex items-center transition-all">
+                                            <span className="w-10 h-10 flex items-center justify-center bg-stone-50 group-hover:bg-[#8baeb2] group-hover:text-white rounded-full mr-4 text-xs font-bold border border-stone-100">{String.fromCharCode(65 + i)}</span>{opt}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {view === 'result' && (
+                            <div className="space-y-6 fade-in flex flex-col items-center">
+                                <div className="certificate-preview-scroll">
+                                    <div className="certificate-outer" ref={certificateRef}>
+                                        <div className="certificate-container">
+                                            <div className="watermark-overlay"></div>
+                                            <div className="certificate-inner-border">
+                                                
+                                                {/* 1. Logo (固定位置) */}
+                                                <div style={{ marginTop: '70px', marginBottom: '40px' }} className="text-center">
+                                                    <img src="IP標籤.jpg" alt="Logo" className="w-20 h-auto mx-auto border border-stone-200" />
+                                                </div>
+
+                                                {/* 2. 標題與章節 */}
+                                                <div style={{ marginBottom: '50px' }} className="text-center">
+                                                    <h1 className="text-6xl font-black text-stone-800 tracking-[0.15em] no-wrap">結業證書</h1>
+                                                    <p className="text-stone-400 text-sm mt-3 tracking-[0.3em] font-bold uppercase no-wrap">Chap 1 選擇權邏輯入門</p>
+                                                </div>
+
+                                                {/* 3. 茲證明 */}
+                                                <div style={{ marginBottom: '30px' }} className="text-center">
+                                                    <p className="text-stone-500 text-xl italic">茲證明</p>
+                                                </div>
+
+                                                {/* 4. 姓名 */}
+                                                <div style={{ marginBottom: '60px' }} className="text-center">
+                                                    <h2 className="text-5xl font-black text-stone-900 no-wrap">{playerName}</h2>
+                                                    <div className="name-underline"></div>
+                                                </div>
+
+                                                {/* 5. 參與測驗 */}
+                                                <div style={{ marginBottom: '40px' }} className="text-center">
+                                                    <p className="text-stone-600 text-lg">參與隨堂測驗，獲得成績：</p>
+                                                </div>
+
+                                                {/* 6. 分數與階級 */}
+                                                <div style={{ marginBottom: '60px' }} className="flex items-center justify-center gap-20">
+                                                    <div className="text-center">
+                                                        <span className="text-[10px] text-stone-300 font-bold block mb-2 uppercase tracking-widest">分數</span>
+                                                        <span className="text-8xl font-black text-amber-800">{score}</span>
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <span className="text-[10px] text-stone-300 font-bold block mb-2 uppercase tracking-widest">授予階級</span>
+                                                        <div className="flex flex-col items-center">
+                                                            <span className={`text-6xl mb-2 ${rank.glow}`}>{rank.icon}</span>
+                                                            <span className={`text-2xl font-black ${rank.color} no-wrap`}>{rank.title}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* 7. 結語 */}
+                                                <div style={{ marginBottom: '50px' }} className="max-w-sm mx-auto text-center px-10">
+                                                    <p className="text-stone-400 text-sm leading-loose tracking-wide">
+                                                        具備初階選擇權風險識別與<br/>
+                                                        基本策略運用能力，特發此證。
+                                                    </p>
+                                                </div>
+
+                                                {/* 8. 簽章 (底部精確對齊) */}
+                                                <div style={{ position: 'absolute', bottom: '50px', left: '50px', right: '50px' }} className="flex justify-between items-end">
+                                                    <div className="text-left text-[9px] text-stone-400 font-sans leading-relaxed uppercase">
+                                                        DATE: {new Date().toLocaleDateString('zh-TW')}<br/>
+                                                        NO: JOPT-ID-{Math.floor(Date.now()/1000)}
+                                                    </div>
+                                                    <div className="relative flex items-center pr-4">
+                                                        <span className="text-stone-900 text-3xl font-black italic mr-3 no-wrap">院長 歐大</span>
+                                                        <div className="w-20 h-20 border-2 border-red-600/40 rounded-full flex items-center justify-center text-red-600/50 font-bold rotate-12 absolute -top-8 -right-10 text-[9px] leading-tight text-center">
+                                                            歐大<br/>選擇權
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="w-full max-w-lg grid grid-cols-1 gap-4 px-2 pt-10">
+                                    <button onClick={() => { setView('leaderboard'); fetchLeaderboard(); }} className="btn-ghibli w-full bg-[#8baeb2] text-white py-4 rounded-full font-bold shadow-lg text-lg flex items-center justify-center gap-2"><Trophy /> 觀看即時排行榜</button>
+                                    <div className="flex gap-4">
+                                        <button onClick={saveAsImage} disabled={isSaving} className="btn-ghibli flex-1 bg-stone-900 text-white py-4 rounded-full font-bold shadow hover:bg-black transition-all text-base flex items-center justify-center gap-2">
+                                            {isSaving ? <Loader className="w-4 h-4 text-white" /> : <><Download className="w-4 h-4"/> 儲存結業證書</>}
+                                        </button>
+                                        <button onClick={() => setView('home')} className="btn-ghibli flex-1 bg-white text-stone-400 border-2 border-stone-100 py-4 rounded-full font-bold hover:bg-stone-50 transition-all text-base">返回挑戰</button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {view === 'leaderboard' && (
+                            <div className="bg-white/95 backdrop-blur-md p-10 rounded-[40px] max-h-[85vh] flex flex-col shadow-2xl border-4 border-white fade-in mx-auto max-w-md">
+                                <div className="flex justify-between items-center mb-8 border-b border-stone-100 pb-6">
+                                    <h2 className="text-xl font-bold text-stone-900 tracking-widest text-center no-wrap">巔峰挑戰賽榜單</h2>
+                                    <button onClick={() => setView('home')} className="p-2 text-stone-300 hover:text-stone-800 transition-colors"><Home /></button>
+                                </div>
+                                <div className="overflow-y-auto flex-1 space-y-3 pr-2 scrollbar-thin text-left">
+                                    {isLoadingLeaderboard ? (
+                                        <div className="text-center py-24 text-stone-300 flex flex-col items-center gap-4"><Loader className="w-8 h-8 text-stone-300" /><p className="text-[10px] tracking-widest uppercase text-center font-bold">讀取中...</p></div>
+                                    ) : leaderboard.length > 0 ? leaderboard.map((item, idx) => (
+                                        <div key={idx} className="flex items-center justify-between p-5 bg-stone-50/50 rounded-[25px] hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-stone-100">
+                                            <div className="flex items-center gap-5 overflow-hidden">
+                                                <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-black text-xs ${idx === 0 ? 'bg-[#8baeb2] text-white shadow-lg' : 'bg-stone-100 text-stone-400'}`}>{idx + 1}</span>
+                                                <div className="overflow-hidden">
+                                                    <div className="font-bold text-stone-800 text-base truncate">{item.name}</div>
+                                                    <div className={`text-[9px] font-bold uppercase tracking-widest ${getRankInfo(item.score).color} truncate`}>
+                                                        {getRankInfo(item.score).icon} {getRankInfo(item.score).title}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="text-right flex-shrink-0 ml-2"><span className="font-black text-stone-900 text-2xl">{item.score}</span></div>
+                                        </div>
+                                    )) : (
+                                        <div className="text-center py-24 text-stone-400 flex flex-col items-center gap-4"><Trophy /><p className="text-xs tracking-widest text-center font-bold">目前尚無紀錄資料</p></div>
+                                    )}
+                                </div>
+                                <button onClick={() => setView('home')} className="mt-8 w-full bg-stone-50 text-stone-400 font-bold py-4 rounded-full hover:bg-stone-100 transition-all text-xs tracking-widest text-center font-bold uppercase">離開榜單</button>
+                            </div>
+                        )}
+
+                        {savedImage && (
+                            <div className="modal-backdrop" onClick={() => setSavedImage(null)}>
+                                <div className="bg-white p-4 rounded-2xl max-w-sm w-full animate-in zoom-in duration-200 shadow-2xl relative" onClick={e => e.stopPropagation()}>
+                                    <button onClick={() => setSavedImage(null)} className="absolute -top-12 right-0 text-white flex items-center gap-1 font-bold">關閉 <X /></button>
+                                    <div className="text-center mb-4 text-stone-600">
+                                        <p className="font-bold text-amber-600 mb-1 italic">🎉 結業成功！</p>
+                                        <p className="text-sm font-bold">手機用戶：長按圖片點選「儲存」</p>
+                                        <p className="text-sm">電腦用戶：點擊圖片按右鍵「另存」</p>
+                                    </div>
+                                    <img src={savedImage} alt="Certificate Preview" className="w-full rounded-lg shadow-lg border border-stone-200" />
+                                    <button onClick={() => setSavedImage(null)} className="mt-6 w-full py-4 bg-stone-100 text-stone-600 rounded-xl font-bold font-serif hover:bg-stone-200 transition-colors">儲存完成，關閉預覽</button>
+                                </div>
+                            </div>
+                        )}
+
                     </div>
-                </a>
-            `).join('');
-
-            lucide.createIcons();
+                </div>
+            );
         }
 
-        window.onload = render;
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
