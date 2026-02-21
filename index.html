@@ -132,7 +132,7 @@
     </script>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState, useEffect, useMemo, useRef } = React;
 
         const Icons = {
             Home: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>,
@@ -158,6 +158,7 @@
             const [isMenuOpen, setIsMenuOpen] = useState(false);
             const [user, setUser] = useState(null);
             const [visitorStats, setVisitorStats] = useState({ total: null, daily: null });
+            const hasIncremented = useRef(false);
 
             const ipImageUrl = "https://www.joption.com.tw/ip%E6%A8%99%E7%B1%A4.jpg";
 
@@ -184,12 +185,12 @@
                         const db = getFirestore(app);
                         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-                        const dateKey = new Intl.DateTimeFormat('zh-TW', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            timeZone: 'Asia/Taipei'
-                        }).format(new Date()).replace(/\//g, '');
+                        const now = new Date();
+                        const taiwanTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Taipei"}));
+                        const y = taiwanTime.getFullYear();
+                        const m = String(taiwanTime.getMonth() + 1).padStart(2, '0');
+                        const d = String(taiwanTime.getDate()).padStart(2, '0');
+                        const dateKey = `${y}${m}${d}`;
 
                         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                             await signInWithCustomToken(auth, __initial_auth_token);
@@ -197,33 +198,38 @@
                             await signInAnonymously(auth);
                         }
 
-                        unsubscribeAuth = onAuthStateChanged(auth, (u) => {
+                        unsubscribeAuth = onAuthStateChanged(auth, async (u) => {
                             setUser(u);
                             if (u) {
                                 const totalDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', 'totalStats');
                                 const dailyDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', `daily_${dateKey}`);
                                 
-                                if (!sessionStorage.getItem('v_tracked')) {
-                                    const updateData = { count: increment(1), lastUpdated: serverTimestamp() };
-                                    setDoc(totalDocRef, updateData, { merge: true }).catch(console.error);
-                                    setDoc(dailyDocRef, updateData, { merge: true }).catch(console.error);
-                                    sessionStorage.setItem('v_tracked', 'true');
+                                // 原則：刷新畫面都算新的造訪。
+                                // 使用 useRef 確保在單次組件生命週期內只加一次，但「刷新」會重設所有內容，進而觸發加法。
+                                if (!hasIncremented.current) {
+                                    hasIncremented.current = true;
+                                    const updatePayload = { count: increment(1), lastUpdated: serverTimestamp() };
+                                    try {
+                                        await Promise.all([
+                                            setDoc(totalDocRef, updatePayload, { merge: true }),
+                                            setDoc(dailyDocRef, updatePayload, { merge: true })
+                                        ]);
+                                    } catch (err) {
+                                        console.error("Firestore Write Error:", err);
+                                    }
                                 }
 
                                 unsubscribeTotal = onSnapshot(totalDocRef, (snap) => {
-                                    const val = snap.exists() ? snap.data().count : 0;
-                                    setVisitorStats(prev => ({ ...prev, total: val }));
+                                    setVisitorStats(prev => ({ ...prev, total: snap.exists() ? (snap.data().count || 0) : 0 }));
                                 }, () => setVisitorStats(prev => ({ ...prev, total: 0 })));
 
                                 unsubscribeDaily = onSnapshot(dailyDocRef, (snap) => {
-                                    const val = snap.exists() ? snap.data().count : 0;
-                                    setVisitorStats(prev => ({ ...prev, daily: val }));
+                                    setVisitorStats(prev => ({ ...prev, daily: snap.exists() ? (snap.data().count || 0) : 0 }));
                                 }, () => setVisitorStats(prev => ({ ...prev, daily: 0 })));
                             }
                         });
 
                     } catch (e) {
-                        console.warn("Firebase stats error:", e);
                         setVisitorStats({ total: 0, daily: 0 });
                     }
                 };
@@ -482,18 +488,16 @@
                                             </div>
                                         </div>
 
-                                        {/* 造訪計數器與頁尾年份 */}
                                         <div className="flex flex-col items-center justify-center gap-4 pt-4 animate-fade-in">
                                             <div className="h-[2px] w-24 bg-stone-200 rounded-full mb-2"></div>
                                             <div className="flex flex-wrap justify-center gap-3">
                                                 <div className="visitor-badge bg-emerald-50 border border-emerald-100 text-emerald-800 shadow-sm">
-                                                    <Icons.Users /> 累積造訪：<span className="font-black">{visitorStats.total !== null ? visitorStats.total.toLocaleString() : '...'}</span>
+                                                    <Icons.Users /> 累積造訪：<span className="font-black">{visitorStats.total !== null ? visitorStats.total.toLocaleString() : '讀取中...'}</span>
                                                 </div>
                                                 <div className="visitor-badge bg-amber-50 border border-amber-100 text-amber-800 shadow-sm">
-                                                    <Icons.Clock /> 今日造訪：<span className="font-black">{visitorStats.daily !== null ? visitorStats.daily.toLocaleString() : '...'}</span>
+                                                    <Icons.Clock /> 今日造訪：<span className="font-black">{visitorStats.daily !== null ? visitorStats.daily.toLocaleString() : '讀取中...'}</span>
                                                 </div>
                                             </div>
-                                            {/* 已更新年份至 2026 */}
                                             <p className="text-[11px] font-bold text-stone-400 tracking-widest uppercase">© JOPTION ACADEMY - Since 2026</p>
                                         </div>
                                     </div>
