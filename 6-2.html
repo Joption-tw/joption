@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM! 歐式 vs 美式選擇權 | 歐大選擇權教室</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 英雄普普風專屬色調 */
+        :root {
+            --c-bg: #FAF9F6;
+            --c-primary: #EF4444; /* 英雄紅 (美式) */
+            --c-secondary: #3B82F6; /* 正義藍 (歐式) */
+            --c-accent: #FDE047; /* 閃電黃 */
+            --c-dark: #0F172A;
+            --c-halftone: #CBD5E1;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--c-bg);
+            color: var(--c-dark);
+            /* 漫畫半色調網點背景 */
+            background-image: radial-gradient(var(--c-halftone) 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+
+        .font-comic {
+            font-family: 'Bangers', 'Noto Sans TC', cursive;
+            letter-spacing: 0.05em;
+        }
+
+        /* 普普風卡通邊框與深度陰影 */
+        .pop-card {
+            border: 5px solid var(--c-dark);
+            border-radius: 1.5rem;
+            background-color: white;
+            box-shadow: 10px 10px 0px var(--c-dark);
+            transition: all 0.2s ease;
+        }
+
+        .pop-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 13px 13px 0px var(--c-dark);
+        }
+
+        /* 膠囊容器 */
+        .capsule-container {
+            background: white;
+            border: 4px solid var(--c-dark);
+            border-radius: 9999px;
+            box-shadow: 0 10px 0 var(--c-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* 互動拉桿樣式 */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 20px;
+            background: var(--c-dark);
+            border-radius: 10px;
+            border: 2px solid white;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 48px;
+            width: 48px;
+            border-radius: 50%;
+            background: var(--c-accent);
+            cursor: pointer;
+            margin-top: -16px;
+            border: 4px solid var(--c-dark);
+            box-shadow: 0 5px 0 var(--c-dark);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><path d="M13 3l-2 3h-3v3l-3 2v3l3 2v3h3l2 3h3l2-3h3v-3l3-2v-3l-3-2v-3h-3l-2-3h-3z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 60%;
+        }
+
+        /* 英雄標籤 */
+        .hero-tag {
+            clip-path: polygon(0% 0%, 100% 0%, 90% 50%, 100% 100%, 0% 100%);
+            padding-right: 2rem;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); background-color: #F87171; }
+        }
+        .active-american { animation: pulse-red 1s infinite; }
+
+        /* 警告文字閃爍動畫 */
+        @keyframes text-flash {
+            0%, 100% { color: var(--c-dark); opacity: 1; }
+            50% { color: var(--c-primary); opacity: 0.8; }
+        }
+        .animate-important-flash {
+            animation: text-flash 0.8s infinite;
+        }
+
+        @media (max-width: 640px) {
+            .pop-card { border-width: 4px; box-shadow: 7px 7px 0px var(--c-dark); }
+            .header-capsule { padding: 0.8rem 1rem; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4 sm:p-8 overflow-x-hidden">
+
+    <!-- 頁首 -->
+    <header class="w-full flex justify-center mb-12">
+        <div class="capsule-container header-capsule py-4 md:py-5 px-6 md:px-12 flex flex-row items-center justify-center">
+            <div class="flex items-center justify-center gap-4 md:gap-5">
+                <!-- Logo：圓角正方形 -->
+                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl border-4 border-[var(--c-dark)] overflow-hidden bg-white shrink-0 shadow-sm">
+                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/3B82F6/FFFFFF?text=J&font=Bangers'">
+                </div>
+                <!-- 標題文字區 -->
+                <div class="flex flex-col">
+                    <h1 class="text-2xl md:text-4xl font-black text-[var(--c-dark)] leading-tight tracking-tight">歐大選擇權教室</h1>
+                    <p class="text-[10px] md:text-xs font-black text-[var(--c-secondary)] tracking-[0.15em] uppercase mt-0.5 font-comic italic text-left">
+                        OPTION STYLE MASTERCLASS
+                    </p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-6xl flex-grow flex flex-col gap-12">
+        
+        <!-- 大標題 -->
+        <div class="text-center">
+            <div class="inline-block bg-[var(--c-accent)] px-8 py-5 pop-card transform -rotate-1 relative max-w-full">
+                <div class="absolute -top-10 -right-10 text-7xl md:text-9xl transform rotate-12">🥊</div>
+                <h2 class="text-4xl sm:text-7xl md:text-8xl font-black text-[var(--c-dark)] tracking-wide font-comic uppercase">
+                    American vs European
+                </h2>
+                <div class="mt-2 text-xl md:text-3xl font-black text-white bg-[var(--c-primary)] px-5 py-2 inline-block rounded-xl border-4 border-black shadow-[4px_4px_0_#000]">
+                    歐式與美式選擇權差異
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心觀念對決 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+            <!-- 美式選擇權 -->
+            <div class="pop-card p-8 flex flex-col bg-white border-t-[16px] border-t-[var(--c-primary)]">
+                <h3 class="text-3xl font-black mb-4 flex items-center gap-3">
+                    <span class="bg-[var(--c-primary)] text-white w-10 h-10 rounded-full flex items-center justify-center font-comic">A</span>
+                    美式選擇權
+                </h3>
+                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-6">
+                    <strong>「隨時都能行使權力」</strong>的超級英雄。<br>
+                    買方在到期日之前的<span class="text-[var(--c-primary)] underline decoration-4">任何一天</span>，只要覺得價格合適，都可以要求履約結算。
+                </p>
+                <div class="mt-auto bg-red-50 p-4 border-2 border-dashed border-[var(--c-primary)] rounded-xl">
+                    <span class="font-black text-[var(--c-primary)] uppercase tracking-widest text-xs">典型代表</span>
+                    <p class="font-bold text-gray-600">個股選擇權 (如美股個股)</p>
+                </div>
+            </div>
+
+            <!-- 歐式選擇權 -->
+            <div class="pop-card p-8 flex flex-col bg-white border-t-[16px] border-t-[var(--c-secondary)]">
+                <h3 class="text-3xl font-black mb-4 flex items-center gap-3">
+                    <span class="bg-[var(--c-secondary)] text-white w-10 h-10 rounded-full flex items-center justify-center font-comic">E</span>
+                    歐式選擇權
+                </h3>
+                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-6">
+                    <strong>「只有最後一刻能行使」</strong>的紳士。<br>
+                    買方必須等到<span class="text-[var(--c-secondary)] underline decoration-4">到期當天</span>，才能根據當時的價格進行結算，不能提前要求履約。
+                </p>
+                <div class="mt-auto bg-blue-50 p-4 border-2 border-dashed border-[var(--c-secondary)] rounded-xl">
+                    <span class="font-black text-[var(--c-secondary)] uppercase tracking-widest text-xs">典型代表</span>
+                    <p class="font-black text-[var(--c-dark)]">台指選擇權 (TXO) 、指數型選擇權</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ★ 核心互動：履約權利時間軸 ★ -->
+        <section class="flex flex-col items-center mt-6">
+            <h3 class="text-2xl md:text-4xl font-black mb-8 text-[var(--c-dark)] tracking-wide text-center bg-white px-8 py-3 pop-card inline-block border-dashed">
+                🕹️ 互動實驗：行使權利的時間點
+            </h3>
+            
+            <div class="w-full pop-card bg-[#1E293B] p-6 md:p-12 relative overflow-hidden">
+                <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 20px 20px;"></div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+                    <!-- 左側：視覺展示區 -->
+                    <div class="lg:col-span-4 flex flex-col gap-6">
+                        <!-- 美式狀態 -->
+                        <div id="americanBox" class="pop-card bg-white p-5 border-4 flex flex-col items-center justify-center transition-all duration-300">
+                            <span class="text-sm font-black text-gray-400 uppercase mb-2">美式選擇權</span>
+                            <div class="text-4xl mb-2">🔓</div>
+                            <div class="font-black text-xl text-[var(--c-primary)]" id="americanStatus">隨時可履約</div>
+                        </div>
+                        <!-- 歐式狀態 -->
+                        <div id="europeanBox" class="pop-card bg-gray-200 p-5 border-4 flex flex-col items-center justify-center transition-all duration-300 opacity-60">
+                            <span class="text-sm font-black text-gray-400 uppercase mb-2">歐式選擇權</span>
+                            <div class="text-4xl mb-2">🔒</div>
+                            <div class="font-black text-xl text-gray-500" id="europeanStatus">尚未到期・鎖定中</div>
+                        </div>
+                    </div>
+
+                    <!-- 右側：控制與模擬 -->
+                    <div class="lg:col-span-8 flex flex-col gap-8">
+                        <div class="bg-white p-6 rounded-2xl border-4 border-black shadow-[6px_6px_0_var(--c-accent)]">
+                            <div class="flex justify-between items-end mb-6">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-500 font-black text-xs uppercase tracking-widest">模擬合約存續期間</span>
+                                    <div class="flex items-baseline gap-1">
+                                        <span id="daysNum" class="text-5xl md:text-7xl font-black text-[var(--c-dark)] font-comic">第 1 天</span>
+                                    </div>
+                                </div>
+                                <div id="phaseTag" class="bg-[var(--c-dark)] text-white px-4 py-2 rounded-xl font-black text-sm transform rotate(1deg)">合約初期</div>
+                            </div>
+                            
+                            <!-- 時間拉桿 -->
+                            <input type="range" id="timeSlider" min="1" max="14" step="1" value="1">
+                            
+                            <div class="flex justify-between mt-4 text-[10px] font-black text-gray-400 uppercase tracking-tighter">
+                                <span>剛掛牌 (Day 1)</span>
+                                <span>合約中期</span>
+                                <span class="text-red-500">結算日 (Day 14)</span>
+                            </div>
+                        </div>
+
+                        <!-- 台指選實戰視窗 -->
+                        <div class="bg-[var(--c-dark)] p-6 rounded-2xl relative border-l-8 border-[var(--c-secondary)]">
+                            <h4 class="text-[var(--c-secondary)] font-black text-lg mb-2 flex items-center gap-2">
+                                🇹🇼 歐大實戰筆記：台指期 30,000 點
+                            </h4>
+                            <p id="analysisText" class="text-white font-bold text-sm leading-relaxed">
+                                目前合約剛開始。即使大盤明天噴到 31,000 點，因為 **台指選擇權是「歐式」**，你無法明天就要求領走那 1,000 點價差。你只能等到第 14 天結算，或者在市場上交易平倉。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 一張表秒懂戰力表 -->
+        <section class="w-full">
+            <h3 class="text-2xl md:text-3xl font-black mb-8 text-center font-comic uppercase tracking-widest">📊 Style Comparison Cheat Sheet</h3>
+            <div class="pop-card p-0 overflow-hidden shadow-blue-500/20">
+                <div class="w-full overflow-x-auto">
+                    <table class="w-full text-center border-collapse">
+                        <thead>
+                            <tr class="bg-[var(--c-dark)] text-white">
+                                <th class="py-6 px-6 font-black text-lg border-r border-gray-700">比較項目</th>
+                                <th class="py-6 px-6 font-black text-lg text-[var(--c-primary)] border-r border-gray-700">美式 (American)</th>
+                                <th class="py-6 px-6 font-black text-lg text-[var(--c-secondary)]">歐式 (European)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="font-bold text-sm md:text-base divide-y-4 divide-gray-100">
+                            <tr>
+                                <td class="py-6 px-6 bg-gray-50 text-gray-500 italic">行使權利時間</td>
+                                <td class="py-6 px-6 text-[var(--c-primary)]">隨時 (Anytime)</td>
+                                <td class="py-6 px-6 text-[var(--c-secondary)]">僅限到期日 (Expiry only)</td>
+                            </tr>
+                            <tr class="bg-gray-50/30">
+                                <td class="py-6 px-6 bg-gray-50 text-gray-500 italic">交易彈性</td>
+                                <td class="py-6 px-6">最高，策略靈活</td>
+                                <td class="py-6 px-6">一般，但可透過交易解決</td>
+                            </tr>
+                            <tr>
+                                <td class="py-6 px-6 bg-gray-50 text-gray-500 italic">常見標的</td>
+                                <td class="py-6 px-6">個股股票 (Stocks)</td>
+                                <td class="py-6 px-6 font-black text-[var(--c-dark)]">指數 (Indices) - 如台指選</td>
+                            </tr>
+                            <tr class="bg-yellow-50">
+                                <td class="py-6 px-6 font-black text-orange-600 uppercase italic">歐大總結</td>
+                                <td colspan="2" class="py-8 px-6 text-lg md:text-2xl font-black italic animate-important-flash leading-tight">
+                                    "台指選擇權屬於歐式，不論指數在 30,000 點噴多高，結算前都不能提前要求領錢！但是可以隨時在市場上交易，實現獲利或虧損。"
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="w-full flex justify-center mt-24 pb-16 px-4">
+        <div class="capsule-container py-8 md:py-10 px-6 md:px-12 flex flex-col items-center justify-center">
+            <div class="flex items-center justify-center gap-3 md:gap-5 mb-4">
+                <!-- 圓形 Logo 標籤 -->
+                <div class="w-10 h-10 md:w-14 md:h-14 rounded-full border-2 border-gray-200 overflow-hidden shadow-sm shrink-0 bg-white">
+                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/3B82F6/FFFFFF?text=J&font=Bangers'">
+                </div>
+                <!-- 品牌與名稱 -->
+                <div class="flex items-center">
+                    <span class="text-xl md:text-3xl font-black italic tracking-tight text-[var(--c-dark)] font-comic">JOPTION</span>
+                    <span class="mx-3 md:mx-5 text-gray-300 font-light text-2xl">|</span>
+                    <span class="text-lg md:text-2xl font-bold text-[var(--c-dark)]">歐大選擇權教室</span>
+                </div>
+            </div>
+            <div class="text-center w-full">
+                <p class="text-[10px] md:text-sm text-gray-400 font-bold italic tracking-tight leading-relaxed">
+                    © 2026 Joption Academy - 台指選擇權為歐式結算。投資有風險，操作需謹慎。
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slider = document.getElementById('timeSlider');
+            const daysDisplay = document.getElementById('daysNum');
+            const americanBox = document.getElementById('americanBox');
+            const europeanBox = document.getElementById('europeanBox');
+            const americanStatus = document.getElementById('americanStatus');
+            const europeanStatus = document.getElementById('europeanStatus');
+            const phaseTag = document.getElementById('phaseTag');
+            const analysisText = document.getElementById('analysisText');
+
+            function update() {
+                const day = parseInt(slider.value);
+                daysDisplay.innerText = `第 ${day} 天`;
+
+                if (day < 7) {
+                    phaseTag.innerText = "合約初期";
+                    phaseTag.className = "bg-green-500 text-white px-4 py-2 rounded-xl font-black text-sm transform rotate(1deg)";
+                } else if (day < 14) {
+                    phaseTag.innerText = "合約中期";
+                    phaseTag.className = "bg-orange-500 text-white px-4 py-2 rounded-xl font-black text-sm transform -rotate(1deg)";
+                } else {
+                    phaseTag.innerText = "最終結算日";
+                    phaseTag.className = "bg-red-600 text-white px-4 py-2 rounded-xl font-black text-sm transform rotate(2deg) animate-bounce";
+                }
+
+                americanBox.classList.add('active-american');
+                americanStatus.innerHTML = "🔓 隨時可履約";
+
+                if (day === 14) {
+                    europeanBox.classList.remove('opacity-60', 'bg-gray-200');
+                    europeanBox.classList.add('bg-white', 'border-[var(--c-secondary)]');
+                    europeanBox.style.boxShadow = "8px 8px 0px var(--c-secondary)";
+                    europeanStatus.innerHTML = "🔓 結算日！可履約";
+                    europeanStatus.classList.remove('text-gray-500');
+                    europeanStatus.classList.add('text-[var(--c-secondary)]');
+                    
+                    analysisText.innerHTML = "🏁 **大決算時刻！** 今天是第 14 天。歐式合約終於解鎖。如果目前台指期是在 31,000 點，而你持有 30,000 點的 Call，系統會自動幫你以 1,000 點的差額進行現金結算。";
+                } else {
+                    europeanBox.classList.add('opacity-60', 'bg-gray-200');
+                    europeanBox.classList.remove('bg-white', 'border-[var(--c-secondary)]');
+                    europeanBox.style.boxShadow = "8px 8px 0px var(--c-dark)";
+                    europeanStatus.innerHTML = "🔒 尚未到期・鎖定中";
+                    europeanStatus.classList.add('text-gray-500');
+                    europeanStatus.classList.remove('text-[var(--c-secondary)]');
+
+                    analysisText.innerHTML = `目前是第 ${day} 天。即使大盤站在 30,000 點以上，**歐式選擇權**依然不能提早行使權利。這就是台指選的規則——你必須撐到最後，或者提早透過市場交易結束合約。`;
+                }
+            }
+
+            slider.addEventListener('input', update);
+            update();
+        });
+    </script>
+</body>
+</html>

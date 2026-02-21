@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM! 選擇權新手生存手冊 | 歐大選擇權教室</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 核心普普風色調 */
+        :root {
+            --c-bg: #F8FAFC;
+            --c-yellow: #FFDE03; /* 核心標示 */
+            --c-magenta: #FF0266;/* 危險/警告 */
+            --c-cyan: #03DAC6;   /* 資訊/安全 */
+            --c-blue: #3700B3;   /* 專業/深度 */
+            --c-dark: #000000;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--c-bg);
+            color: var(--c-dark);
+            /* 經典漫畫網點背景 */
+            background-image: radial-gradient(var(--c-dark) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+
+        .font-comic {
+            font-family: 'Bangers', 'Noto Sans TC', cursive;
+            letter-spacing: 0.05em;
+        }
+
+        /* 普普風卡通框線 */
+        .pop-border { border: 4px solid var(--c-dark); border-radius: 1rem; }
+        .pop-shadow { box-shadow: 8px 8px 0px var(--c-dark); transition: all 0.2s; }
+        .pop-shadow:hover { transform: translate(-2px, -2px); box-shadow: 10px 10px 0px var(--c-dark); }
+
+        /* 膠囊容器 */
+        .capsule-container {
+            background: white;
+            border: 4px solid var(--c-dark);
+            border-radius: 9999px;
+            box-shadow: 0 10px 0 var(--c-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* --- 美式漫畫標題板樣式 --- */
+        .comic-header-plate {
+            position: relative;
+            display: inline-block;
+            margin: 2rem 0;
+            z-index: 10;
+        }
+
+        .comic-header-plate::before {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 100%;
+            height: 100%;
+            background: var(--c-magenta);
+            border: 4px solid var(--c-dark);
+            z-index: -1;
+        }
+
+        .plate-box {
+            background: var(--c-yellow);
+            border: 5px solid var(--c-dark);
+            padding: 0.8rem 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 280px;
+        }
+
+        .plate-box h3 {
+            margin: 0;
+            color: var(--c-dark);
+            text-shadow: 2px 2px 0px rgba(255,255,255,0.5);
+            font-style: italic;
+        }
+
+        .action-star {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background: var(--c-accent);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            border: 2px solid var(--c-dark);
+            display: none;
+        }
+        .star-left { left: -50px; }
+        .star-right { right: -50px; }
+
+        /* --- 修正後的數字圓圈標籤 --- */
+        .number-badge {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            width: 50px;
+            height: 50px;
+            background: var(--c-dark);
+            color: white;
+            border: 4px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Bangers', cursive;
+            font-size: 24px;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+            z-index: 30;
+            padding-bottom: 2px; /* 針對 Bangers 字體的微調 */
+        }
+
+        /* 互動拉桿樣式 */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 16px; background: var(--c-dark); border-radius: 10px; border: 2px solid white; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 36px; width: 36px; border-radius: 50%; background: var(--c-magenta); cursor: pointer; margin-top: -12px; border: 4px solid var(--c-dark); box-shadow: 0 4px 0 var(--c-dark); }
+
+        @media (min-width: 1024px) {
+            .action-star { display: block; }
+            .plate-box { min-width: 450px; padding: 1.2rem 4rem; }
+        }
+
+        @media (max-width: 640px) {
+            .pop-border { border-width: 3px; }
+            .header-capsule { padding: 0.8rem 1rem; }
+            .plate-box { padding: 0.6rem 1.5rem; min-width: 220px; border-width: 4px; }
+            .comic-header-plate::before { top: 6px; left: 6px; border-width: 3px; }
+            .number-badge { width: 40px; height: 40px; font-size: 20px; top: -15px; left: -15px; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4 sm:p-8 overflow-x-hidden">
+
+    <!-- 頁首 -->
+    <header class="w-full flex justify-center mb-16">
+        <div class="capsule-container header-capsule py-4 md:py-5 px-6 md:px-12 flex flex-row items-center justify-center">
+            <div class="flex items-center justify-center gap-4 md:gap-5">
+                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl border-4 border-[var(--c-dark)] overflow-hidden bg-white shrink-0 shadow-sm">
+                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/FFDE03/000000?text=J&font=Bangers'">
+                </div>
+                <div class="flex flex-col">
+                    <h1 class="text-2xl md:text-4xl font-black text-[var(--c-dark)] leading-tight tracking-tight text-left">歐大選擇權教室</h1>
+                    <p class="text-[10px] md:text-xs font-black text-[var(--c-magenta)] tracking-[0.15em] uppercase mt-0.5 font-comic italic text-left">NEWBIE SURVIVAL HANDBOOK</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-6xl flex flex-col gap-16 md:gap-24">
+        
+        <!-- 大標題看板 -->
+        <div class="text-center relative">
+            <div class="inline-block bg-[var(--c-yellow)] px-8 py-6 pop-border pop-shadow transform -rotate-1 relative max-w-full">
+                <div class="absolute -top-10 -right-10 text-8xl opacity-10 font-black font-comic">30000</div>
+                <h2 class="text-4xl sm:text-6xl md:text-8xl font-black text-[var(--c-dark)] tracking-wide font-comic uppercase text-shadow-sm">
+                    Survival Handbook
+                </h2>
+                <div class="mt-4 text-xl md:text-3xl font-black text-white bg-[var(--c-magenta)] px-6 py-2 inline-block rounded-xl border-4 border-black shadow-[6px_6px_0_#000]">
+                    新手生存手冊 — 30 個必懂知識
+                </div>
+            </div>
+        </div>
+
+        <!-- 一、交易時間區域 -->
+        <section class="flex flex-col items-center">
+            <div class="comic-header-plate">
+                <div class="action-star star-left"></div>
+                <div class="plate-box">
+                    <h3 class="text-2xl md:text-5xl font-black font-comic">CHAPTER 1: TRADING TIME</h3>
+                </div>
+                <div class="action-star star-right"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 w-full mt-6">
+                <!-- 修正 1：移除 overflow-hidden -->
+                <div class="pop-card pop-border pop-shadow bg-white p-6 pt-8 relative overflow-visible">
+                    <div class="number-badge">1</div>
+                    <h4 class="text-xl font-black mb-4 mt-2">日盤開盤與收盤</h4>
+                    <p class="text-3xl font-black text-[var(--c-blue)] font-comic">08:45 ~ 13:45</p>
+                    <p class="text-sm font-bold text-gray-500 mt-2">比台股早開 15 分鐘，晚收 15 分鐘。</p>
+                </div>
+                <div class="pop-card pop-border pop-shadow bg-[var(--c-dark)] text-white p-6 pt-8 relative overflow-visible">
+                    <div class="number-badge" style="background:var(--c-magenta)">2</div>
+                    <h4 class="text-xl font-black mb-4 mt-2 text-[var(--c-cyan)]">夜盤不夜城</h4>
+                    <p class="text-3xl font-black text-white font-comic">15:00 ~ 05:00</p>
+                    <p class="text-sm font-bold text-gray-400 mt-2">隔日清晨收盤。無午休，美股動盪時極易跳空。</p>
+                </div>
+                <div class="pop-card pop-border pop-shadow bg-white p-6 pt-8 relative overflow-visible">
+                    <div class="number-badge">3</div>
+                    <h4 class="text-xl font-black mb-4 mt-2 text-[var(--c-magenta)]">結算日生死戰</h4>
+                    <p class="text-3xl font-black text-[var(--c-dark)] font-comic">13:30 截止</p>
+                    <p class="text-sm font-bold text-gray-600 mt-2">結算價採 **13:00~13:30 大盤加權指數平均值**，最後一分鐘拉抬沒效！</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 二、結算制度區域 -->
+        <section class="flex flex-col items-center">
+            <div class="comic-header-plate">
+                <div class="action-star star-left" style="background:var(--c-cyan)"></div>
+                <div class="plate-box" style="background:var(--c-cyan)">
+                    <h3 class="text-2xl md:text-5xl font-black font-comic">CHAPTER 2: SETTLEMENT</h3>
+                </div>
+                <div class="action-star star-right" style="background:var(--c-cyan)"></div>
+            </div>
+            
+            <div class="w-full pop-card pop-border pop-shadow bg-white p-6 md:p-10">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="flex flex-col gap-2 p-4 bg-gray-50 rounded-xl border-2 border-black">
+                        <span class="font-black text-xs text-gray-400 uppercase tracking-widest">4. 類型</span>
+                        <span class="text-2xl font-black">歐式選擇權</span>
+                        <span class="text-xs font-bold text-gray-500 italic">不能提前履約，只能到期自動結算。</span>
+                    </div>
+                    <div class="flex flex-col gap-2 p-4 bg-[var(--c-cyan)]/20 rounded-xl border-2 border-black">
+                        <span class="font-black text-xs text-gray-600 uppercase tracking-widest">5. 結算日</span>
+                        <span class="text-2xl font-black">週三 & 週五</span>
+                        <span class="text-xs font-bold text-gray-700 italic">**一週結算兩次**，每週三、週五都是生死戰！(遇假日提前)</span>
+                    </div>
+                    <div class="flex flex-col gap-2 p-4 bg-gray-50 rounded-xl border-2 border-black">
+                        <span class="font-black text-xs text-gray-400 uppercase tracking-widest">6. 到期</span>
+                        <span class="text-2xl font-black text-[var(--c-magenta)]">價內結算</span>
+                        <span class="text-xs font-bold text-gray-500 italic">自動現金結算差額，不需實物券。</span>
+                    </div>
+                    <div class="flex flex-col gap-2 p-4 bg-[var(--c-magenta)] text-white rounded-xl border-2 border-black">
+                        <span class="font-black text-xs text-white/60 uppercase tracking-widest">7. 結局</span>
+                        <span class="text-2xl font-black font-comic">ZERO 歸零</span>
+                        <span class="text-xs font-bold text-white/80 italic">價外權利金直接變 0 元，淪為廢紙。</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 三、金額計算區域 -->
+        <section class="flex flex-col items-center">
+            <div class="comic-header-plate">
+                <div class="action-star star-left" style="background:var(--c-magenta)"></div>
+                <div class="plate-box" style="background:var(--c-magenta)">
+                    <h3 class="text-2xl md:text-5xl font-black font-comic text-white">CHAPTER 3: CALCULATION</h3>
+                </div>
+                <div class="action-star star-right" style="background:var(--c-magenta)"></div>
+            </div>
+            
+            <div class="w-full pop-card pop-border pop-shadow bg-[#1E293B] p-8 md:p-12 text-white relative overflow-hidden">
+                <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 20px 20px;"></div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+                    <div class="flex flex-col gap-6">
+                        <h4 class="text-3xl font-black text-[var(--c-yellow)] tracking-widest font-comic uppercase">💰 Money Calculator</h4>
+                        <p class="text-lg font-bold text-gray-400">輸入權利金點數，換算你的真實成本！</p>
+                        
+                        <div class="bg-gray-800 p-6 rounded-2xl border-4 border-black">
+                            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">8 & 9. 權利金點數輸入</label>
+                            <div class="flex items-center gap-4">
+                                <input type="number" id="ptsInput" value="100" class="flex-1 bg-transparent text-5xl font-black font-comic text-[var(--c-cyan)] outline-none border-b-4 border-[var(--c-cyan)] pb-2">
+                                <span class="text-xl font-bold">點</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between bg-white/5 p-4 rounded-xl border-2 border-white/10">
+                            <span class="font-black text-sm uppercase tracking-widest text-gray-400">10. 最小跳動</span>
+                            <span class="font-comic text-2xl text-[var(--c-yellow)]">1 點 ($50)</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-[var(--c-yellow)] pop-border p-8 text-[var(--c-dark)] flex flex-col items-center justify-center transform rotate-2 shadow-[12px_12px_0_var(--c-magenta)]">
+                        <span class="text-sm font-black uppercase tracking-widest opacity-60">實際台幣成本</span>
+                        <div id="ntdResult" class="text-6xl md:text-8xl font-black font-comic">$5,000</div>
+                        <div class="mt-4 px-4 py-1 bg-black text-white text-xs font-black rounded-full uppercase tracking-tighter">1 Point = 50 TWD</div>
+                        
+                        <div class="mt-8 pt-6 border-t-4 border-black/10 w-full text-center">
+                            <p class="text-sm font-bold">當前台指行情 (30,000點)</p>
+                            <p class="text-sm font-bold text-gray-500 mt-1 italic">注意！高檔盤勢波點位波動非常劇烈。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 四 & 五：風險看板 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-10 w-full">
+            <div class="pop-card pop-border pop-shadow bg-white p-8 border-t-[16px] border-t-[var(--c-magenta)] relative overflow-visible">
+                <div class="number-badge" style="top: -25px; left: -10px; width: 60px; height: 35px; border-radius: 8px;">11~15</div>
+                <h3 class="text-2xl font-black mb-6 flex items-center gap-3">🪪 保證金生存戰</h3>
+                <ul class="space-y-4 font-bold text-gray-700">
+                    <li class="flex items-start gap-3"><span class="text-[var(--c-magenta)]">✔</span> 買方：不用保證金，風險僅限權利金。</li>
+                    <li class="flex items-start gap-3"><span class="text-[var(--c-magenta)]">✔</span> 賣方：需保證金，且波動大時會調高。</li>
+                    <li class="flex items-start gap-3"><span class="text-[var(--c-magenta)] text-xl">⚠</span> 追繳與斷頭：資金不足會被追繳，不補錢券商會直接「斷頭」強制平倉。</li>
+                </ul>
+            </div>
+            <div class="pop-card pop-border pop-shadow bg-white p-8 border-t-[16px] border-t-[var(--c-dark)] relative overflow-visible">
+                <div class="number-badge" style="top: -25px; left: -10px; width: 60px; height: 35px; border-radius: 8px; background: #475569;">16~18</div>
+                <h3 class="text-2xl font-black mb-6 flex items-center gap-3">⚡ 漲跌停與跳空</h3>
+                <ul class="space-y-4 font-bold text-gray-700">
+                    <li class="flex items-start gap-3"><span class="text-[var(--c-magenta)]">✔</span> 台指期：限制 ±10% 漲跌幅。</li>
+                    <li class="flex items-start gap-3"><span class="text-[var(--c-magenta)]">✔</span> 選擇權：無漲跌停，價格變動極具爆發力。</li>
+                    <li class="flex items-start gap-3"><span class="text-[var(--c-magenta)] text-xl">⚠</span> 夜盤跳空：美股暴跌時常發生，權利金會瞬間翻倍或腰斬。</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 六 ~ 八：進階常識 -->
+        <section class="flex flex-col items-center">
+            <div class="comic-header-plate">
+                <div class="action-star star-left" style="background:var(--c-blue)"></div>
+                <div class="plate-box" style="background:var(--c-blue)">
+                    <h3 class="text-2xl md:text-5xl font-black font-comic text-white">CHAPTER 4: TRADING KNOWLEDGE</h3>
+                </div>
+                <div class="action-star star-right" style="background:var(--c-blue)"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+                <div class="pop-card pop-border p-6 bg-pink-50 border-2 border-dashed border-[var(--c-magenta)]">
+                    <h4 class="font-black text-lg text-[var(--c-magenta)] mb-2 italic text-shadow-sm">19-20. 週選 vs 月選</h4>
+                    <p class="text-sm font-bold text-gray-600">週選衰減極快，專攻波段。月選較穩，適合中長線佈局。</p>
+                </div>
+                <div class="pop-card pop-border p-6 bg-cyan-50 border-2 border-dashed border-cyan-400">
+                    <h4 class="font-black text-lg text-cyan-600 mb-2 italic text-shadow-sm">21-22. 流動性陷阱</h4>
+                    <p class="text-sm font-bold text-gray-600">遠價外不好成交。價差大代表冷門，容易吃豆腐滑價。</p>
+                </div>
+                <div class="pop-card pop-border p-6 bg-yellow-50 border-2 border-dashed border-yellow-500">
+                    <h4 class="font-black text-lg text-orange-600 mb-2 italic text-shadow-sm">23-24. 波動率 IV</h4>
+                    <p class="text-sm font-bold text-gray-600">IV 高權利金貴。重大事件後 IV Crush 崩盤會讓買方雙殺。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 九：新手常見誤區 -->
+        <section class="flex flex-col items-center">
+            <div class="comic-header-plate">
+                <div class="action-star star-left" style="background:black"></div>
+                <div class="plate-box" style="background:black">
+                    <h3 class="text-2xl md:text-5xl font-black font-comic text-white uppercase text-shadow-sm">THE NEWBIE TRAP</h3>
+                </div>
+                <div class="action-star star-right" style="background:black"></div>
+            </div>
+
+            <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="pop-card pop-border p-8 bg-[var(--c-magenta)] text-white flex flex-col justify-center items-center text-center relative overflow-visible">
+                    <div class="absolute -top-10 -right-6 text-7xl transform rotate-12">💀</div>
+                    <h4 class="text-2xl font-black mb-4">為什麼新手死在第三週？</h4>
+                    <p class="text-base font-bold text-white/90 leading-relaxed">
+                        30. 這是規律！新手在前兩週賺到了錢，會開始**「放大部位」**，自以為看穿規律卻**「忘記風險」**。一旦結算週 Gamma 風暴來襲，一次爆虧就能吐回整個月獲利。
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="pop-card pop-border p-4 bg-white flex items-center gap-4 hover:bg-red-50">
+                        <span class="text-2xl">💣</span>
+                        <p class="text-sm font-bold">25. 價外不代表安全，單邊行情照樣秒殺賣方。</p>
+                    </div>
+                    <div class="pop-card pop-border p-4 bg-white flex items-center gap-4 hover:bg-red-50">
+                        <span class="text-2xl">💣</span>
+                        <p class="text-sm font-bold">26. 勝率高不等於賺錢，盈虧比才是獲利關鍵。</p>
+                    </div>
+                    <div class="pop-card pop-border p-4 bg-white flex items-center gap-4 hover:bg-red-50">
+                        <span class="text-2xl">💣</span>
+                        <p class="text-sm font-bold">27. 到期前才最危險，Gamma 加速度會讓人暴死。</p>
+                    </div>
+                    <div class="pop-card pop-border p-4 bg-white flex items-center gap-4 hover:bg-red-50">
+                        <span class="text-2xl">💣</span>
+                        <p class="text-sm font-bold">28 & 29. 只有盤整盤賣方才賺時間。一週結算兩次壓力極大。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="w-full flex justify-center mt-24 pb-16 px-4">
+        <div class="capsule-container py-8 md:py-10 px-6 md:px-12 flex flex-col items-center justify-center">
+            
+            <div class="flex items-center justify-center gap-3 md:gap-5 mb-4">
+                <div class="w-10 h-10 md:w-14 md:h-14 rounded-full border-2 border-gray-200 overflow-hidden shadow-sm shrink-0 bg-white">
+                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/000000/FFFFFF?text=J&font=Bangers'">
+                </div>
+                <div class="flex items-center">
+                    <span class="text-xl md:text-3xl font-black italic tracking-tight text-[var(--c-dark)] font-comic">JOPTION</span>
+                    <span class="mx-3 md:mx-5 text-gray-300 font-light text-2xl">|</span>
+                    <span class="text-lg md:text-2xl font-bold text-[var(--c-dark)]">歐大選擇權教室</span>
+                </div>
+            </div>
+            
+            <div class="text-center w-full">
+                <p class="text-[10px] md:text-sm text-gray-400 font-bold italic tracking-tight leading-relaxed">
+                    © 2026 Joption Academy - 新手生存手冊 30 條規律。投資有風險，操作需謹慎。
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 互動邏輯 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ptsInput = document.getElementById('ptsInput');
+            const ntdResult = document.getElementById('ntdResult');
+
+            function updateMoney() {
+                const pts = parseFloat(ptsInput.value) || 0;
+                const ntd = pts * 50;
+                ntdResult.innerText = `$${ntd.toLocaleString()}`;
+            }
+
+            ptsInput.addEventListener('input', updateMoney);
+            updateMoney();
+        });
+    </script>
+</body>
+</html>

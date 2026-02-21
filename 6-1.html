@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM! 保證金計算完全圖解 | 歐大選擇權教室</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 重工業普普風專屬色調 */
+        :root {
+            --c-bg: #F1F5F9;
+            --c-primary: #EAB308; /* 工業黃 (保證金/金錢) */
+            --c-secondary: #06B6D4; /* 科技青 (公式/邏輯) */
+            --c-accent: #F43F5E; /* 警告紅 (風險) */
+            --c-dark: #0F172A;
+            --c-halftone: #CBD5E1;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--c-bg);
+            color: var(--c-dark);
+            /* 漫畫半色調網格背景 */
+            background-image: radial-gradient(var(--c-halftone) 2px, transparent 2px);
+            background-size: 28px 28px;
+        }
+
+        .font-comic {
+            font-family: 'Bangers', 'Noto Sans TC', cursive;
+            letter-spacing: 0.05em;
+        }
+
+        /* 普普風卡通框線與深度陰影 */
+        .pop-card {
+            border: 5px solid var(--c-dark);
+            border-radius: 1.5rem;
+            background-color: white;
+            box-shadow: 10px 10px 0px var(--c-dark);
+            transition: all 0.2s ease;
+        }
+
+        /* 膠囊容器 */
+        .capsule-container {
+            background: white;
+            border: 4px solid var(--c-dark);
+            border-radius: 9999px;
+            box-shadow: 0 10px 0 var(--c-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* 按鈕樣式 */
+        .strategy-btn {
+            border: 4px solid var(--c-dark);
+            transition: all 0.1s;
+            cursor: pointer;
+            box-shadow: 0 5px 0 var(--c-dark);
+        }
+        .strategy-btn:active, .strategy-btn.active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 var(--c-dark);
+            background-color: var(--c-primary);
+            color: var(--c-dark) !important;
+        }
+
+        @keyframes rotate-gear {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .gear-spin { animation: rotate-gear 10s linear infinite; }
+
+        @media (max-width: 640px) {
+            .pop-card { border-width: 4px; box-shadow: 7px 7px 0px var(--c-dark); }
+            .header-capsule { padding: 0.8rem 1rem; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4 sm:p-8 overflow-x-hidden w-full">
+
+    <!-- 頁首 -->
+    <header class="w-full flex justify-center mb-12">
+        <div class="capsule-container header-capsule py-4 md:py-5 px-6 md:px-12 flex flex-row items-center justify-center">
+            <div class="flex items-center justify-center gap-4 md:gap-5">
+                <!-- Logo -->
+                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl border-4 border-[var(--c-dark)] overflow-hidden bg-white shrink-0 shadow-sm">
+                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/EAB308/FFFFFF?text=J&font=Bangers'">
+                </div>
+                <!-- 標題 -->
+                <div class="flex flex-col">
+                    <h1 class="text-2xl md:text-4xl font-black text-[var(--c-dark)] leading-tight tracking-tight text-left">歐大選擇權教室</h1>
+                    <p class="text-[10px] md:text-xs font-black text-[var(--c-primary)] tracking-[0.15em] uppercase mt-0.5 font-comic italic text-left">
+                        MARGIN CALCULATION MASTER
+                    </p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-6xl flex-grow flex flex-col gap-12">
+        
+        <!-- 大標題看板 -->
+        <div class="text-center relative">
+            <div class="inline-block bg-[var(--c-primary)] px-8 py-5 pop-card transform -rotate-1 relative max-w-full">
+                <div class="absolute -top-10 -right-10 text-7xl md:text-9xl transform rotate-12 gear-spin opacity-20">⚙️</div>
+                <h2 class="text-4xl sm:text-7xl md:text-8xl font-black text-[var(--c-dark)] tracking-wide font-comic uppercase">
+                    Margin Calculator
+                </h2>
+                <div class="mt-2 text-xl md:text-3xl font-black text-white bg-[var(--c-dark)] px-6 py-2 inline-block rounded-xl">
+                    台指選擇權：保證金計算大解析
+                </div>
+            </div>
+        </div>
+
+        <!-- 基礎邏輯與三大指標 (更新 2025 A/B/C 值) -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+            <div class="pop-card p-6 bg-white flex flex-col items-center text-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-[var(--c-primary)] text-white px-3 py-1 font-black text-[10px] uppercase italic">2025 New</div>
+                <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center text-3xl mb-4 border-2 border-black">A</div>
+                <h3 class="font-black text-xl mb-2">原始保證金 (A值)</h3>
+                <p class="text-sm font-bold text-gray-500 italic">目前公告：約 <strong class="text-[var(--c-dark)]">$86,000</strong> 元</p>
+                <p class="text-[10px] text-gray-400 mt-2 font-bold leading-tight text-center">下單時帳戶必須擁有的基本門檻金。</p>
+            </div>
+            <div class="pop-card p-6 bg-white flex flex-col items-center text-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-[var(--c-secondary)] text-white px-3 py-1 font-black text-[10px] uppercase italic">2025 New</div>
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-3xl mb-4 border-2 border-black">B</div>
+                <h3 class="font-black text-xl mb-2">最低保證金 (B值)</h3>
+                <p class="text-sm font-bold text-gray-500 italic">目前公告：約 <strong class="text-[var(--c-dark)]">$43,000</strong> 元</p>
+                <p class="text-[10px] text-gray-400 mt-2 font-bold leading-tight text-center">風險底線。若權益數跌破此處將面臨追繳。</p>
+            </div>
+            <div class="pop-card p-6 bg-white flex flex-col items-center text-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-[var(--c-accent)] text-white px-3 py-1 font-black text-[10px] uppercase italic">2025 New</div>
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-3xl mb-4 border-2 border-black">C</div>
+                <h3 class="font-black text-xl mb-2">混合部位 (C值)</h3>
+                <p class="text-sm font-bold text-gray-500 italic">目前公告：約 <strong class="text-[var(--c-dark)]">$8,600</strong> 元</p>
+                <p class="text-[10px] text-gray-400 mt-2 font-bold leading-tight text-center">用於組合部位的風險折抵基準。</p>
+            </div>
+        </section>
+
+        <!-- ★ 核心互動：策略保證金組裝機 ★ -->
+        <section class="flex flex-col items-center mt-6">
+            <h3 class="text-2xl md:text-4xl font-black mb-8 text-[var(--c-dark)] tracking-wide text-center bg-white px-8 py-3 pop-card inline-block border-dashed">
+                🏗️ 互動實驗：策略組合與資金需求
+            </h3>
+            
+            <div class="w-full pop-card bg-[#1E293B] p-6 md:p-12 relative overflow-hidden">
+                <!-- 裝飾網格 -->
+                <div class="absolute inset-0 opacity-10" style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 50px 50px;"></div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start relative z-10">
+                    
+                    <!-- 左側：策略選擇器 -->
+                    <div class="lg:col-span-4 flex flex-col gap-4">
+                        <div class="bg-white/10 p-4 rounded-2xl border-2 border-white/20">
+                            <span class="text-white font-black text-xs uppercase tracking-widest block mb-4">Step 1. 選擇策略類型</span>
+                            <div class="grid grid-cols-1 gap-3">
+                                <button onclick="selectStrategy('single')" id="btn-single" class="strategy-btn active bg-white text-[var(--c-dark)] py-3 px-4 rounded-xl font-black text-left flex justify-between">
+                                    <span>🏹 單式賣方 (Sell)</span>
+                                    <span class="text-xs opacity-50">門檻最高</span>
+                                </button>
+                                <button onclick="selectStrategy('spread')" id="btn-spread" class="strategy-btn bg-white/10 text-white py-3 px-4 rounded-xl font-black text-left flex justify-between">
+                                    <span>🪜 價差組合 (Spread)</span>
+                                    <span class="text-xs opacity-50">最高效率</span>
+                                </button>
+                                <button onclick="selectStrategy('straddle')" id="btn-straddle" class="strategy-btn bg-white/10 text-white py-3 px-4 rounded-xl font-black text-left flex justify-between">
+                                    <span>⚖️ 跨式/勒式 (Dual)</span>
+                                    <span class="text-xs opacity-50">雙邊盤整</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 參數調整區域 -->
+                        <div class="bg-white p-6 rounded-2xl border-4 border-black shadow-[4px_4px_0_var(--c-primary)]">
+                            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-4 text-left">Step 2. 模擬大盤距離 (OTM)</label>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-bold text-gray-400">目前價外距離</span>
+                                <span id="otmDisplay" class="text-2xl font-black font-comic text-[var(--c-accent)]">200 點</span>
+                            </div>
+                            <input type="range" id="otmSlider" min="0" max="1000" step="50" value="200" class="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                            <p class="text-[10px] text-gray-400 font-bold mt-4 leading-tight italic text-left">
+                                * 在台指 30,000 點環境下，距離越遠保證金會遞減。目前的 A 值基準已調整為 $86,000。
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 右側：計算結果與視覺化 -->
+                    <div class="lg:col-span-8 flex flex-col gap-6">
+                        <!-- 公式顯示板 (調整：字小、不換行) -->
+                        <div class="bg-[var(--c-dark)] p-6 rounded-2xl border-l-8 border-[var(--c-primary)] text-white overflow-hidden">
+                            <h4 class="text-[var(--c-primary)] font-black text-[10px] md:text-xs uppercase mb-2 tracking-tighter italic text-left">最新計算公式 (Calculation Formula):</h4>
+                            <div id="formulaText" class="text-sm sm:text-base md:text-lg lg:text-xl font-black tracking-wide whitespace-nowrap overflow-x-auto text-left py-1 scrollbar-hide">
+                                保證金 = 權利金市值 + 較大值(A值 - 價外值, B值)
+                            </div>
+                        </div>
+
+                        <!-- 核心金額顯示 -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="pop-card bg-[var(--c-primary)] p-8 flex flex-col items-center justify-center transform rotate-1">
+                                <span class="text-xs font-black text-[var(--c-dark)] uppercase tracking-widest mb-2 opacity-60">預估保證金總額</span>
+                                <div id="totalMargin" class="text-5xl md:text-6xl font-black text-[var(--c-dark)] font-comic">$81,000</div>
+                                <div class="mt-4 bg-white/30 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">2025 Current Rate</div>
+                            </div>
+
+                            <div class="pop-card bg-white p-6 flex flex-col justify-center">
+                                <span class="text-gray-400 font-black text-xs uppercase mb-4 block text-left">💰 資金效率分析</span>
+                                <div class="space-y-4 text-left">
+                                    <div>
+                                        <div class="flex justify-between text-xs font-black mb-1 uppercase">
+                                            <span>資金使用效率</span>
+                                            <span id="leverageVal">約 18%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-100 h-4 rounded-full border-2 border-[var(--c-dark)] overflow-hidden">
+                                            <div id="leverageBar" class="h-full bg-[var(--c-secondary)] transition-all duration-500" style="width: 18%;"></div>
+                                        </div>
+                                    </div>
+                                    <div id="efficiencyTag" class="bg-[var(--c-dark)] text-[var(--c-primary)] px-4 py-2 rounded-xl text-center font-black italic text-sm">
+                                        「重裝策略：防禦力高，但資金佔用大」
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 歐大實戰解讀 -->
+                        <div class="bg-blue-50 p-5 rounded-2xl border-2 border-blue-200 shadow-inner">
+                            <p id="analysisText" class="text-blue-900 font-bold text-sm leading-relaxed text-left">
+                                目前大盤在 30,000 點。單式賣出 30200 Call (OTM 200)，你的保證金計算為：$5,000(權利金) + $86,000(A值) - $10,000(200點×50)，總共約 $81,000。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 四大策略保證金特性表 (更新數據) -->
+        <section class="w-full">
+            <h3 class="text-2xl md:text-3xl font-black mb-8 text-center font-comic uppercase tracking-widest">📊 Strategy Margin Matrix (2025 Edition)</h3>
+            <div class="pop-card p-0 overflow-hidden shadow-blue-500/20">
+                <div class="w-full overflow-x-auto">
+                    <table class="w-full text-center border-collapse">
+                        <thead>
+                            <tr class="bg-[var(--c-dark)] text-white">
+                                <th class="py-6 px-6 font-black text-lg">策略名稱</th>
+                                <th class="py-6 px-6 font-black text-lg border-x border-gray-700">計算基準 (A/B/C)</th>
+                                <th class="py-6 px-6 font-black text-lg">小資族建議</th>
+                            </tr>
+                        </thead>
+                        <tbody class="font-bold text-sm md:text-base divide-y-4 divide-gray-100">
+                            <tr>
+                                <td class="py-6 px-6 bg-gray-50 text-[var(--c-dark)]">單式賣方 (Naked Sell)</td>
+                                <td class="py-6 px-6 text-left pl-12 italic text-gray-500">
+                                    全額 A 值基數 ($86,000)<br>隨盤勢變動
+                                </td>
+                                <td class="py-6 px-6 text-red-500">🔴 需厚實本金，防範追繳</td>
+                            </tr>
+                            <tr class="bg-blue-50/30">
+                                <td class="py-6 px-6 italic text-[var(--c-secondary)]">價差組合 (Vertical Spread)</td>
+                                <td class="py-6 px-6 font-black text-left pl-12">
+                                    僅需「價差點數 × 50」<br>最高不超過價差值
+                                </td>
+                                <td class="py-6 px-6 text-[var(--c-success)] text-xl text-center">🟢 小資首選，資金最靈活</td>
+                            </tr>
+                            <tr>
+                                <td class="py-6 px-6 bg-gray-50 text-[var(--c-dark)]">跨式/勒式 (Strangle)</td>
+                                <td class="py-6 px-6 text-left pl-12 text-gray-500">
+                                    較大邊保證金 + 另邊權利金<br>雙邊收租
+                                </td>
+                                <td class="py-6 px-6 text-orange-500">🟡 中等難度，需控風險</td>
+                            </tr>
+                            <tr class="bg-yellow-50">
+                                <td class="py-6 px-6 font-black text-orange-600 uppercase italic">歐大金律</td>
+                                <td colspan="2" class="py-6 px-6 text-lg font-black italic text-center">
+                                    "隨著 A 值提高到 $86,000，賣方單式壓力變大。想穩健收租，價差策略是目前最好的資金效率解！"
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="w-full flex justify-center mt-20 pb-16 px-4">
+        <div class="capsule-container py-8 md:py-10 px-6 md:px-12 flex flex-col items-center justify-center">
+            <div class="flex items-center justify-center gap-3 md:gap-5 mb-4">
+                <div class="w-10 h-10 md:w-14 md:h-14 rounded-full border-2 border-gray-200 overflow-hidden shadow-sm shrink-0 bg-white">
+                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/EAB308/000000?text=J&font=Bangers'">
+                </div>
+                <div class="flex items-center">
+                    <span class="text-xl md:text-3xl font-black italic tracking-tight text-[var(--c-dark)] font-comic">JOPTION</span>
+                    <span class="mx-3 md:mx-5 text-gray-300 font-light text-2xl">|</span>
+                    <span class="text-lg md:text-2xl font-bold text-[var(--c-dark)]">歐大選擇權教室</span>
+                </div>
+            </div>
+            <div class="text-center w-full">
+                <p class="text-[10px] md:text-sm text-gray-400 font-bold italic tracking-tight leading-relaxed text-center">
+                    © 2026 Joption Academy - 數據參考 2025 年期交所最新標準 (A:86,000 / B:43,000 / C:8,600)。投資有風險。
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let currentStrategy = 'single';
+        const otmSlider = document.getElementById('otmSlider');
+        const otmDisplay = document.getElementById('otmDisplay');
+        const formulaText = document.getElementById('formulaText');
+        const totalMargin = document.getElementById('totalMargin');
+        const leverageVal = document.getElementById('leverageVal');
+        const leverageBar = document.getElementById('leverageBar');
+        const efficiencyTag = document.getElementById('efficiencyTag');
+        const analysisText = document.getElementById('analysisText');
+
+        // --- 更新為 2025 年最新台指選擇權 A/B 值 ---
+        const A_VAL = 86000;
+        const B_VAL = 43000;
+        const INDEX_VAL = 30000;
+
+        function selectStrategy(type) {
+            currentStrategy = type;
+            document.querySelectorAll('.strategy-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-white', 'text-[var(--c-dark)]');
+                btn.classList.add('bg-white/10', 'text-white');
+            });
+            const activeBtn = document.getElementById(`btn-${type}`);
+            activeBtn.classList.add('active', 'bg-white', 'text-[var(--c-dark)]');
+            activeBtn.classList.remove('bg-white/10', 'text-white');
+            
+            // 更新拉桿限制
+            if (type === 'spread') {
+                otmSlider.max = 500;
+                otmSlider.value = 200;
+            } else {
+                otmSlider.max = 1000;
+            }
+            
+            update();
+        }
+
+        function update() {
+            const otm = parseInt(otmSlider.value);
+            otmDisplay.innerText = otm + " 點";
+            
+            let margin = 0;
+            let efficiency = 0;
+            let formula = "";
+            let analysis = "";
+            
+            const premiumPts = Math.max(10, 200 - (otm * 0.15)); 
+            const current_premium_ntd = premiumPts * 50;
+
+            switch(currentStrategy) {
+                case 'single':
+                    const variablePart = Math.max(A_VAL - (otm * 50), B_VAL);
+                    margin = current_premium_ntd + variablePart;
+                    formula = "保證金 = 權利金市值 + 較大值(A值 - 價外值, B值)";
+                    efficiency = 18;
+                    efficiencyTag.innerText = "「重裝策略：防禦力高，但單口資金需求顯著增加」";
+                    analysis = `當大盤 30,000，賣出 1 口價外 ${otm} 點。權利金市值約 $${Math.round(current_premium_ntd).toLocaleString()}，總保證金需求為 $${Math.round(margin).toLocaleString()}。`;
+                    break;
+                    
+                case 'spread':
+                    margin = otm * 50; 
+                    formula = "保證金 = 價差點數 × 50 (鎖定最大風險)";
+                    efficiency = 92;
+                    efficiencyTag.innerText = "「精簡策略：在 A 值提高的環境下，價差策略更顯效率」";
+                    analysis = `做一個 ${otm} 點價差策略。你只需支付 $${margin.toLocaleString()}，資金效率是單式的 10 倍以上！`;
+                    break;
+                    
+                case 'straddle':
+                    const sideAMargin = current_premium_ntd + Math.max(A_VAL - (otm * 50), B_VAL);
+                    margin = sideAMargin + current_premium_ntd;
+                    formula = "保證金 = 較大值(A側保證金 + B側權利金)";
+                    efficiency = 32;
+                    efficiencyTag.innerText = "「雙向策略：收兩邊租金，保證金僅收較大一邊，效率尚可」";
+                    analysis = `同時賣出 買權 與 賣權。由於單向受損，交易所只收風險較大一邊的保證金。目前總需 $${Math.round(margin).toLocaleString()}。`;
+                    break;
+            }
+
+            totalMargin.innerText = "$" + Math.round(margin).toLocaleString();
+            leverageBar.style.width = efficiency + "%";
+            leverageVal.innerText = `效率指數: ${efficiency}%`;
+            formulaText.innerText = formula;
+            analysisText.innerHTML = analysis;
+        }
+
+        otmSlider.addEventListener('input', update);
+        
+        // 初始啟動
+        selectStrategy('single');
+    </script>
+</body>
+</html>

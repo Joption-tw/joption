@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM! 新手必看 10 個地雷 | 歐大選擇權教室</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 地雷爆發普普風專屬色調 */
+        :root {
+            --c-bg: #FAF9F6;
+            --c-primary: #FF007F; /* 桃紅 (爆炸) */
+            --c-secondary: #00D2FF; /* 電光藍 */
+            --c-accent: #FFD700; /* 警示黃 */
+            --c-dark: #0F172A;
+            --c-halftone: #CBD5E1;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--c-bg);
+            color: var(--c-dark);
+            /* 漫畫半色調背景 */
+            background-image: radial-gradient(var(--c-halftone) 2px, transparent 2px);
+            background-size: 28px 28px;
+        }
+
+        .font-comic {
+            font-family: 'Bangers', 'Noto Sans TC', cursive;
+            letter-spacing: 0.05em;
+        }
+
+        /* 普普風卡通框線 */
+        .pop-card {
+            border: 4px solid var(--c-dark);
+            border-radius: 1.5rem;
+            background-color: white;
+            box-shadow: 10px 10px 0px var(--c-dark);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .pop-card:hover {
+            transform: scale(1.02) rotate(1deg);
+            box-shadow: 15px 15px 0px var(--c-primary);
+        }
+
+        /* 膠囊容器 */
+        .capsule-container {
+            background: white;
+            border: 4px solid var(--c-dark);
+            border-radius: 9999px;
+            box-shadow: 0 10px 0 var(--c-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* 爆炸動畫 */
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; filter: brightness(1.5); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-explode:active {
+            animation: explode 0.3s ease-out;
+        }
+
+        /* 霓虹閃爍 (高危險地雷用) */
+        @keyframes neon-flash {
+            0%, 100% { border-color: var(--c-dark); box-shadow: 10px 10px 0px var(--c-dark); }
+            50% { border-color: var(--c-primary); box-shadow: 10px 10px 0px var(--c-primary); }
+        }
+        .danger-card {
+            animation: neon-flash 1s infinite;
+        }
+
+        @media (max-width: 640px) {
+            .pop-card { border-width: 3px; box-shadow: 6px 6px 0px var(--c-dark); }
+            .header-capsule { padding: 0.8rem 1rem; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4 sm:p-8 overflow-x-hidden w-full">
+
+    <!-- 頁首 -->
+    <header class="w-full flex justify-center mb-12">
+        <div class="capsule-container header-capsule py-4 md:py-5 px-6 md:px-12 flex flex-row items-center justify-center">
+            <div class="flex items-center justify-center gap-4 md:gap-5">
+                <!-- Logo -->
+                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl border-4 border-[var(--c-dark)] overflow-hidden bg-white shrink-0 shadow-sm">
+                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/FF007F/FFFFFF?text=J&font=Bangers'">
+                </div>
+                <!-- 標題 -->
+                <div class="flex flex-col text-left">
+                    <h1 class="text-2xl md:text-4xl font-black text-[var(--c-dark)] leading-tight tracking-tight">歐大選擇權教室</h1>
+                    <p class="text-[10px] md:text-xs font-black text-[var(--c-primary)] tracking-[0.15em] uppercase mt-0.5 font-comic italic">
+                        PITFALLS SURVIVAL GUIDE
+                    </p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-6xl flex-grow flex flex-col gap-12">
+        
+        <!-- 大標題區 -->
+        <div class="text-center relative">
+            <div class="inline-block bg-[var(--c-accent)] px-8 py-6 pop-card transform -rotate-1 relative max-w-full">
+                <div class="absolute -top-8 -right-8 text-7xl md:text-9xl transform rotate-12 drop-shadow-lg">💣</div>
+                <h2 class="text-3xl sm:text-5xl md:text-7xl font-black text-[var(--c-dark)] tracking-wide font-comic uppercase">
+                    Warning! Pitfalls
+                </h2>
+                <div class="mt-4 text-xl md:text-3xl font-black text-white bg-[var(--c-primary)] px-6 py-2 inline-block rounded-xl border-4 border-black shadow-[6px_6px_0_#000]">
+                    新手一定要知道的 10 個地雷
+                </div>
+            </div>
+        </div>
+
+        <!-- 導言 -->
+        <p class="text-center text-lg md:text-xl font-bold text-gray-700 max-w-3xl mx-auto leading-relaxed">
+            選擇權市場充滿了隱形的地雷。當台指期站上 <strong class="text-[var(--c-dark)]">30,000 點</strong> 之際，一丁點的錯誤都可能讓你的帳戶瞬間引爆。點擊下方地雷來解鎖避雷知識！
+        </p>
+
+        <!-- ★ 核心互動：地雷區分佈圖 ★ -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-4">
+            
+            <!-- 地雷 1 -->
+            <div onclick="showTip(1)" class="pop-card p-6 flex flex-col h-full danger-card animate-explode">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="text-4xl">🌌</span>
+                    <h3 class="text-xl font-black text-[var(--c-dark)]">1. 夜盤會跳空</h3>
+                </div>
+                <p class="text-sm font-bold text-gray-500">新手最常在睡覺時爆倉的原因。</p>
+            </div>
+
+            <!-- 地雷 2 -->
+            <div onclick="showTip(2)" class="pop-card p-6 flex flex-col h-full animate-explode">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="text-4xl">⚖️</span>
+                    <h3 class="text-xl font-black text-[var(--c-dark)]">2. 結算不是收盤價</h3>
+                </div>
+                <p class="text-sm font-bold text-gray-500">不要盯著 13:45 的點位在那邊喊。</p>
+            </div>
+
+            <!-- 地雷 3 -->
+            <div onclick="showTip(3)" class="pop-card p-6 flex flex-col h-full animate-explode">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="text-4xl">🧹</span>
+                    <h3 class="text-xl font-black text-[var(--c-dark)]">3. 週選會歸零</h3>
+                </div>
+                <p class="text-sm font-bold text-gray-500">這不是投資，這是「快閃賽局」。</p>
+            </div>
+
+            <!-- 地雷 4 -->
+            <div onclick="showTip(4)" class="pop-card p-6 flex flex-col h-full danger-card animate-explode">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="text-4xl">📞</span>
+                    <h3 class="text-xl font-black text-[var(--c-dark)]">4. 賣方會追繳</h3>
+                </div>
+                <p class="text-sm font-bold text-gray-500">保證金不夠會接到奪命連環 Call。</p>
+            </div>
+
+            <!-- 地雷 5 -->
+            <div onclick="showTip(5)" class="pop-card p-6 flex flex-col h-full animate-explode">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="text-4xl">🛡️</span>
+                    <h3 class="text-xl font-black text-[var(--c-dark)]">5. 價外不等於安全</h3>
+                </div>
+                <p class="text-sm font-bold text-gray-500">大盤在 30,000 點，偏離 500 點也是一秒穿。</p>
+            </div>
+
+            <!-- 地雷 6 -->
+            <div onclick="showTip(6)" class="pop-card p-6 flex flex-col h-full animate-explode">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="text-4xl">💸</span>
+                    <h3 class="text-xl font-black text-[var(--c-dark)]">6. 高勝率不等於賺錢</h3>
+                </div>
+                <p class="text-sm font-bold text-gray-500">贏九次輸一次就把獲利賠光？</p>
+            </div>
+
+            <!-- 地雷 7 -->
+            <div onclick="showTip(7)" class="pop-card p-6 flex flex-col h-full animate-explode">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="text-4xl">📉</span>
+                    <h3 class="text-xl font-black text-[var(--c-dark)]">7. 保證金會調整</h3>
+                </div>
+                <p class="text-sm font-bold text-gray-500">行情越大，交易所要求的押金越高。</p>
+            </div>
+
+            <!-- 地雷 8 -->
+            <div onclick="showTip(8)" class="pop-card p-6 flex flex-col h-full animate-explode">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="text-4xl">🧟</span>
+                    <h3 class="text-xl font-black text-[var(--c-dark)]">8. 最後一天 Theta 不是朋友</h3>
+                </div>
+                <p class="text-sm font-bold text-gray-500">小心 Gamma 怪物在背後捅你一刀。</p>
+            </div>
+
+            <!-- 地雷 9 -->
+            <div onclick="showTip(9)" class="pop-card p-6 flex flex-col h-full animate-explode">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="text-4xl">🌪️</span>
+                    <h3 class="text-xl font-black text-[var(--c-dark)]">9. IV 會影響權利金</h3>
+                </div>
+                <p class="text-sm font-bold text-gray-500">明明方向猜對，權利金卻縮水了？</p>
+            </div>
+
+            <!-- 地雷 10 -->
+            <div onclick="showTip(10)" class="pop-card p-6 flex flex-col h-full animate-explode lg:col-span-1">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="text-4xl">🧩</span>
+                    <h3 class="text-xl font-black text-[var(--c-dark)]">10. 不懂 Delta 亂加倉</h3>
+                </div>
+                <p class="text-sm font-bold text-gray-500">你在加倉還是在自殺？這就是區別。</p>
+            </div>
+        </div>
+
+        <!-- ★ 動態提示展示區 ★ -->
+        <section id="tipSection" class="hidden animate-in fade-in zoom-in duration-300">
+            <div class="pop-card p-8 md:p-12 border-t-[16px] border-t-[var(--c-primary)] relative bg-white">
+                <button onclick="closeTip()" class="absolute top-4 right-4 text-3xl font-black hover:scale-110 transition-transform">✕</button>
+                
+                <div class="flex flex-col md:flex-row gap-10 items-start">
+                    <div class="flex-grow">
+                        <h3 id="tipTitle" class="text-3xl md:text-5xl font-black text-[var(--c-dark)] mb-6 font-comic uppercase">地雷標題</h3>
+                        <p id="tipDescription" class="text-lg md:text-xl font-bold text-gray-600 leading-relaxed mb-8">地雷詳細解說內容...</p>
+                        
+                        <!-- 實戰場景 (台指 30,000) -->
+                        <div class="bg-[var(--c-dark)] p-6 rounded-2xl border-l-8 border-l-[var(--c-accent)] text-white">
+                            <h4 class="text-[var(--c-accent)] font-black text-sm uppercase mb-2 tracking-widest italic">台指 30,000 點 實戰模擬：</h4>
+                            <p id="tipScenario" class="font-bold text-sm md:text-base italic leading-relaxed">當大盤正在三萬點時...</p>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/3 flex justify-center items-center">
+                        <div id="tipIcon" class="text-[8rem] md:text-[12rem] drop-shadow-xl">💣</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 總結金律 -->
+        <section class="text-center mt-8">
+            <div class="inline-block pop-card bg-white p-8 border-dashed border-4">
+                <h3 class="text-2xl font-black text-[var(--c-dark)] mb-4 italic">「新手死於無知，老手死於貪婪。」</h3>
+                <p class="text-gray-500 font-bold">避開這 10 個坑，你才算真正拿到了選擇權交易的門票。</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾：依照 image_7a977e.png 改版 -->
+    <footer class="w-full flex justify-center mt-24 pb-16 px-4">
+        <div class="capsule-container py-8 md:py-10 px-6 md:px-12 flex flex-col items-center justify-center">
+            <div class="flex items-center justify-center gap-3 md:gap-5 mb-4">
+                <div class="w-10 h-10 md:w-14 md:h-14 rounded-full border-2 border-gray-200 overflow-hidden shadow-sm shrink-0 bg-white">
+                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/000000/FFFFFF?text=J&font=Bangers'">
+                </div>
+                <div class="flex items-center">
+                    <span class="text-xl md:text-3xl font-black italic tracking-tight text-[var(--c-dark)] font-comic">JOPTION</span>
+                    <span class="mx-3 md:mx-5 text-gray-300 font-light text-2xl">|</span>
+                    <span class="text-lg md:text-2xl font-bold text-[var(--c-dark)] text-right">歐大選擇權教室</span>
+                </div>
+            </div>
+            <div class="text-center w-full">
+                <p class="text-[10px] md:text-sm text-gray-400 font-bold italic tracking-tight leading-relaxed">
+                    © 2026 Joption Academy - 10 大地雷生存指南。投資有風險，操作需謹慎。
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const tips = {
+            1: {
+                title: "夜盤會跳空",
+                icon: "🌌",
+                desc: "台指期夜盤（15:00 ~ 05:00）跟隨美股波動。當你在睡覺時，美股大跌 1%，大盤開盤就直接跳空下殺。",
+                scenario: "大盤在 30,000 點時，美股道瓊暴跌 500 點，台指夜盤可能直接跳空 300 點。賣方單式保證金會瞬間爆表，如果這時沒在盯盤，起床就已經被斷頭了。"
+            },
+            2: {
+                title: "結算不是收盤價",
+                icon: "⚖️",
+                desc: "結算價是 13:00 到 13:30 加權指數的「平均值」。不要以為 13:45 收盤價定勝負。",
+                scenario: "大盤 13:45 收盤在 30,005 點，你以為你的 30,000 Call 贏了 5 點。但 13:00~13:30 的平均值可能是 29,998，結果你的合約領不到錢，直接歸零。"
+            },
+            3: {
+                title: "週選會歸零",
+                icon: "🧹",
+                desc: "週選（Wednesday/Friday Expiring）時間極短。時間一到，只要沒過履約價，權利金會歸零，連 1 點都不剩。",
+                scenario: "你在 30,000 點時買入 30,200 Call。結算日當天大盤只到 30,199，雖然漲了快 200 點，但這張合約最後價值就是 0。這就是選擇權的殘酷。"
+            },
+            4: {
+                title: "賣方會追繳",
+                icon: "📞",
+                desc: "賣方收取權利金，但承擔義務。帳戶價值跌破維持保證金時，券商會要求你補錢。",
+                scenario: "在 30,000 點賣出 Call。大盤突然急拉 200 點，你的保證金維持率會從 200% 暴跌到 80%。這時券商的追繳簡訊就會像炸彈一樣轟炸你的手機。"
+            },
+            5: {
+                title: "價外不等於安全",
+                icon: "🛡️",
+                desc: "很多新手以為選離 500 點外的履約價當賣方很安全。在單邊暴走盤，這只是「慢一點死」。",
+                scenario: "大盤在 30,000 點。你覺得 30,500 Call 很安全。但遇到像 2021 年那樣的瘋牛盤，大盤可能一天就漲 600 點，你的「安全區」會在半小時內被夷為平地。"
+            },
+            6: {
+                title: "高勝率不等於賺錢",
+                icon: "💸",
+                desc: "賣方勝率通常有 70~80%。但「贏十次不夠輸一次大賠」是新手的致命傷。",
+                scenario: "在 30,000 點附近橫盤，你連續五週收租賺了 2 萬台幣。但第六週大盤突然黑天鵝跳空下挫 1,000 點，你一口氣賠了 10 萬。勝率 83%，結果結算還虧 8 萬。"
+            },
+            7: {
+                title: "保證金會調整",
+                icon: "📉",
+                desc: "交易所（期交所）有權根據市場波動率隨時調高保證金 A 值與 B 值。",
+                scenario: "目前大盤 30,000 點，A值規定 8.6 萬。如果波動率噴發，期交所明天可能宣布調高到 11 萬。你的帳戶如果資金太緊，會因為這個「規定調整」而被迫平倉。"
+            },
+            8: {
+                title: "最後一天 Theta 不是朋友",
+                icon: "🧟",
+                desc: "雖然 Theta 在結算日流逝最快，但 Gamma（加速度）也最大。小跳動會造成權利金巨大震盪。",
+                scenario: "結算日當天，大盤在 30,000 點上下 5 點震盪。你賣出 30,000 Call 想收乾 Theta。結果主力在最後一分鐘強拉 20 點，權利金會從 2 點瞬間噴到 15 點，讓你措手不及。"
+            },
+            9: {
+                title: "IV 會影響權利金",
+                icon: "🌪️",
+                desc: "隱含波動率（IV）代表市場的恐慌程度。IV 崩盤時，權利金會跟著縮水。",
+                scenario: "你在大盤 30,000 點大漲前買了 Call。雖然真的大漲了，但因為恐慌情緒（IV）在漲後消失，權利金的增幅被 IV 縮減抵銷，導致你「看對方向卻沒賺錢」。"
+            },
+            10: {
+                title: "不懂 Delta 不要亂加倉",
+                icon: "🧩",
+                desc: "Delta 決定了部位的曝險。亂攤平或是加倉，會讓風險呈幾何級數上升。",
+                scenario: "大盤 30,000 點，你的部位 Delta 是 0.5。大盤跌時你為了「攤平」再賣一口，Delta 變成 1.2。這時大盤只要再跌 10 點，你的虧損速度會是原本的 2.4 倍！"
+            }
+        };
+
+        function showTip(id) {
+            const tip = tips[id];
+            document.getElementById('tipTitle').innerText = `${id}. ${tip.title}`;
+            document.getElementById('tipIcon').innerText = tip.icon;
+            document.getElementById('tipDescription').innerText = tip.desc;
+            document.getElementById('tipScenario').innerText = tip.scenario;
+            
+            const section = document.getElementById('tipSection');
+            section.classList.remove('hidden');
+            section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function closeTip() {
+            document.getElementById('tipSection').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
