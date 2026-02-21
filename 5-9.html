@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歐大選擇權教室 - JOPTION</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ghibli-bg: #f0f9ff; /* 極淺藍 */
+            --ghibli-night: #1e3a8a; /* 深藍 */
+            --ghibli-accent: #3b82f6; /* 亮藍 */
+            --ghibli-profit: #dbeafe; /* 獲利區淺藍 */
+        }
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(180deg, var(--ghibli-bg) 0%, #ffffff 100%);
+            color: #334155;
+            scroll-behavior: smooth;
+        }
+        .ghibli-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 2px solid #dbeafe; 
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.05);
+        }
+        .chart-line {
+            stroke-dasharray: 2000;
+            stroke-dashoffset: 2000;
+            animation: dash 3s linear forwards;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: 0; }
+        }
+        input[type="range"] {
+            accent-color: var(--ghibli-accent);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-blue-100">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <img src="ip標籤.jpg" alt="Logo" class="w-10 h-10 rounded-full object-cover border-2 border-blue-100" onerror="this.src='https://via.placeholder.com/40?text=JP'">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold tracking-tighter text-slate-800">JOPTION</span>
+                    <div class="h-6 w-[1px] bg-slate-300 mx-3"></div>
+                    <span class="text-lg font-medium text-slate-600">歐大選擇權教室</span>
+                </div>
+            </div>
+            <div class="hidden md:flex space-x-8 text-slate-600 font-medium">
+                <a href="#definition" class="hover:text-blue-600">組合定義</a>
+                <a href="#strategy" class="hover:text-blue-600">策略優勢</a>
+                <a href="#interactive" class="hover:text-blue-600">四腿模擬</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative py-16 px-4 text-center overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-20">
+            <div class="absolute top-10 right-10 w-32 h-32 bg-blue-200 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-10 left-10 w-48 h-48 bg-cyan-200 rounded-full blur-3xl"></div>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight">平穩翱翔的天空：鐵禿鷹組合</h1>
+        <p class="text-lg text-slate-600 max-w-2xl mx-auto">在 Joption 教室，學會如何利用四筆單子的平衡，在市場震盪中鎖定風險並穩健收租。</p>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 space-y-12 pb-24">
+        
+        <!-- Section 1: Definition -->
+        <section id="definition" class="ghibli-card p-8 md:p-12 border-l-8 border-l-blue-500">
+            <div class="flex flex-col md:flex-row items-center gap-8">
+                <div class="flex-1">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
+                        <span class="bg-blue-100 text-blue-600 p-2 rounded-lg mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        </span>
+                        什麼是鐵禿鷹組合 (Iron Condor)？
+                    </h2>
+                    <div class="space-y-4 text-slate-600 leading-relaxed">
+                        <p>
+                            <strong>鐵禿鷹組合</strong>是由一個「賣權空頭價差」與一個「買權多頭價差」所組成。簡單來說，就是同時賣出 Put 與 Call（雙賣），並在兩端各買入一筆保險單來鎖定最大損失。
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-50">
+                                <div class="text-blue-500 font-bold text-sm">最大獲利</div>
+                                <div class="text-slate-800 font-medium">收取的淨權利金</div>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-50">
+                                <div class="text-blue-500 font-bold text-sm">最大風險</div>
+                                <div class="text-slate-800 font-medium">履約價間距 - 權利金</div>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-50">
+                                <div class="text-blue-500 font-bold text-sm">勝率特性</div>
+                                <div class="text-slate-800 font-medium">高勝率、風險有限</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/3 bg-blue-50 p-6 rounded-2xl border-2 border-blue-100 italic text-blue-700/70">
+                    "在 選擇權 的視野裡，鐵禿鷹就像是在森林中心蓋起一間堅固的小屋。只要外面的暴風雨（大漲大跌）不把屋頂掀掉，你就能在屋裡安穩度日。"
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Interactive Simulator -->
+        <section id="interactive" class="ghibli-card p-8 md:p-12 overflow-hidden">
+            <div class="flex justify-between items-start mb-10">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800 mb-2">鐵禿鷹動態模擬</h2>
+                    <p class="text-slate-500">調整四筆履約價，觀察中間平坦的「獲利高原」。</p>
+                </div>
+                <span class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Iron Condor</span>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-12 items-center">
+                <!-- Controls -->
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[10px] font-bold text-slate-500">保護型買 Put (LP)</label>
+                            <span class="text-blue-600 font-mono text-xs" id="val-lp">29400</span>
+                        </div>
+                        <input type="range" id="lp-strike" min="28000" max="30000" step="100" value="29400" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[10px] font-bold text-slate-700 font-bold">主要收租賣 Put (SP)</label>
+                            <span class="text-blue-600 font-mono text-xs" id="val-sp">29800</span>
+                        </div>
+                        <input type="range" id="sp-strike" min="28000" max="31000" step="100" value="29800" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[10px] font-bold text-slate-700 font-bold">主要收租賣 Call (SC)</label>
+                            <span class="text-blue-600 font-mono text-xs" id="val-sc">30200</span>
+                        </div>
+                        <input type="range" id="sc-strike" min="29000" max="32000" step="100" value="30200" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[10px] font-bold text-slate-500">保護型買 Call (LC)</label>
+                            <span class="text-blue-600 font-mono text-xs" id="val-lc">30600</span>
+                        </div>
+                        <input type="range" id="lc-strike" min="30000" max="32000" step="100" value="30600" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    
+                    <div class="p-6 rounded-2xl bg-gradient-to-br from-white to-blue-50 border border-blue-100 shadow-sm">
+                        <div class="text-xs text-slate-400 mb-1">結算股價: <span id="val-current">30000</span></div>
+                        <input type="range" id="current-price" min="28000" max="32000" step="100" value="30000" class="w-full h-2 mb-4 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                        <div class="text-xs text-slate-400 mb-1 uppercase tracking-tighter font-bold">最大獲利點數 (淨收)</div>
+                        <div class="text-3xl font-black text-blue-500" id="profit-result">+120</div>
+                    </div>
+                </div>
+
+                <!-- Visualization -->
+                <div class="lg:col-span-2 relative h-80 bg-white rounded-3xl border-2 border-blue-50 shadow-inner flex items-center justify-center p-4">
+                    <svg id="chart" viewBox="0 0 500 250" class="w-full h-full">
+                        <defs>
+                            <linearGradient id="profitGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#dbeafe" stop-opacity="0.9" />
+                                <stop offset="100%" stop-color="#dbeafe" stop-opacity="0" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Grid Lines -->
+                        <line x1="0" y1="125" x2="500" y2="125" stroke="#f1f5f9" stroke-width="1" />
+                        
+                        <!-- Profit Area -->
+                        <path id="profit-area" d="" fill="url(#profitGradient)" />
+                        
+                        <!-- Payoff Line -->
+                        <path id="payoff-path" d="" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round" class="chart-line" />
+                        
+                        <!-- Marker -->
+                        <circle id="marker" cx="0" cy="0" r="8" fill="#2563eb" stroke="white" stroke-width="3" />
+                        
+                        <!-- Labels -->
+                        <text x="210" y="30" font-size="12" font-weight="bold" fill="#2563eb">獲利平台</text>
+                        <text x="10" y="235" font-size="11" fill="#94a3b8">風險鎖定</text>
+                        <text x="440" y="235" font-size="11" fill="#94a3b8">風險鎖定</text>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Benefits -->
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white/60 p-6 rounded-2xl border border-blue-50">
+                <h4 class="font-bold text-blue-800 mb-2">💡 鐵禿鷹的魅力</h4>
+                <p class="text-sm text-slate-600 leading-relaxed">比起單純的雙賣（跨勒式），鐵禿鷹多買了兩筆保險單。雖然這會減少部分權利金收入，但它能讓你在睡覺時完全不用擔心行情突然跳空噴發造成毀滅性損失。</p>
+            </div>
+            <div class="bg-white/60 p-6 rounded-2xl border border-blue-50">
+                <h4 class="font-bold text-blue-800 mb-2">🎯 適用場景</h4>
+                <p class="text-sm text-slate-600 leading-relaxed">當預期市場即將進入長期的區間盤整，或是波動率 (IV) 處於高檔準備回落時，鐵禿鷹是最佳的時間價值收割工具。在 Joption 教室，我們稱之為「專業玩家的懶人包」。</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#fcfcfc] border-t border-gray-100 pt-12 pb-10 px-4">
+        <div class="max-w-6xl mx-auto flex flex-col items-center">
+            <div class="flex items-center space-x-3 mb-4">
+                <img src="ip標籤.jpg" alt="Logo" class="w-10 h-10 rounded-full object-cover shadow-sm" onerror="this.src='https://via.placeholder.com/40?text=JP'">
+                <div class="flex items-center text-lg font-bold tracking-wider">
+                    <span class="text-gray-500 uppercase">JOPTION</span>
+                    <span class="text-gray-400 mx-3 font-light">|</span>
+                    <span class="text-gray-500 font-medium">歐大選擇權教室</span>
+                </div>
+            </div>
+            <div class="text-[13px] text-gray-400 text-center font-normal tracking-normal">
+                © 2026 Joption Academy - 金融教育僅供參考，投資有風險，操作需謹慎。
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const lpInput = document.getElementById('lp-strike');
+        const spInput = document.getElementById('sp-strike');
+        const scInput = document.getElementById('sc-strike');
+        const lcInput = document.getElementById('lc-strike');
+        const currentInput = document.getElementById('current-price');
+        
+        const valLp = document.getElementById('val-lp');
+        const valSp = document.getElementById('val-sp');
+        const valSc = document.getElementById('val-sc');
+        const valLc = document.getElementById('val-lc');
+        const valCurrent = document.getElementById('val-current');
+        const profitResult = document.getElementById('profit-result');
+        
+        const payoffPath = document.getElementById('payoff-path');
+        const profitArea = document.getElementById('profit-area');
+        const marker = document.getElementById('marker');
+
+        function updateSimulation() {
+            let lp = parseInt(lpInput.value);
+            let sp = parseInt(spInput.value);
+            let sc = parseInt(scInput.value);
+            let lc = parseInt(lcInput.value);
+            const current = parseInt(currentInput.value);
+
+            // Validations for IC order
+            if (sp <= lp) sp = lp + 100; spInput.value = sp;
+            if (sc <= sp) sc = sp + 200; scInput.value = sc;
+            if (lc <= sc) lc = sc + 100; lcInput.value = lc;
+
+            valLp.innerText = lp.toLocaleString();
+            valSp.innerText = sp.toLocaleString();
+            valSc.innerText = sc.toLocaleString();
+            valLc.innerText = lc.toLocaleString();
+            valCurrent.innerText = current.toLocaleString();
+
+            const netPremium = 120; // Simulated net premium received
+            
+            // Calculate Profit
+            let profit = netPremium;
+            if (current < lp) profit = netPremium - (sp - lp);
+            else if (current < sp) profit = netPremium - (sp - current);
+            else if (current <= sc) profit = netPremium;
+            else if (current < lc) profit = netPremium - (current - sc);
+            else profit = netPremium - (lc - sc);
+
+            profitResult.innerText = profit > 0 ? `+${profit.toLocaleString()}` : profit.toLocaleString();
+            profitResult.className = `text-4xl font-black ${profit > 0 ? 'text-blue-500' : (profit < 0 ? 'text-red-400' : 'text-slate-800')}`;
+
+            const minX = 28000;
+            const maxX = 32000;
+            const chartWidth = 500;
+            const zeroY = 125;
+            const scaleX = chartWidth / (maxX - minX);
+            const scaleY = 0.3; 
+
+            const lpX = (lp - minX) * scaleX;
+            const spX = (sp - minX) * scaleX;
+            const scX = (sc - minX) * scaleX;
+            const lcX = (lc - minX) * scaleX;
+
+            const premiumY = zeroY - (netPremium * scaleY);
+            const lpLossY = zeroY - ((netPremium - (sp - lp)) * scaleY);
+            const lcLossY = zeroY - ((netPremium - (lc - sc)) * scaleY);
+
+            // Payoff Line
+            let d = `M 0 ${lpLossY} L ${lpX} ${lpLossY} L ${spX} ${premiumY} L ${scX} ${premiumY} L ${lcX} ${lcLossY} L 500 ${lcLossY}`;
+            payoffPath.setAttribute('d', d);
+
+            // Profit Area (where profit > 0)
+            const beLow = sp - netPremium;
+            const beHigh = sc + netPremium;
+            const beLowX = (beLow - minX) * scaleX;
+            const beHighX = (beHigh - minX) * scaleX;
+
+            let areaD = `M ${beLowX} ${zeroY} L ${spX} ${premiumY} L ${scX} ${premiumY} L ${beHighX} ${zeroY} Z`;
+            profitArea.setAttribute('d', areaD);
+
+            // Marker
+            marker.setAttribute('cx', (current - minX) * scaleX);
+            marker.setAttribute('cy', zeroY - (profit * scaleY));
+        }
+
+        [lpInput, spInput, scInput, lcInput, currentInput].forEach(input => {
+            input.addEventListener('input', updateSimulation);
+        });
+
+        window.onload = updateSimulation;
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歐大選擇權教室 - JOPTION</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ghibli-bg: #fef2f2; /* 極淺紅 */
+            --ghibli-sun: #991b1b; /* 深紅 */
+            --ghibli-accent: #ef4444; /* 鮮紅 */
+            --ghibli-profit: #fee2e2; /* 獲利區粉紅 */
+        }
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(180deg, var(--ghibli-bg) 0%, #ffffff 100%);
+            color: #334155;
+            scroll-behavior: smooth;
+        }
+        .ghibli-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 2px solid #fee2e2; 
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(153, 27, 27, 0.05);
+        }
+        .chart-line {
+            stroke-dasharray: 2000;
+            stroke-dashoffset: 2000;
+            animation: dash 3s linear forwards;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: 0; }
+        }
+        input[type="range"] {
+            accent-color: var(--ghibli-accent);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-red-100">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <img src="ip標籤.jpg" alt="Logo" class="w-10 h-10 rounded-full object-cover border-2 border-red-100" onerror="this.src='https://via.placeholder.com/40?text=JP'">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold tracking-tighter text-slate-800">JOPTION</span>
+                    <div class="h-6 w-[1px] bg-slate-300 mx-3"></div>
+                    <span class="text-lg font-medium text-slate-600">歐大選擇權教室</span>
+                </div>
+            </div>
+            <div class="hidden md:flex space-x-8 text-slate-600 font-medium">
+                <a href="#definition" class="hover:text-red-600">策略定義</a>
+                <a href="#strategy" class="hover:text-red-600">優勢分析</a>
+                <a href="#interactive" class="hover:text-red-600">價差模擬</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative py-16 px-4 text-center overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-20">
+            <div class="absolute top-10 left-10 w-32 h-32 bg-red-200 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-10 right-10 w-48 h-48 bg-orange-200 rounded-full blur-3xl"></div>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight">溫暖的上升氣流：多頭價差</h1>
+        <p class="text-lg text-slate-600 max-w-2xl mx-auto">在 Joption 教室，學會如何用「組合」的智慧，降低成本並參與台指期的噴出段。</p>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 space-y-12 pb-24">
+        
+        <!-- Section 1: Definition -->
+        <section id="definition" class="ghibli-card p-8 md:p-12 border-l-8 border-l-red-500">
+            <div class="flex flex-col md:flex-row items-center gap-8">
+                <div class="flex-1">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
+                        <span class="bg-red-100 text-red-600 p-2 rounded-lg mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                        </span>
+                        什麼是多頭價差 (Bull Spread)？
+                    </h2>
+                    <div class="space-y-4 text-slate-600 leading-relaxed">
+                        <p>
+                            <strong>多頭價差</strong>（以買權價差為例）是由「買進一筆低履約價買權」與「賣出一筆高履約價買權」組合而成。當你認為行情會漲，但可能不會漲過某個目標點位時，這是一個非常有效率的工具。
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-red-50">
+                                <div class="text-red-500 font-bold text-sm">最大風險</div>
+                                <div class="text-slate-800 font-medium">淨權利金支出(有限)</div>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-red-50">
+                                <div class="text-red-500 font-bold text-sm">最大獲利</div>
+                                <div class="text-slate-800 font-medium">履約價差額 - 成本</div>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-red-50">
+                                <div class="text-red-500 font-bold text-sm">策略特色</div>
+                                <div class="text-slate-800 font-medium">抗Theta、成本低</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/3 bg-red-50 p-6 rounded-2xl border-2 border-red-100 italic text-red-700/70">
+                    "在 選擇權 的視野裡，多頭價差就像是在森林中搭建的階梯。雖然你不能一步登天，但每一步都走得比單打獨鬥更穩健。"
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Interactive Simulator -->
+        <section id="interactive" class="ghibli-card p-8 md:p-12 overflow-hidden">
+            <div class="flex justify-between items-start mb-10">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800 mb-2">台指多頭價差模擬器</h2>
+                    <p class="text-slate-500">調整兩個不同的履約價，觀察紅色「獲利階梯」的變化。</p>
+                </div>
+                <span class="bg-red-100 text-red-600 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Bull Call Spread</span>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-12 items-center">
+                <!-- Controls -->
+                <div class="space-y-8">
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <label class="text-sm font-bold text-slate-700">買入買權 (Low Strike)</label>
+                            <span class="text-red-600 font-mono font-bold" id="val-long">30000</span>
+                        </div>
+                        <input type="range" id="long-strike" min="28000" max="32000" step="100" value="30000" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <label class="text-sm font-bold text-slate-700">賣出買權 (High Strike)</label>
+                            <span class="text-red-600 font-mono font-bold" id="val-short">30400</span>
+                        </div>
+                        <input type="range" id="short-strike" min="28000" max="32000" step="100" value="30400" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <label class="text-sm font-bold text-slate-700">淨權利金成本</label>
+                            <span class="text-red-600 font-mono font-bold" id="val-net-cost">120</span>
+                        </div>
+                        <input type="range" id="net-cost" min="10" max="400" step="10" value="120" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <label class="text-sm font-bold text-slate-700">結算股價 (Settlement)</label>
+                            <span class="text-red-600 font-mono font-bold" id="val-current">30600</span>
+                        </div>
+                        <input type="range" id="current-price" min="28000" max="32000" step="100" value="30600" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    
+                    <div class="p-6 rounded-2xl bg-gradient-to-br from-white to-red-50 border border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="text-xs text-slate-400 mb-1 uppercase tracking-tighter">組合策略損益</div>
+                            <div class="text-4xl font-black" id="profit-result">+280</div>
+                            <div class="mt-4 pt-4 border-t border-red-100 flex justify-between items-center">
+                                <span class="text-xs text-slate-400">損益平衡點</span>
+                                <span class="text-sm font-bold text-slate-600" id="breakeven">30120</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualization -->
+                <div class="lg:col-span-2 relative h-80 bg-white rounded-3xl border-2 border-red-50 shadow-inner flex items-center justify-center p-4">
+                    <svg id="chart" viewBox="0 0 500 250" class="w-full h-full">
+                        <defs>
+                            <linearGradient id="profitGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#fee2e2" stop-opacity="0.9" />
+                                <stop offset="100%" stop-color="#fee2e2" stop-opacity="0" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Grid Lines -->
+                        <line x1="0" y1="125" x2="500" y2="125" stroke="#f1f5f9" stroke-width="1" />
+                        
+                        <!-- Profit Area (Red/Pink) -->
+                        <path id="profit-area" d="" fill="url(#profitGradient)" />
+                        
+                        <!-- Payoff Line -->
+                        <path id="payoff-path" d="" fill="none" stroke="#dc2626" stroke-width="4" stroke-linecap="round" class="chart-line" />
+                        
+                        <!-- Vertical Breakeven Line -->
+                        <line id="breakeven-line" x1="0" y1="0" x2="0" y2="250" stroke="#ef4444" stroke-width="1" stroke-dasharray="4" />
+
+                        <!-- Current Position Marker -->
+                        <circle id="marker" cx="0" cy="0" r="8" fill="#dc2626" stroke="white" stroke-width="3" />
+                        
+                        <!-- Labels -->
+                        <text x="400" y="30" font-size="12" font-weight="bold" fill="#dc2626">獲利高原</text>
+                        <text x="10" y="235" font-size="12" font-weight="bold" fill="#94a3b8">下跌風險(有限)</text>
+                    </svg>
+                    <div class="absolute bottom-4 left-6 text-[10px] text-slate-300 font-mono">
+                        X: 台指點數 / Y: 價差損益
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Insight -->
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white/60 p-6 rounded-2xl border border-red-50">
+                <h4 class="font-bold text-red-800 mb-2">💡 買方與價差的差別</h4>
+                <p class="text-sm text-slate-600 leading-relaxed">單純買進買權 (Long Call) 會面臨劇烈的時間價值流失。透過賣出一筆更高履約價的買權，你可以對沖掉部分的 Theta 損失，讓你在「慢漲」的行情中也能獲利。</p>
+            </div>
+            <div class="bg-white/60 p-6 rounded-2xl border border-red-50">
+                <h4 class="font-bold text-red-800 mb-2">🎯 適用場景</h4>
+                <p class="text-sm text-slate-600 leading-relaxed">當你認為行情會突破，但前方的壓力區非常明顯時，多頭價差是最佳方案。它讓你在成本最小化的情況下，鎖定一段明確的噴出利潤。</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#fcfcfc] border-t border-gray-100 pt-12 pb-10 px-4">
+        <div class="max-w-6xl mx-auto flex flex-col items-center">
+            <!-- Footer Brand Area -->
+            <div class="flex items-center space-x-3 mb-4">
+                <img src="ip標籤.jpg" alt="Logo" class="w-8 h-8 rounded-full object-cover shadow-sm" onerror="this.src='https://via.placeholder.com/32?text=JP'">
+                <div class="flex items-center text-lg font-bold tracking-wider">
+                    <span class="text-gray-500 uppercase">JOPTION</span>
+                    <span class="text-gray-400 mx-2 font-light">|</span>
+                    <span class="text-gray-500 font-medium">歐大選擇權教室</span>
+                </div>
+            </div>
+            
+            <!-- Disclaimer -->
+            <div class="text-[13px] text-gray-400 text-center font-normal tracking-normal">
+                © 2026 Joption Academy - 金融教育僅供參考，投資有風險，操作需謹慎。
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const longStrikeInput = document.getElementById('long-strike');
+        const shortStrikeInput = document.getElementById('short-strike');
+        const costInput = document.getElementById('net-cost');
+        const currentInput = document.getElementById('current-price');
+        
+        const valLong = document.getElementById('val-long');
+        const valShort = document.getElementById('val-short');
+        const valCost = document.getElementById('val-net-cost');
+        const valCurrent = document.getElementById('val-current');
+        const profitResult = document.getElementById('profit-result');
+        const breakEvenEl = document.getElementById('breakeven');
+        
+        const payoffPath = document.getElementById('payoff-path');
+        const profitArea = document.getElementById('profit-area');
+        const marker = document.getElementById('marker');
+        const beLine = document.getElementById('breakeven-line');
+
+        function updateSimulation() {
+            let longStrike = parseInt(longStrikeInput.value);
+            let shortStrike = parseInt(shortStrikeInput.value);
+            
+            // Ensure long < short for Bull Call Spread logic
+            if (shortStrike <= longStrike) {
+                shortStrike = longStrike + 100;
+                shortStrikeInput.value = shortStrike;
+            }
+
+            const cost = parseInt(costInput.value);
+            const current = parseInt(currentInput.value);
+            const breakeven = longStrike + cost;
+
+            valLong.innerText = longStrike.toLocaleString();
+            valShort.innerText = shortStrike.toLocaleString();
+            valCost.innerText = cost.toLocaleString();
+            valCurrent.innerText = current.toLocaleString();
+            breakEvenEl.innerText = breakeven.toLocaleString();
+
+            // Bull Call Spread Profit Calculation
+            // Gain = Max(0, current - LongStrike) - Max(0, current - ShortStrike) - Cost
+            const gainFromLong = Math.max(0, current - longStrike);
+            const lossFromShort = Math.max(0, current - shortStrike);
+            const profit = gainFromLong - lossFromShort - cost;
+
+            profitResult.innerText = profit > 0 ? `+${profit.toLocaleString()}` : profit.toLocaleString();
+            profitResult.className = `text-4xl font-black ${profit > 0 ? 'text-red-500' : (profit < 0 ? 'text-slate-400' : 'text-slate-800')}`;
+
+            const minX = 28000;
+            const maxX = 32000;
+            const chartWidth = 500;
+            const zeroY = 125;
+            const scaleX = chartWidth / (maxX - minX);
+            const scaleY = 0.2; 
+
+            // Points for Payoff Path
+            const pMinX = 0;
+            const pMaxLossY = zeroY + (cost * scaleY);
+            
+            const pLongX = (longStrike - minX) * scaleX;
+            const pShortX = (shortStrike - minX) * scaleX;
+            
+            const pMaxProfit = (shortStrike - longStrike) - cost;
+            const pMaxProfitY = zeroY - (pMaxProfit * scaleY);
+            const pMaxX = chartWidth;
+
+            let d = `M ${pMinX} ${pMaxLossY}`;
+            d += ` L ${pLongX} ${pMaxLossY}`;
+            d += ` L ${pShortX} ${pMaxProfitY}`;
+            d += ` L ${pMaxX} ${pMaxProfitY}`;
+            payoffPath.setAttribute('d', d);
+
+            // Draw Profit Area
+            const beX = (breakeven - minX) * scaleX;
+            if (beX < pMaxX) {
+                let areaD = `M ${beX} ${zeroY}`;
+                areaD += ` L ${pShortX} ${pMaxProfitY}`;
+                areaD += ` L ${pMaxX} ${pMaxProfitY}`;
+                areaD += ` L ${pMaxX} ${zeroY}`;
+                areaD += ` Z`;
+                profitArea.setAttribute('d', areaD);
+            } else {
+                profitArea.setAttribute('d', "");
+            }
+
+            // Update Breakeven Line
+            beLine.setAttribute('x1', beX);
+            beLine.setAttribute('x2', beX);
+
+            // Update Marker
+            const markerX = (current - minX) * scaleX;
+            const markerY = zeroY - (profit * scaleY);
+            marker.setAttribute('cx', markerX);
+            marker.setAttribute('cy', markerY);
+        }
+
+        [longStrikeInput, shortStrikeInput, costInput, currentInput].forEach(input => {
+            input.addEventListener('input', updateSimulation);
+        });
+
+        window.onload = updateSimulation;
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM! Vega 波動率完全圖解 | 歐大選擇權教室</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 氣球普普風專屬色調 */
+        :root {
+            --c-bg: #FFFBEB; /* 淺黃底 */
+            --c-primary: #06B6D4; /* 亮青色 (Vega/市場情緒) */
+            --c-secondary: #D946EF; /* 電光紫 (權利金) */
+            --c-accent: #FACC15; /* 太陽黃 */
+            --c-dark: #0F172A;
+            --c-grid: #E2E8F0;
+            --c-call: #3B82F6;
+            --c-put: #EF4444;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--c-bg);
+            color: var(--c-dark);
+            /* 普普風圓點背景 */
+            background-image: radial-gradient(var(--c-grid) 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        .font-comic {
+            font-family: 'Bangers', 'Noto Sans TC', cursive;
+            letter-spacing: 0.05em;
+        }
+
+        /* 普普風卡通框線與深度陰影 */
+        .pop-card {
+            border: 5px solid var(--c-dark);
+            border-radius: 1.5rem;
+            background-color: white;
+            box-shadow: 12px 12px 0px var(--c-dark);
+            transition: all 0.2s ease;
+        }
+
+        .pop-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 15px 15px 0px var(--c-dark);
+        }
+
+        /* 膠囊容器 */
+        .capsule-container {
+            background: white;
+            border: 4px solid var(--c-dark);
+            border-radius: 9999px;
+            box-shadow: 0 8px 0 var(--c-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* 互動拉桿 */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 20px;
+            background: var(--c-dark);
+            border-radius: 10px;
+            border: 2px solid white;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 48px;
+            width: 48px;
+            border-radius: 50%;
+            background: var(--c-primary);
+            cursor: pointer;
+            margin-top: -16px;
+            border: 5px solid var(--c-dark);
+            box-shadow: 0 4px 0 var(--c-dark);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 60%;
+        }
+
+        /* 氣球縮放動畫 */
+        .balloon-container {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .mood-btn.active {
+            background-color: var(--c-dark);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .curve-mode-btn.active {
+            box-shadow: inset 0 0 0 4px var(--c-dark);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .float-anim {
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @media (max-width: 640px) {
+            .pop-card { border-width: 4px; box-shadow: 8px 8px 0px var(--c-dark); }
+            .header-capsule { padding: 0.5rem 1rem; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4 sm:p-8 overflow-x-hidden">
+
+    <!-- 頁首：請確認圖片檔案 IP標籤.jpg 是否在同目錄下 -->
+    <header class="w-full flex justify-center mb-12">
+        <div class="capsule-container px-6 py-3 flex-row gap-4">
+            <div class="w-14 h-14 rounded-xl border-4 border-[var(--c-dark)] overflow-hidden bg-white shrink-0">
+                <!-- 如果本地預覽看不到圖，請檢查路徑與名稱 -->
+                <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/06B6D4/FFFFFF?text=Logo&font=Bangers'">
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-2xl sm:text-3xl font-black text-[var(--c-dark)] leading-none tracking-tight">歐大選擇權教室</h1>
+                <p class="text-xs font-black text-[var(--c-primary)] tracking-[0.2em] uppercase mt-1 font-comic">VOLATILITY MASTERCLASS</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-6xl flex flex-col gap-12">
+        
+        <!-- 大標題 -->
+        <div class="text-center">
+            <div class="inline-block bg-[var(--c-accent)] px-8 py-5 pop-card transform rotate-1 relative">
+                <div class="absolute -top-10 -right-10 text-7xl md:text-9xl transform -rotate-12 float-anim">🎈</div>
+                <h2 class="text-4xl sm:text-7xl md:text-8xl font-black text-[var(--c-dark)] tracking-wide font-comic uppercase">
+                    Vega
+                </h2>
+                <div class="mt-2 text-xl md:text-3xl font-black text-white bg-[var(--c-primary)] px-5 py-2 inline-block rounded-xl border-4 border-black shadow-[4px_4px_0_#000]">
+                    情緒敏感度：權利金的膨脹器
+                </div>
+            </div>
+        </div>
+
+        <!-- Vega 核心概念 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+            <div class="pop-card p-8 flex flex-col justify-center relative overflow-hidden bg-white">
+                <div class="absolute -bottom-10 -right-6 text-[10rem] opacity-5 font-black font-comic">V</div>
+                <h3 class="text-3xl font-black mb-6 flex items-center gap-3">
+                    <span class="bg-[var(--c-dark)] text-white w-10 h-10 rounded-full flex items-center justify-center font-comic">?</span>
+                    Vega 是什麼？
+                </h3>
+                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-4">
+                    它是衡量<strong class="text-[var(--c-primary)] underline decoration-4 decoration-[var(--c-primary)] underline-offset-4">市場情緒 (恐慌或興奮)</strong> 的指標。<br>
+                    隱含波動率 (IV) 每變動 <strong class="text-[var(--c-dark)]">1%</strong>，你的選擇權價格大約會跟著變動多少點。
+                </p>
+                <div class="mt-4 p-4 bg-cyan-50 rounded-xl border-4 border-dashed border-cyan-200 text-center">
+                    <p class="font-bold text-gray-600">⚠ 注意：Vega 與漲跌無關，而是對「未來的不確定性」敏感。</p>
+                </div>
+            </div>
+
+            <div class="pop-card p-8 bg-[var(--c-dark)] text-white flex flex-col justify-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-2 bg-yellow-400 text-black font-black text-[10px] uppercase">Thermometer</div>
+                <h3 class="text-2xl font-black mb-6 text-[var(--c-primary)] uppercase font-comic tracking-widest">Core Laws</h3>
+                <ul class="space-y-4 font-bold">
+                    <li class="flex items-center gap-3">
+                        <span class="text-2xl">📈</span>
+                        <span><strong class="text-yellow-400">IV 上升 ➔ 氣球變大</strong>：Call 跟 Put 同時變貴！</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="text-2xl">📉</span>
+                        <span><strong class="text-cyan-400">IV 下降 ➔ 氣球爆裂</strong>：權利金瞬間縮水 (IV Crush)。</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="text-2xl">🎯</span>
+                        <span><strong class="text-purple-400">價平 (ATM) 最敏感</strong>：最容易受情緒波動影響。</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="text-2xl">🔭</span>
+                        <span><strong class="text-green-400">長天期 Vega 較大</strong>：未來變數多，影響更顯著。</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ★ 核心互動：市場情緒膨脹器 ★ -->
+        <section class="flex flex-col items-center mt-6">
+            <h3 class="text-2xl md:text-4xl font-black mb-8 text-[var(--c-dark)] tracking-wide text-center bg-white px-8 py-3 pop-card inline-block border-dashed">
+                🕹️ 市場情緒膨脹器 (台指 30,000)
+            </h3>
+            
+            <div class="w-full pop-card bg-[#1E293B] p-6 md:p-12 relative overflow-hidden">
+                <div class="absolute inset-0 opacity-10" style="background: radial-gradient(circle, white, transparent 70%);"></div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+                    <div class="lg:col-span-5 flex flex-col items-center justify-center min-h-[300px]">
+                        <div id="balloonScale" class="balloon-container flex items-center justify-center relative">
+                            <div class="w-48 h-48 sm:w-64 sm:h-64 bg-[var(--c-secondary)] rounded-full border-[8px] border-[var(--c-dark)] flex items-center justify-center shadow-[0_15px_0_#000] relative">
+                                <div class="absolute top-8 left-8 w-12 h-12 bg-white/30 rounded-full"></div>
+                                <div class="flex flex-col items-center">
+                                    <span class="text-white font-black text-xs uppercase tracking-widest">Premium</span>
+                                    <span id="premiumVal" class="text-5xl sm:text-7xl font-black text-white font-comic drop-shadow-md">150</span>
+                                </div>
+                            </div>
+                            <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-4 bg-[var(--c-dark)] rounded-sm"></div>
+                            <div class="absolute top-full left-1/2 -translate-x-1/2 w-1 h-32 bg-[var(--c-dark)]"></div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-7 flex flex-col gap-8">
+                        <div class="bg-gray-800 p-3 rounded-2xl flex gap-3">
+                            <button onclick="setExpiry('short')" id="btn-short" class="mood-btn active flex-1 py-3 border-4 border-black rounded-xl font-black text-xs sm:text-sm bg-gray-100 transition-all">🐝 週選 (Vega 小)</button>
+                            <button onclick="setExpiry('long')" id="btn-long" class="mood-btn flex-1 py-3 border-4 border-black rounded-xl font-black text-xs sm:text-sm bg-gray-100 transition-all">🦅 次月選 (Vega 大)</button>
+                        </div>
+
+                        <div class="bg-white/95 p-8 rounded-2xl border-4 border-black shadow-[6px_6px_0_var(--c-primary)]">
+                            <div class="flex justify-between items-end mb-6">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-500 font-black text-xs uppercase tracking-widest">市場隱含波動率 (IV)</span>
+                                    <div class="flex items-baseline gap-1">
+                                        <span id="ivNum" class="text-5xl md:text-7xl font-black text-[var(--c-primary)] font-comic">20</span>
+                                        <span class="text-xl font-bold text-gray-400">%</span>
+                                    </div>
+                                </div>
+                                <div id="sentimentTag" class="bg-[var(--c-dark)] text-white px-4 py-2 rounded-xl font-black text-sm transform rotate-2">平常心</div>
+                            </div>
+                            <input type="range" id="ivSlider" min="10" max="50" step="1" value="20">
+                            <div class="flex justify-between mt-4 text-[10px] font-black text-gray-400">
+                                <span>10% (極度冷靜)</span>
+                                <span class="text-red-500">50% (恐慌/大事)</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-[var(--c-dark)] p-6 rounded-2xl border-b-8 border-yellow-400">
+                                <span class="text-gray-500 text-[10px] font-black uppercase">該合約 Vega 值</span>
+                                <div id="vegaDisplay" class="text-4xl font-black text-yellow-400 font-comic mt-2">5.5</div>
+                                <p class="text-[10px] text-gray-500 font-bold mt-1">IV 每升 1%，權利金漲 5.5 點</p>
+                            </div>
+                            <div id="impactBox" class="bg-[var(--c-dark)] p-6 rounded-2xl border-b-8 border-[var(--c-secondary)] flex flex-col justify-center">
+                                <span class="text-gray-500 text-[10px] font-black uppercase">情緒帶來的額外價值</span>
+                                <div id="addedVal" class="text-3xl font-black text-[var(--c-secondary)] font-comic mt-2">+ 0 點</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 追加：互動體驗：Delta 敏感度變動曲線 -->
+        <section class="flex flex-col items-center">
+            <div class="w-full pop-card bg-[#E0F2F1] p-6 md:p-10 relative">
+                <div class="flex items-center gap-3 mb-8">
+                    <span class="text-3xl">🎮</span>
+                    <h3 class="text-2xl md:text-3xl font-black text-[var(--c-dark)] uppercase italic">互動體驗：Delta 敏感度曲線</h3>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="flex flex-col gap-6">
+                        <div class="bg-white p-6 rounded-2xl border-4 border-black shadow-[6px_6px_0_#000]">
+                            <span class="text-xs font-black text-gray-400 uppercase block mb-4">1. 選擇類型</span>
+                            <div class="flex gap-4">
+                                <button onclick="setCurveType('call')" id="curve-call" class="curve-mode-btn flex-1 py-3 border-4 border-black rounded-xl font-black text-sm bg-white transition-all active text-blue-500">CALL</button>
+                                <button onclick="setCurveType('put')" id="curve-put" class="curve-mode-btn flex-1 py-3 border-4 border-black rounded-xl font-black text-sm bg-white transition-all text-red-500">PUT</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl border-4 border-black shadow-[6px_6px_0_#000]">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-xs font-black text-gray-400 uppercase">2. 標的價格</span>
+                                <span id="curvePriceVal" class="text-3xl font-black text-orange-500 font-comic">30000</span>
+                            </div>
+                            <input type="range" id="curveSlider" min="29000" max="31000" step="20" value="30000">
+                        </div>
+
+                        <div class="bg-[var(--c-accent)] p-6 rounded-full border-4 border-black aspect-square flex flex-col items-center justify-center shadow-[8px_8px_0_#000]">
+                            <span class="text-[10px] font-black text-black/60 uppercase">當前 DELTA</span>
+                            <div id="curveDeltaDisplay" class="text-4xl md:text-5xl font-black font-comic">0.50</div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white rounded-3xl border-4 border-black p-6 relative h-[400px] overflow-hidden">
+                        <svg viewBox="0 0 500 300" class="w-full h-full overflow-visible">
+                            <line x1="40" y1="20" x2="40" y2="280" stroke="#000" stroke-width="2"/>
+                            <line x1="40" y1="150" x2="480" y2="150" stroke="#E2E8F0" stroke-width="2" stroke-dasharray="4 4"/>
+                            <line x1="40" y1="280" x2="480" y2="280" stroke="#000" stroke-width="2"/>
+                            <text x="35" y="30" text-anchor="end" font-size="12" font-weight="900">1</text>
+                            <text x="35" y="155" text-anchor="end" font-size="12" font-weight="900">0</text>
+                            <text x="35" y="280" text-anchor="end" font-size="12" font-weight="900">-1</text>
+                            <path id="curveArea" d="" fill="rgba(59, 130, 246, 0.2)" />
+                            <path id="curveLine" d="" fill="none" stroke="var(--c-call)" stroke-width="5" stroke-linecap="round"/>
+                            <line id="scanLine" x1="0" y1="30" x2="0" y2="280" stroke="#EF4444" stroke-width="3" stroke-dasharray="4 2"/>
+                            <circle id="scanDot" cx="0" cy="0" r="8" fill="#EF4444" stroke="#000" stroke-width="2"/>
+                        </svg>
+                        <div class="absolute bottom-2 left-0 w-full flex justify-between px-12 text-[10px] font-black text-gray-400">
+                            <span>29,000 (價外)</span>
+                            <span>30,000 (價平)</span>
+                            <span>31,000 (價內)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 買賣方視角 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="pop-card p-8 bg-white border-t-[12px] border-t-cyan-500">
+                <h3 class="text-2xl font-black text-cyan-600 mb-4">買方 = 正 Vega (+V)</h3>
+                <p class="text-gray-600 font-bold mb-6">在大行情（如法說會、戰爭）前買入。市場恐慌升溫時，即使大盤沒動，你的權利金也會自動變貴！</p>
+                <div class="bg-cyan-50 p-4 rounded-xl border-2 border-dashed border-cyan-300 italic text-xs font-bold text-gray-500">
+                    💡 實戰提醒：最怕「利多出盡」，IV 暴跌時買方會被雙殺。
+                </div>
+            </div>
+
+            <div class="pop-card p-8 bg-white border-t-[12px] border-t-pink-500">
+                <h3 class="text-2xl font-black text-pink-600 mb-4">賣方 = 負 Vega (-V)</h3>
+                <p class="text-gray-600 font-bold mb-6">最愛 IV 高位。等市場冷靜、氣球消風，權利金會自動縮回口袋，是賺取穩定租金的好時機。</p>
+                <div class="bg-pink-50 p-4 rounded-xl border-2 border-dashed border-pink-300 italic text-xs font-bold text-gray-500">
+                    💡 實戰提醒：賣方最怕「黑天鵝」。IV 從 20% 飆到 50% 時曝險極大。
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="w-full flex justify-center mt-20 pb-12 px-4">
+        <div class="capsule-container px-8 py-4 flex-col gap-2">
+            <div class="flex items-center gap-4">
+                <span class="text-2xl font-black text-[var(--c-dark)] font-comic tracking-widest uppercase">JOPTION</span>
+                <div class="w-1 h-8 bg-gray-300"></div>
+                <span class="text-lg font-bold text-gray-600">歐大選擇權教室</span>
+            </div>
+            <p class="text-[10px] text-gray-400 font-black italic tracking-wider text-center">
+                © 2026 金融教育僅供參考。Vega 是市場溫度的體現，學會冷靜才能獲利。
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // --- 氣球模擬器邏輯 ---
+        let expiryMode = 'short';
+        const ivSlider = document.getElementById('ivSlider');
+        const ivNum = document.getElementById('ivNum');
+        const balloonScale = document.getElementById('balloonScale');
+        const premiumVal = document.getElementById('premiumVal');
+        const vegaDisplay = document.getElementById('vegaDisplay');
+        const addedVal = document.getElementById('addedVal');
+        const sentimentTag = document.getElementById('sentimentTag');
+
+        function setExpiry(mode) {
+            expiryMode = mode;
+            document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${mode}`).classList.add('active');
+            updateBalloon();
+        }
+
+        function updateBalloon() {
+            const currentIV = parseInt(ivSlider.value);
+            ivNum.innerText = currentIV;
+            const vegaValue = expiryMode === 'short' ? 3.5 : 8.2;
+            vegaDisplay.innerText = vegaValue.toFixed(1);
+            const changeInPoints = (currentIV - 20) * vegaValue;
+            const finalPremium = Math.max(10, Math.round(100 + changeInPoints));
+            premiumVal.innerText = finalPremium;
+            addedVal.innerText = (changeInPoints >= 0 ? "+ " : "- ") + Math.abs(Math.round(changeInPoints)) + " 點";
+            addedVal.style.color = changeInPoints >= 0 ? "var(--c-secondary)" : "var(--c-put)";
+            const scale = 0.5 + (finalPremium / 100) * 0.5;
+            balloonScale.style.transform = `scale(${scale})`;
+
+            if (currentIV < 15) { sentimentTag.innerText = "😴 極度冷感"; sentimentTag.className = "bg-blue-600 text-white px-4 py-2 rounded-xl font-black text-sm transform -rotate-3"; }
+            else if (currentIV > 40) { sentimentTag.innerText = "😱 驚聲尖叫"; sentimentTag.className = "bg-red-600 text-white px-4 py-2 rounded-xl font-black text-sm transform rotate-3 animate-pulse"; }
+            else { sentimentTag.innerText = "😊 平常心"; sentimentTag.className = "bg-[var(--c-dark)] text-white px-4 py-2 rounded-xl font-black text-sm transform rotate-2"; }
+        }
+
+        // --- 追加曲線圖邏輯 ---
+        let curveType = 'call';
+        const curveSlider = document.getElementById('curveSlider');
+        const curvePriceVal = document.getElementById('curvePriceVal');
+        const curveDeltaDisplay = document.getElementById('curveDeltaDisplay');
+        const curveLine = document.getElementById('curveLine');
+        const curveArea = document.getElementById('curveArea');
+        const scanLine = document.getElementById('scanLine');
+        const scanDot = document.getElementById('scanDot');
+
+        function setCurveType(type) {
+            curveType = type;
+            document.querySelectorAll('.curve-mode-btn').forEach(btn => btn.classList.remove('active', 'border-blue-500', 'text-blue-500', 'border-red-500', 'text-red-500'));
+            const btn = document.getElementById(`curve-${type}`);
+            const colorClass = type === 'call' ? 'border-blue-500 text-blue-500' : 'border-red-500 text-red-500';
+            btn.classList.add('active', ...colorClass.split(' '));
+            updateCurve();
+        }
+
+        function updateCurve() {
+            const price = parseInt(curveSlider.value);
+            curvePriceVal.innerText = price;
+            const strike = 30000;
+            const points = [];
+            const svgWidth = 440; 
+            const centerY = 150;
+
+            for (let x = 0; x <= svgWidth; x++) {
+                const p = 29000 + (x / svgWidth) * 2000;
+                let d = 1 / (1 + Math.exp(-(p - strike) / 250));
+                if (curveType === 'put') d = d - 1;
+                const y = centerY - (d * 125); 
+                points.push(`${x + 40},${y}`);
+            }
+
+            const pathData = "M " + points.join(" L ");
+            curveLine.setAttribute('d', pathData);
+            curveLine.setAttribute('stroke', curveType === 'call' ? 'var(--c-call)' : 'var(--c-put)');
+            const areaPath = pathData + ` L ${480},150 L 40,150 Z`;
+            curveArea.setAttribute('d', areaPath);
+            curveArea.setAttribute('fill', curveType === 'call' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)');
+
+            const currentX = 40 + ((price - 29000) / 2000) * svgWidth;
+            let currentDelta = 1 / (1 + Math.exp(-(price - strike) / 250));
+            if (curveType === 'put') currentDelta = currentDelta - 1;
+            const currentY = centerY - (currentDelta * 125);
+            
+            scanLine.setAttribute('x1', currentX); scanLine.setAttribute('x2', currentX);
+            scanDot.setAttribute('cx', currentX); scanDot.setAttribute('cy', currentY);
+            curveDeltaDisplay.innerText = currentDelta.toFixed(2);
+            curveDeltaDisplay.style.color = curveType === 'call' ? 'var(--c-call)' : 'var(--c-put)';
+        }
+
+        ivSlider.addEventListener('input', updateBalloon);
+        curveSlider.addEventListener('input', updateCurve);
+        updateBalloon();
+        updateCurve();
+    </script>
+</body>
+</html>

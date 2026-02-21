@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM! Gamma 加速度圖解 | 歐大選擇權教室</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 極速賽車普普風專屬色調 */
+        :root {
+            --c-bg: #FFFBEB; /* 暖黃底 */
+            --c-gamma: #F97316; /* 橙色 (加速度/火焰) */
+            --c-delta: #3B82F6; /* 藍色 (速度) */
+            --c-accent: #EF4444; /* 紅色 (爆發) */
+            --c-dark: #0F172A;
+            --c-grid: #E2E8F0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--c-bg);
+            color: var(--c-dark);
+            /* 普普風大型圓點背景 */
+            background-image: radial-gradient(var(--c-grid) 3px, transparent 3px);
+            background-size: 40px 40px;
+        }
+
+        .font-comic {
+            font-family: 'Bangers', 'Noto Sans TC', cursive;
+            letter-spacing: 0.05em;
+        }
+
+        /* 普普風卡通框線與深度陰影 */
+        .pop-card {
+            border: 5px solid var(--c-dark);
+            border-radius: 1.5rem;
+            background-color: white;
+            box-shadow: 12px 12px 0px var(--c-dark);
+            transition: all 0.2s ease;
+        }
+
+        .pop-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 15px 15px 0px var(--c-dark);
+        }
+
+        /* 膠囊容器 */
+        .capsule-container {
+            background: white;
+            border: 4px solid var(--c-dark);
+            border-radius: 9999px;
+            box-shadow: 0 8px 0 var(--c-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* 拉桿樣式 */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 20px;
+            background: var(--c-dark);
+            border-radius: 10px;
+            border: 2px solid white;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 48px;
+            width: 48px;
+            border-radius: 12px;
+            background: var(--c-gamma);
+            cursor: pointer;
+            margin-top: -16px;
+            border: 5px solid var(--c-dark);
+            box-shadow: 0 5px 0 var(--c-dark);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M13.17 16l-4.58 4.59L10 22l6-6-6-6-1.41 1.41z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* 儀表板針動畫 */
+        .gauge-needle {
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: 100px 100px;
+        }
+
+        /* 模式按鈕激活 */
+        .mode-btn.active {
+            background-color: var(--c-dark);
+            color: white;
+            transform: scale(1.05) rotate(-2deg);
+        }
+
+        @keyframes fire {
+            0% { transform: translateY(0) scale(1); opacity: 0.8; }
+            50% { transform: translateY(-5px) scale(1.1); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 0.8; }
+        }
+        .fire-effect {
+            animation: fire 0.3s infinite;
+        }
+
+        @media (max-width: 640px) {
+            .pop-card { border-width: 4px; box-shadow: 8px 8px 0px var(--c-dark); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4 sm:p-8 overflow-x-hidden w-full">
+
+    <!-- 頁首 -->
+    <header class="w-full flex justify-center mb-12">
+        <div class="capsule-container px-6 py-3 flex-row gap-4">
+            <div class="w-14 h-14 rounded-xl border-4 border-[var(--c-dark)] overflow-hidden bg-white shrink-0">
+                <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/F97316/FFFFFF?text=Logo&font=Bangers'">
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-2xl sm:text-3xl font-black text-[var(--c-dark)] leading-none tracking-tight">歐大選擇權教室</h1>
+                <p class="text-xs font-black text-[var(--c-gamma)] tracking-[0.2em] uppercase mt-1 font-comic">ACCELERATION MASTERCLASS</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-6xl flex flex-col gap-12">
+        
+        <!-- 大標題 -->
+        <div class="text-center">
+            <div class="inline-block bg-[var(--c-gamma)] px-8 py-5 pop-card transform -rotate-1 relative">
+                <div class="absolute -top-10 -right-10 text-7xl md:text-9xl transform rotate-12 fire-effect">🔥</div>
+                <h2 class="text-5xl sm:text-7xl md:text-8xl font-black text-white tracking-wide font-comic uppercase drop-shadow-[4px_4px_0_#000]">
+                    Gamma
+                </h2>
+                <div class="mt-2 text-xl md:text-3xl font-black text-[var(--c-dark)] bg-white px-5 py-2 inline-block rounded-xl border-4 border-black shadow-[4px_4px_0_#000]">
+                    獲利的加速器：Delta 的變化球
+                </div>
+            </div>
+        </div>
+
+        <!-- Gamma 核心概念定義 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+            <div class="pop-card p-8 flex flex-col justify-center relative overflow-hidden bg-white">
+                <div class="absolute -bottom-10 -right-6 text-[10rem] opacity-5 font-black font-comic">Γ</div>
+                <h3 class="text-3xl font-black mb-6 flex items-center gap-3">
+                    <span class="bg-[var(--c-dark)] text-white w-10 h-10 rounded-full flex items-center justify-center font-comic">?</span>
+                    Gamma 是什麼？
+                </h3>
+                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-4">
+                    它是 Delta 的<strong class="text-[var(--c-accent)] underline decoration-4 decoration-[var(--c-accent)] underline-offset-4">加速度</strong>。<br>
+                    大盤（標的）每變動 <strong class="text-[var(--c-dark)]">1 點</strong>，你的 Delta 會增加或減少多少。
+                </p>
+                <div class="mt-4 grid grid-cols-2 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-xl border-2 border-blue-200">
+                        <div class="text-xs font-black text-blue-400 uppercase mb-1">Delta</div>
+                        <div class="font-bold text-sm">現在會動多少速度</div>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-xl border-2 border-orange-200">
+                        <div class="text-xs font-black text-orange-400 uppercase mb-1">Gamma</div>
+                        <div class="font-bold text-sm">接下來會不會變快</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pop-card p-8 bg-[var(--c-dark)] text-white flex flex-col justify-center">
+                <h3 class="text-2xl font-black mb-6 text-[var(--c-gamma)] uppercase font-comic tracking-widest">Core Principles</h3>
+                <ul class="space-y-4 font-bold">
+                    <li class="flex items-center gap-3">
+                        <span class="text-2xl">🎯</span>
+                        <span><strong class="text-[var(--c-gamma)]">價平 (ATM) 最大</strong>：價平附近的合約對波動最敏感。</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="text-2xl">⏳</span>
+                        <span><strong class="text-[var(--c-gamma)]">到期前暴衝</strong>：越接近結算日，價平 Gamma 越像原子彈。</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="text-2xl">🏹</span>
+                        <span><strong class="text-green-400">買方正 Gamma</strong>：越動越有利，獲利會「跑起來」。</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="text-2xl">🛡️</span>
+                        <span><strong class="text-red-400">賣方負 Gamma</strong>：越動越不利，虧損會「炸開來」。</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ★ 核心互動：Gamma 渦輪增壓模擬儀 ★ -->
+        <section class="flex flex-col items-center mt-6">
+            <h3 class="text-2xl md:text-4xl font-black mb-8 text-[var(--c-dark)] tracking-wide text-center bg-white px-8 py-3 pop-card inline-block border-dashed">
+                🕹️ Gamma 渦輪增壓模擬儀 (台指 30,000)
+            </h3>
+            
+            <div class="w-full pop-card bg-[#1E293B] p-6 md:p-12 relative overflow-hidden">
+                <!-- 背景賽道線條裝飾 -->
+                <div class="absolute inset-0 opacity-10" style="background: repeating-linear-gradient(0deg, transparent, transparent 40px, #fff 40px, #fff 41px);"></div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+                    
+                    <!-- 左側：Delta 與 Gamma 雙儀表板 -->
+                    <div class="lg:col-span-5 flex flex-col items-center gap-8">
+                        <!-- Delta 儀表板 -->
+                        <div class="relative w-56 h-56 bg-white border-[6px] border-[var(--c-dark)] rounded-full shadow-[0_10px_0_#000] flex items-center justify-center">
+                            <svg viewBox="0 0 200 200" class="w-full h-full">
+                                <path d="M 40 140 A 75 75 0 1 1 160 140" fill="none" stroke="#E2E8F0" stroke-width="15" stroke-linecap="round"/>
+                                <g id="deltaNeedle" class="gauge-needle" style="transform: rotate(-90deg);">
+                                    <path d="M 100 100 L 100 40" stroke="var(--c-delta)" stroke-width="6" stroke-linecap="round"/>
+                                    <circle cx="100" cy="100" r="10" fill="var(--c-dark)"/>
+                                </g>
+                            </svg>
+                            <div class="absolute bottom-6 flex flex-col items-center">
+                                <span class="text-[10px] font-black text-gray-400 uppercase">Delta (速度)</span>
+                                <span id="deltaNum" class="text-3xl font-black font-comic text-[var(--c-delta)]">0.50</span>
+                            </div>
+                        </div>
+
+                        <!-- Gamma 指示燈 -->
+                        <div id="gammaLight" class="w-full py-4 rounded-2xl border-4 border-black text-center bg-gray-800 transition-all duration-300">
+                            <span class="text-xs font-black text-gray-500 uppercase tracking-widest">Turbo Acceleration (Gamma)</span>
+                            <div id="gammaValue" class="text-4xl font-black text-white font-comic mt-1">LOW</div>
+                        </div>
+                    </div>
+
+                    <!-- 右側：控制面板 -->
+                    <div class="lg:col-span-7 flex flex-col gap-8">
+                        <!-- 時間狀態切換 -->
+                        <div class="bg-gray-800 p-3 rounded-2xl flex gap-3">
+                            <button onclick="setTimeMode('normal')" id="btn-time-normal" class="mode-btn active flex-1 py-3 border-4 border-black rounded-xl font-black text-xs sm:text-sm bg-gray-100 transition-all">🌙 平時 (Gamma 穩定)</button>
+                            <button onclick="setTimeMode('expiry')" id="btn-time-expiry" class="mode-btn flex-1 py-3 border-4 border-black rounded-xl font-black text-xs sm:text-sm bg-gray-100 transition-all">⚡ 結算前夕 (Gamma 爆衝)</button>
+                        </div>
+
+                        <!-- 大盤拉桿 -->
+                        <div class="bg-white/95 p-6 rounded-2xl border-4 border-black shadow-[6px_6px_0_var(--c-gamma)]">
+                            <div class="flex justify-between items-end mb-6">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-500 font-black text-xs uppercase tracking-widest">模擬台指期跳動</span>
+                                    <div class="flex items-baseline gap-1">
+                                        <span id="indexVal" class="text-4xl font-black text-[var(--c-gamma)] font-comic">30,000</span>
+                                        <span class="text-sm font-bold text-gray-400">點</span>
+                                    </div>
+                                </div>
+                                <div id="stateTag" class="bg-[var(--c-dark)] text-white px-3 py-1 rounded font-black text-xs">價平 ATM</div>
+                            </div>
+                            <input type="range" id="indexSlider" min="29500" max="30500" step="10" value="30000">
+                            <div class="flex justify-between mt-4 text-[10px] font-black text-gray-400">
+                                <span>29,500</span>
+                                <span>30,000 (Strike)</span>
+                                <span>30,500</span>
+                            </div>
+                        </div>
+
+                        <!-- 戰況即時分析 -->
+                        <div class="bg-[var(--c-dark)] p-5 rounded-2xl relative border-l-8 border-[var(--c-accent)]">
+                            <h4 class="text-[var(--c-accent)] font-black text-sm mb-2 uppercase italic tracking-tighter">Live Analysis:</h4>
+                            <p id="analysisText" class="text-white font-bold text-sm leading-relaxed">
+                                目前就在履約價附近。Gamma 處於最高峰！大盤只要稍微一動，Delta 就會像脫韁野馬一樣狂奔。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 買賣方 Gamma 大不同 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- 買方 -->
+            <div class="pop-card p-8 bg-white border-t-[12px] border-t-green-500">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-4xl">🏹</span>
+                    <h3 class="text-2xl font-black text-green-600">買方正 Gamma (+Γ)</h3>
+                </div>
+                <h4 class="font-black text-[var(--c-dark)] bg-green-50 px-2 py-1 inline-block rounded mb-4">特性：獲利自動增壓器</h4>
+                <p class="text-gray-600 font-bold mb-6">上漲時 Delta 變大（越賺越快），下跌時 Delta 變小（賠錢變慢）。</p>
+                <div class="bg-gray-50 p-4 rounded-xl border-2 border-dashed border-gray-300 italic font-bold text-sm text-gray-500">
+                    💡 「小錢變大錢」的魔術。只要大行情啟動，Gamma 就會幫你把 Delta 從 0.5 推向 1.0！
+                </div>
+            </div>
+
+            <!-- 賣方 -->
+            <div class="pop-card p-8 bg-white border-t-[12px] border-t-red-500">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-4xl">🛡️</span>
+                    <h3 class="text-2xl font-black text-red-600">賣方負 Gamma (-Γ)</h3>
+                </div>
+                <h4 class="font-black text-[var(--c-dark)] bg-red-50 px-2 py-1 inline-block rounded mb-4">特性：風險放大定時炸彈</h4>
+                <p class="text-gray-600 font-bold mb-6">上漲時 Delta 變大（越賠越快），下跌時 Delta 也變大（空頭回補壓力）。</p>
+                <div class="bg-gray-50 p-4 rounded-xl border-2 border-dashed border-gray-300 italic font-bold text-sm text-gray-500">
+                    💡 「賣方最怕急漲急跌」。Gamma 會讓曝險在瞬間失控，這就是為什麼賣方不能在結算前夕隨便凹單。
+                </div>
+            </div>
+        </section>
+
+        <!-- 一張表秒懂 Gamma 戰力表 -->
+        <section class="w-full">
+            <h3 class="text-2xl md:text-3xl font-black mb-8 text-center font-comic uppercase tracking-widest">📊 Gamma Quick Summary Table</h3>
+            <div class="pop-card p-0 overflow-hidden shadow-orange-500/20">
+                <div class="w-full overflow-x-auto">
+                    <table class="w-full text-center border-collapse">
+                        <thead>
+                            <tr class="bg-[var(--c-dark)] text-white">
+                                <th class="py-6 px-6 font-black text-lg">合約位置</th>
+                                <th class="py-6 px-6 font-black text-lg border-x border-gray-700">Gamma 強度</th>
+                                <th class="py-6 px-6 font-black text-lg">實戰影響</th>
+                            </tr>
+                        </thead>
+                        <tbody class="font-bold text-sm md:text-base divide-y-4 divide-gray-100">
+                            <tr>
+                                <td class="py-6 px-6 bg-gray-50 text-gray-400 italic">深價外 OTM</td>
+                                <td class="py-6 px-6 text-xl">極低</td>
+                                <td class="py-6 px-6 text-gray-500">🐢 引擎還沒發動，Delta 不太會變。</td>
+                            </tr>
+                            <tr class="bg-orange-50">
+                                <td class="py-6 px-6 font-black text-[var(--c-gamma)] italic">價平附近 ATM</td>
+                                <td class="py-6 px-6 text-3xl font-comic text-[var(--c-accent)]">MAX 🔥</td>
+                                <td class="py-6 px-6 text-[var(--c-dark)]">⚡ 油門踩到底！Delta 變動最劇烈，爆發力最強。</td>
+                            </tr>
+                            <tr>
+                                <td class="py-6 px-6 bg-gray-50 text-gray-400 italic">深價內 ITM</td>
+                                <td class="py-6 px-6 text-xl">極低</td>
+                                <td class="py-6 px-6 text-gray-500">🐎 已進入極速。Delta 接近 1.0，加速空間變小。</td>
+                            </tr>
+                            <tr class="bg-red-50">
+                                <td class="py-6 px-6 font-black text-red-600 uppercase">結算日前夕</td>
+                                <td colspan="2" class="py-6 px-6 text-red-600 font-black text-lg">
+                                    "Gamma 懸崖！小點位波動會造成 Delta 巨大翻轉 (0 ➔ 1 或 1 ➔ 0)"
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="w-full flex justify-center mt-20 pb-12 px-4">
+        <div class="capsule-container px-8 py-4 flex-col gap-2">
+            <div class="flex items-center gap-4">
+                <span class="text-2xl font-black text-[var(--c-dark)] font-comic tracking-widest uppercase">JOPTION</span>
+                <div class="w-1 h-8 bg-gray-300"></div>
+                <span class="text-lg font-bold text-gray-600">歐大選擇權教室</span>
+            </div>
+            <p class="text-[10px] text-gray-400 font-black italic tracking-wider">© 2026 金融教育僅供參考。Gamma 是雙向刃，買方愛它，賣方懼它。</p>
+        </div>
+    </footer>
+
+    <script>
+        let timeMode = 'normal'; // 'normal' or 'expiry'
+        const indexSlider = document.getElementById('indexSlider');
+        const indexDisplay = document.getElementById('indexVal');
+        const deltaDisplay = document.getElementById('deltaNum');
+        const gammaDisplay = document.getElementById('gammaValue');
+        const deltaNeedle = document.getElementById('deltaNeedle');
+        const gammaLight = document.getElementById('gammaLight');
+        const stateTag = document.getElementById('stateTag');
+        const analysisText = document.getElementById('analysisText');
+
+        const strike = 30000;
+
+        function setTimeMode(mode) {
+            timeMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-time-${mode}`).classList.add('active');
+            update();
+        }
+
+        function update() {
+            const currentIdx = parseInt(indexSlider.value);
+            indexDisplay.innerText = currentIdx.toLocaleString();
+
+            // 模擬 Gamma 分佈 (常態分佈)
+            // 到期前夕 Gamma 曲線會變窄且高
+            const sigma = timeMode === 'normal' ? 200 : 60;
+            const diff = currentIdx - strike;
+            
+            // 計算 Delta (Sigmoid)
+            const delta = 1 / (1 + Math.exp(-diff / (sigma * 0.7)));
+            
+            // 計算 Gamma (Delta 的導數, 這裡用高斯分佈模擬強度)
+            const gammaIntensity = Math.exp(-(diff * diff) / (2 * sigma * sigma));
+            
+            // 更新 UI
+            deltaDisplay.innerText = delta.toFixed(2);
+            deltaNeedle.style.transform = `rotate(${-90 + (delta * 180)}deg)`;
+
+            // 更新 Gamma 視覺
+            if (gammaIntensity > 0.8) {
+                gammaDisplay.innerText = timeMode === 'expiry' ? "💣 EXPLOSIVE" : "🔥 HIGH TURBO";
+                gammaLight.style.backgroundColor = "#EF4444";
+                gammaLight.classList.add('fire-effect');
+                stateTag.innerText = "價平附近 ATM";
+                stateTag.style.backgroundColor = "var(--c-gamma)";
+            } else if (gammaIntensity > 0.3) {
+                gammaDisplay.innerText = "⚡ MEDIUM";
+                gammaLight.style.backgroundColor = "#F97316";
+                gammaLight.classList.remove('fire-effect');
+                stateTag.innerText = currentIdx > strike ? "近價內 ITM" : "近價外 OTM";
+                stateTag.style.backgroundColor = "#475569";
+            } else {
+                gammaDisplay.innerText = "🐢 LOW";
+                gammaLight.style.backgroundColor = "#1F2937";
+                gammaLight.classList.remove('fire-effect');
+                stateTag.innerText = currentIdx > strike ? "深價內 ITM" : "深價外 OTM";
+                stateTag.style.backgroundColor = "#1e293b";
+            }
+
+            // 更新分析文字
+            if (timeMode === 'expiry' && Math.abs(diff) < 50) {
+                analysisText.innerHTML = "⚠️ <strong>警告：結算危險區！</strong> 目前 Gamma 已達爆發點。大盤隨便跳幾點，這張合約就會從「廢紙」變成「黃金」，或是從「贏家」變成「歸零」。";
+            } else if (Math.abs(diff) < 50) {
+                analysisText.innerHTML = "🎯 <strong>價平獲利機：</strong> 這裡是加速最強的地方。買方期待油門踩下，讓 Delta 從 0.5 快速衝向 1.0 翻倍獲利。";
+            } else if (currentIdx > strike) {
+                analysisText.innerHTML = "🏎️ <strong>定速行駛：</strong> 已進入深價內。Delta 已趨近於 1，這代表你的獲利與期貨同步。雖然加速度變慢，但速度很快。";
+            } else {
+                analysisText.innerHTML = "💤 <strong>引擎怠速：</strong> 目前深價外。Gamma 非常微弱。除非大盤發生奇蹟式暴漲，否則 Delta 不會有太明顯的變化。";
+            }
+        }
+
+        indexSlider.addEventListener('input', update);
+        
+        // 初始執行
+        update();
+    </script>
+</body>
+</html>

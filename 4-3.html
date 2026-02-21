@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM! Theta 時間衰減圖解 | 歐大選擇權教室</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 吸血鬼普普風專屬色調 */
+        :root {
+            --c-bg: #F5F3FF; /* 極淺紫底 */
+            --c-primary: #A855F7; /* 螢光紫 (Theta) */
+            --c-secondary: #FF007F; /* 桃紅 (血/權利金) */
+            --c-accent: #39FF14; /* 螢光綠 (獲利/能量) */
+            --c-dark: #0F172A;
+            --c-grid: #E2E8F0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--c-bg);
+            color: var(--c-dark);
+            /* 普普風大型交叉網格背景 */
+            background-image: 
+                linear-gradient(var(--c-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--c-grid) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        .font-comic {
+            font-family: 'Bangers', 'Noto Sans TC', cursive;
+            letter-spacing: 0.05em;
+        }
+
+        /* 普普風卡通框線與深度陰影 */
+        .pop-card {
+            border: 5px solid var(--c-dark);
+            border-radius: 1.5rem;
+            background-color: white;
+            box-shadow: 10px 10px 0px var(--c-dark);
+            transition: all 0.2s ease;
+        }
+
+        .pop-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 13px 13px 0px var(--c-dark);
+        }
+
+        /* 膠囊容器 */
+        .capsule-container {
+            background: white;
+            border: 4px solid var(--c-dark);
+            border-radius: 9999px;
+            box-shadow: 0 8px 0 var(--c-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* 互動拉桿 */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 18px;
+            background: var(--c-dark);
+            border-radius: 10px;
+            border: 2px solid white;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 48px;
+            width: 48px;
+            border-radius: 50%;
+            background: var(--c-secondary);
+            cursor: pointer;
+            margin-top: -16px;
+            border: 5px solid var(--c-dark);
+            box-shadow: 0 5px 0 var(--c-dark);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 2c5.52 0 10 4.48 10 10s-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2zm0 18c4.42 0 8-3.58 8-8s-3.58-8-8-8-8 3.58-8 8 3.58 8 8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 60%;
+        }
+
+        /* 能量條動畫 */
+        .blood-bar {
+            transition: height 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+
+        .side-btn.active {
+            background-color: var(--c-dark);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        @keyframes drip {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(100px); opacity: 0; }
+        }
+        .drip-effect {
+            animation: drip 1s infinite linear;
+        }
+
+        @media (max-width: 640px) {
+            .pop-card { border-width: 4px; box-shadow: 8px 8px 0px var(--c-dark); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4 sm:p-8">
+
+    <!-- 頁首 -->
+    <header class="w-full flex justify-center mb-12">
+        <div class="capsule-container px-6 py-3 flex-row gap-4">
+            <div class="w-14 h-14 rounded-xl border-4 border-[var(--c-dark)] overflow-hidden bg-white shrink-0">
+                <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/A855F7/FFFFFF?text=Logo&font=Bangers'">
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-2xl sm:text-3xl font-black text-[var(--c-dark)] leading-none tracking-tight">歐大選擇權教室</h1>
+                <p class="text-xs font-black text-[var(--c-primary)] tracking-[0.2em] uppercase mt-1 font-comic">TIME DECAY MASTERCLASS</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-6xl flex flex-col gap-12">
+        
+        <!-- 大標題 -->
+        <div class="text-center">
+            <div class="inline-block bg-[var(--c-primary)] px-8 py-5 pop-card transform rotate-1 relative">
+                <div class="absolute -top-10 -right-10 text-7xl md:text-9xl transform -rotate-12">🧛‍♂️</div>
+                <h2 class="text-5xl sm:text-7xl md:text-8xl font-black text-white tracking-wide font-comic uppercase drop-shadow-[4px_4px_0_#000]">
+                    Theta
+                </h2>
+                <div class="mt-2 text-xl md:text-3xl font-black text-[var(--c-dark)] bg-[var(--c-accent)] px-5 py-2 inline-block rounded-xl border-4 border-black shadow-[4px_4px_0_#000]">
+                    時間衰減：權利金的吸血鬼
+                </div>
+            </div>
+        </div>
+
+        <!-- Theta 核心概念 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+            <div class="pop-card p-8 flex flex-col justify-center relative overflow-hidden bg-white">
+                <div class="absolute -bottom-10 -right-6 text-[10rem] opacity-5 font-black font-comic">Θ</div>
+                <h3 class="text-3xl font-black mb-6 flex items-center gap-3">
+                    <span class="bg-[var(--c-dark)] text-white w-10 h-10 rounded-full flex items-center justify-center font-comic">?</span>
+                    Theta 是什麼？
+                </h3>
+                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-4">
+                    它是衡量<strong class="text-[var(--c-secondary)] underline decoration-4 decoration-[var(--c-secondary)] underline-offset-4">時間價值消失速度</strong>的指標。<br>
+                    每過一天，即便大盤一動也不動，你的選擇權價值也會減少。
+                </p>
+                <div class="mt-4 p-4 bg-purple-50 rounded-xl border-4 border-dashed border-purple-200 text-center">
+                    <p class="font-comic text-xl">Θ = 每天減少的權利金</p>
+                    <p class="text-xs font-bold text-gray-500 mt-1">※ 通常以負數表示 (對買方而言)</p>
+                </div>
+            </div>
+
+            <div class="pop-card p-8 bg-[var(--c-dark)] text-white flex flex-col justify-center">
+                <h3 class="text-2xl font-black mb-6 text-[var(--c-accent)] uppercase font-comic tracking-widest">Core Logic</h3>
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-[var(--c-secondary)] rounded-lg flex items-center justify-center text-2xl border-2 border-white">📉</div>
+                        <div>
+                            <div class="font-black text-lg text-white">買方 (Long)：與時間對抗</div>
+                            <p class="text-xs text-gray-400 font-bold">每天醒來帳面就少一點，沒行情就是虧。</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-[var(--c-accent)] rounded-lg flex items-center justify-center text-2xl border-2 border-white">🏦</div>
+                        <div>
+                            <div class="font-black text-lg text-white">賣方 (Short)：靠時間吃飯</div>
+                            <p class="text-xs text-gray-400 font-bold">不動也在賺，時間流逝就是你的租金收入。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ★ 核心互動：Theta 吸血量模擬儀 ★ -->
+        <section class="flex flex-col items-center mt-6">
+            <h3 class="text-2xl md:text-4xl font-black mb-8 text-[var(--c-dark)] tracking-wide text-center bg-white px-8 py-3 pop-card inline-block border-dashed">
+                🕹️ Theta 吸血量模擬儀 (台指 30,000)
+            </h3>
+            
+            <div class="w-full pop-card bg-[#1E293B] p-6 md:p-12 relative overflow-hidden">
+                <!-- 沙漏裝飾 -->
+                <div class="absolute inset-0 opacity-5" style="background: repeating-linear-gradient(0deg, transparent, transparent 40px, #fff 40px, #fff 41px);"></div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+                    
+                    <!-- 左側：能量血袋 -->
+                    <div class="lg:col-span-4 flex flex-col items-center">
+                        <div class="relative w-40 h-80 border-[6px] border-[var(--c-dark)] rounded-[2rem] bg-gray-900 p-2 shadow-[0_15px_0_#000] overflow-hidden">
+                            <!-- 背景血袋 -->
+                            <div class="w-full h-full bg-gray-800 rounded-[1.5rem] flex flex-col justify-end relative">
+                                <!-- 動態水滴 -->
+                                <div id="dripContainer" class="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-full pointer-events-none">
+                                    <div class="drip-effect w-3 h-5 bg-[var(--c-secondary)] rounded-full absolute" style="left:0; top:20px;"></div>
+                                </div>
+                                <!-- 剩餘血量 -->
+                                <div id="bloodBar" class="blood-bar w-full bg-[var(--c-secondary)] shadow-[0_-5px_15px_rgba(255,0,127,0.5)]" style="height: 100%;">
+                                    <div class="w-full h-2 bg-white/20"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-8 bg-white border-4 border-black px-6 py-2 rounded-xl font-black text-sm shadow-lg">剩餘權利金能量</div>
+                    </div>
+
+                    <!-- 右側：控制面板 -->
+                    <div class="lg:col-span-8 flex flex-col gap-8">
+                        <!-- 身分切換 -->
+                        <div class="flex gap-4">
+                            <button onclick="setSide('buyer')" id="btn-buyer" class="side-btn active flex-1 py-4 border-4 border-black rounded-2xl font-black text-lg bg-gray-100 transition-all">🏹 買方 (負 Theta)</button>
+                            <button onclick="setSide('seller')" id="btn-seller" class="side-btn flex-1 py-4 border-4 border-black rounded-2xl font-black text-lg bg-gray-100 transition-all">🏦 賣方 (正 Theta)</button>
+                        </div>
+
+                        <!-- 倒數拉桿 -->
+                        <div class="bg-white/95 p-8 rounded-2xl border-4 border-black shadow-[6px_6px_0_var(--c-primary)]">
+                            <div class="flex justify-between items-end mb-6">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-500 font-black text-xs uppercase tracking-widest">距離到期日剩餘</span>
+                                    <div class="flex items-baseline gap-1">
+                                        <span id="daysVal" class="text-5xl md:text-7xl font-black text-[var(--c-primary)] font-comic">14</span>
+                                        <span class="text-xl font-bold text-gray-400">天</span>
+                                    </div>
+                                </div>
+                                <div id="stateTag" class="bg-[var(--c-dark)] text-white px-4 py-2 rounded-xl font-black text-sm transform -rotate-3">價平 ATM</div>
+                            </div>
+                            <input type="range" id="timeSlider" min="0" max="14" step="1" value="14">
+                            <div class="flex justify-between mt-4 text-[10px] font-black text-gray-400">
+                                <span class="text-green-500">剛掛牌 (流速慢)</span>
+                                <span>中期 (加速)</span>
+                                <span class="text-red-500">最後一週 (大崩盤)</span>
+                            </div>
+                        </div>
+
+                        <!-- 即時數據 -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-[var(--c-dark)] p-6 rounded-2xl border-b-8 border-[var(--c-secondary)]">
+                                <span class="text-gray-500 text-[10px] font-black uppercase">今日流逝點數</span>
+                                <div id="thetaPoints" class="text-4xl font-black text-[var(--c-secondary)] font-comic mt-2">- 5.5 點</div>
+                            </div>
+                            <div class="bg-[var(--c-dark)] p-6 rounded-2xl border-b-8 border-[var(--c-accent)]">
+                                <span class="text-gray-500 text-[10px] font-black uppercase">今日錢包變化</span>
+                                <div id="cashChange" class="text-4xl font-black text-[var(--c-accent)] font-comic mt-2">- $275</div>
+                                <p class="text-[10px] text-gray-500 mt-1 font-bold">(* 假設 1 點 = 50 元)</p>
+                            </div>
+                        </div>
+
+                        <!-- 教學提示 -->
+                        <div id="teachingText" class="bg-purple-50 border-l-8 border-[var(--c-primary)] p-5 rounded-r-xl text-sm font-bold text-gray-700">
+                            目前還有 14 天，雖然 Theta 吸血鬼已經開始上班，但吸得還不算太快。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Theta 五大核心規律 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="pop-card p-8 bg-white">
+                <div class="text-5xl mb-4 font-comic">01</div>
+                <h3 class="text-xl font-black mb-3 text-[var(--c-primary)]">越接近到期越劇烈</h3>
+                <p class="text-sm font-bold text-gray-600 leading-relaxed">衰減曲線是非線性的。最後一週的流失量通常佔據大半，這就是為什麼買方不能隨便「凹單」到結算。</p>
+            </div>
+            <div class="pop-card p-8 bg-white">
+                <div class="text-5xl mb-4 font-comic">02</div>
+                <h3 class="text-xl font-black mb-3 text-[var(--c-primary)]">價平 (ATM) 傷最重</h3>
+                <p class="text-sm font-bold text-gray-600 leading-relaxed">30,000 點附近的合約含有最多的「虛幻」價值，也是時間吸血鬼最愛的肥肉。</p>
+            </div>
+            <div class="pop-card p-8 bg-white">
+                <div class="text-5xl mb-4 font-comic">03</div>
+                <h3 class="text-xl font-black mb-3 text-[var(--c-primary)]">價內外衰減較慢</h3>
+                <p class="text-sm font-bold text-gray-600 leading-relaxed">深價內是「實」，深價外本來就「虛」，所以它們的 Theta 流速相對穩健。</p>
+            </div>
+            <div class="pop-card p-8 bg-white border-t-[12px] border-t-[var(--c-accent)]">
+                <div class="text-5xl mb-4 font-comic">04</div>
+                <h3 class="text-xl font-black mb-3">Theta vs Gamma</h3>
+                <p class="text-sm font-bold text-gray-600 leading-relaxed">它們是天敵。想要高爆發（高 Gamma），就得付昂貴的租金（高 Theta）。這就是市場的公平交易。</p>
+            </div>
+            <div class="pop-card p-8 bg-[var(--c-dark)] text-white border-t-[12px] border-t-[var(--c-secondary)]">
+                <div class="text-5xl mb-4 font-comic text-[var(--c-secondary)]">05</div>
+                <h3 class="text-xl font-black mb-3 text-[var(--c-secondary)]">到期日歸零</h3>
+                <p class="text-sm font-bold text-gray-400 leading-relaxed italic">審判之日。所有虛幻的時間價值都會消失，只有實體的「內涵價值」能活下來。</p>
+            </div>
+        </section>
+
+        <!-- 一張表秒懂總結 -->
+        <section class="w-full">
+            <h3 class="text-2xl md:text-3xl font-black mb-8 text-center font-comic uppercase tracking-widest">📊 Theta Cheat Sheet</h3>
+            <div class="pop-card p-0 overflow-hidden shadow-purple-500/20">
+                <div class="w-full overflow-x-auto">
+                    <table class="w-full text-center border-collapse">
+                        <thead>
+                            <tr class="bg-[var(--c-dark)] text-white">
+                                <th class="py-6 px-6 font-black text-lg">角色身分</th>
+                                <th class="py-6 px-6 font-black text-lg border-x border-gray-700">Theta 符號</th>
+                                <th class="py-6 px-6 font-black text-lg">實戰情境</th>
+                            </tr>
+                        </thead>
+                        <tbody class="font-bold text-sm md:text-base divide-y-4 divide-gray-100">
+                            <tr>
+                                <td class="py-6 px-6 bg-gray-50 text-[var(--c-secondary)] italic">買方 (Buyer)</td>
+                                <td class="py-6 px-6 text-2xl font-comic text-red-500">負數 (-)</td>
+                                <td class="py-6 px-6 text-gray-600">🏃 必須跑得比時間快。盤整就是你的死敵。</td>
+                            </tr>
+                            <tr class="bg-green-50/30">
+                                <td class="py-6 px-6 font-black italic text-green-600">賣方 (Seller)</td>
+                                <td class="py-6 px-6 text-2xl font-comic text-green-600">正數 (+)</td>
+                                <td class="py-6 px-6 text-[var(--c-dark)]">🏖️ 躺著收租。最喜歡大盤一動也不動。</td>
+                            </tr>
+                            <tr class="bg-yellow-50">
+                                <td class="py-6 px-6 font-black text-orange-600 uppercase">交易關鍵</td>
+                                <td colspan="2" class="py-6 px-6 text-lg font-black italic">
+                                    "買方一定要快，賣方最怕大變！"
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="w-full flex justify-center mt-20 pb-12 px-4">
+        <div class="capsule-container px-8 py-4 flex-col gap-2">
+            <div class="flex items-center gap-4">
+                <span class="text-2xl font-black text-[var(--c-dark)] font-comic tracking-widest uppercase">JOPTION</span>
+                <div class="w-1 h-8 bg-gray-300"></div>
+                <span class="text-lg font-bold text-gray-600">歐大選擇權教室</span>
+            </div>
+            <p class="text-[10px] text-gray-400 font-black italic tracking-wider">© 2026 金融教育僅供參考。Theta 是必然的衰減，掌握節奏才能勝出。</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentSide = 'buyer'; // 'buyer' or 'seller'
+        const timeSlider = document.getElementById('timeSlider');
+        const daysDisplay = document.getElementById('daysVal');
+        const bloodBar = document.getElementById('bloodBar');
+        const thetaPoints = document.getElementById('thetaPoints');
+        const cashChange = document.getElementById('cashChange');
+        const teachingText = document.getElementById('teachingText');
+        const dripContainer = document.getElementById('dripContainer');
+
+        const initialPremium = 300; // 假設 14 天前權利金 300 點
+
+        function setSide(side) {
+            currentSide = side;
+            document.querySelectorAll('.side-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${side}`).classList.add('active');
+            update();
+        }
+
+        function update() {
+            const remaining = parseInt(timeSlider.value);
+            daysDisplay.innerText = remaining;
+
+            // 核心公式：時間價值 = 初始 * sqrt(剩餘天數 / 14)
+            const timeRatio = Math.sqrt(remaining / 14);
+            const currentPremium = initialPremium * timeRatio;
+            
+            // 計算當日 Theta (導數近似)
+            let theta = 0;
+            if (remaining > 0) {
+                theta = initialPremium / (2 * Math.sqrt(14 * remaining));
+            } else {
+                theta = 0;
+            }
+
+            // 更新 UI 數據
+            const sign = currentSide === 'buyer' ? '-' : '+';
+            const color = currentSide === 'buyer' ? 'var(--c-secondary)' : 'var(--c-accent)';
+            
+            thetaPoints.innerText = `${sign} ${theta.toFixed(1)} 點`;
+            thetaPoints.style.color = color;
+            
+            const money = Math.round(theta * 50);
+            cashChange.innerText = `${sign} $${money.toLocaleString()}`;
+            cashChange.style.color = color;
+
+            // 更新能量條 (買方扣能量，賣方加能量的展示邏輯)
+            // 這裡視覺化統一顯示「剩餘權利金」
+            bloodBar.style.height = `${(currentPremium / initialPremium) * 100}%`;
+            
+            // 更新滴水速度
+            if (remaining === 0) {
+                dripContainer.style.display = 'none';
+            } else {
+                dripContainer.style.display = 'block';
+                const speed = 0.2 + (remaining / 14); // 剩越少滴越快
+                dripContainer.querySelector('.drip-effect').style.animationDuration = `${speed}s`;
+            }
+
+            // 更新教學文字
+            if (currentSide === 'buyer') {
+                if (remaining > 7) {
+                    teachingText.innerHTML = `🏃 <strong>買方挑戰：</strong> 還有 ${remaining} 天。目前 Theta 吸血量穩定。你需要標的大盤趕快發動，否則這些血都會白流。`;
+                } else if (remaining > 1) {
+                    teachingText.innerHTML = `💀 <strong>最後一週：</strong> 剩 ${remaining} 天！吸血量開始翻倍。如果大盤還在盤整，你的權利金將面臨毀滅性縮水。`;
+                } else if (remaining === 0) {
+                    teachingText.innerHTML = `🏁 <strong>結算日：</strong> 時間價值歸零。吸血鬼飽餐一頓，如果你沒中大獎，血袋已經空了。`;
+                }
+            } else {
+                if (remaining > 7) {
+                    teachingText.innerHTML = `🏦 <strong>賣方收租：</strong> 每天穩定收進 ${money} 元租金。只要大盤不突然暴衝，時間就是你最好的朋友。`;
+                } else if (remaining > 1) {
+                    teachingText.innerHTML = `⚡ <strong>加速收割：</strong> 最後 ${remaining} 天！租金入帳速度變快了。賣方最愛的就是這種斷崖式的 Theta 衰減。`;
+                } else if (remaining === 0) {
+                    teachingText.innerHTML = `🤑 <strong>完美收乾：</strong> 時間價值徹底消失。恭喜你賺走全部的權利金（除非被穿價履約）。`;
+                }
+            }
+        }
+
+        timeSlider.addEventListener('input', update);
+        
+        // 初始執行
+        update();
+    </script>
+</body>
+</html>

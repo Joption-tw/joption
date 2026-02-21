@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM! 獲利機率大解密 | 歐大選擇權教室 JOPTION</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 全新色系：泡泡糖普普風 (Bubblegum Pop) */
+        :root {
+            --c-bg: #F8FAFC; /* 亮灰白背景 */
+            --c-primary: #FF1493; /* 螢光粉紅 (代表賣方) */
+            --c-primary-light: #FDF2F8;
+            --c-secondary: #00FFFF; /* 閃電青 (代表買方/按鈕) */
+            --c-secondary-light: #ECFEFF;
+            --c-accent: #FFD700; /* 亮黃色 */
+            --c-dark: #0F172A; /* 極深藍/黑邊框 */
+            
+            --c-orange-shadow: #E2E8F0; /* 頁首膠囊陰影 */
+
+            /* 圖表專用 */
+            --c-profit: #22c55e;
+            --c-loss: #ef4444;
+        }
+
+        body {
+            font-family: 'Nunito', 'Noto Sans TC', sans-serif;
+            background-color: var(--c-bg);
+            color: var(--c-dark);
+            /* 普普風圓點背景 (粉藍交織) */
+            background-image: radial-gradient(#CBD5E1 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+
+        /* 普普風卡通邊框與陰影 */
+        .pop-border {
+            border: 4px solid var(--c-dark);
+            border-radius: 1.5rem;
+        }
+
+        .pop-shadow {
+            box-shadow: 8px 8px 0px var(--c-dark);
+        }
+
+        .pop-shadow-pink {
+            box-shadow: 8px 8px 0px var(--c-primary);
+        }
+
+        .pop-shadow-cyan {
+            box-shadow: 8px 8px 0px var(--c-secondary);
+        }
+        
+        .pop-shadow-yellow {
+            box-shadow: 8px 8px 0px var(--c-accent);
+        }
+
+        /* 膠囊型容器 */
+        .capsule-container {
+            background: white;
+            border: 4px solid var(--c-dark);
+            border-radius: 9999px;
+            box-shadow: 0 10px 0 var(--c-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .header-capsule { padding: 0.6rem 2.5rem; }
+        .footer-capsule { padding: 1.5rem 2rem; margin-bottom: 2rem; }
+
+        /* 按鈕互動特效 */
+        .pop-btn {
+            border: 3px solid var(--c-dark);
+            border-radius: 1rem;
+            transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
+            cursor: pointer;
+            box-shadow: 0px 4px 0px var(--c-dark);
+        }
+
+        .pop-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0px 6px 0px var(--c-dark);
+        }
+
+        .pop-btn:active, .pop-btn.active {
+            transform: translateY(2px);
+            box-shadow: 0px 2px 0px var(--c-dark);
+        }
+
+        /* 切換標籤內容動畫 */
+        .tab-content {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 互動拉桿樣式 */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            background: var(--c-accent);
+            cursor: pointer;
+            margin-top: -14px;
+            border: 4px solid var(--c-dark);
+            box-shadow: 0 4px 0 var(--c-dark);
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:active {
+            transform: scale(1.1);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 12px;
+            cursor: pointer;
+            background: linear-gradient(90deg, var(--c-secondary) 50%, var(--c-primary) 50%);
+            border-radius: 10px;
+            border: 3px solid var(--c-dark);
+        }
+
+        /* 動畫 */
+        .balance-beam {
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .fade-text {
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+
+        /* 常態分配圖柱狀動畫 */
+        @keyframes growUp {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+        .anim-bar {
+            transform-origin: bottom;
+            transform: scaleY(0); /* 初始隱藏 */
+        }
+        .anim-bar.play-anim {
+            animation: growUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @media (max-width: 640px) {
+            .capsule-container {
+                border-radius: 2rem; 
+                padding: 1rem;
+            }
+            .header-capsule { padding: 0.5rem 1rem; }
+            .pop-border {
+                border-width: 3px;
+                border-radius: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-3 sm:p-4 md:p-8 overflow-x-hidden w-full">
+
+    <!-- 頁首：標頭設計 -->
+    <header class="w-full flex justify-center mb-10 md:mb-16 relative z-10 px-2">
+        <div class="capsule-container header-capsule flex-row w-full max-w-3xl">
+            <div class="flex items-center justify-center gap-3 md:gap-6 w-full">
+                <!-- Logo -->
+                <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl border-2 border-[var(--c-dark)] overflow-hidden shadow-sm shrink-0 bg-white">
+                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/FF1493/FFFFFF?text=Logo&font=Nunito'">
+                </div>
+                <!-- 文字 -->
+                <div class="flex flex-col">
+                    <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-[var(--c-dark)] leading-none mb-1 tracking-wide">
+                        歐大選擇權教室
+                    </h1>
+                    <p class="text-[10px] sm:text-xs md:text-sm font-black text-[var(--c-dark)] tracking-[0.1em] sm:tracking-[0.2em] uppercase leading-none mt-1 opacity-70">
+                        JOPTION ACADEMY
+                    </p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main class="w-full max-w-5xl flex-grow flex flex-col gap-12 md:gap-20">
+        
+        <!-- 大標題區 -->
+        <div class="text-center px-2">
+            <div class="inline-block bg-[var(--c-accent)] px-4 sm:px-8 py-3 sm:py-4 pop-border pop-shadow transform rotate-2 relative max-w-full">
+                <div class="absolute -top-6 -left-6 md:-top-8 md:-left-8 text-4xl md:text-6xl transform -rotate-12 drop-shadow-md">🎯</div>
+                <h2 class="text-2xl sm:text-3xl md:text-5xl font-black text-[var(--c-dark)] tracking-wide">
+                    選擇權勝率大對決
+                </h2>
+            </div>
+            <p class="mt-6 text-sm md:text-xl font-bold text-gray-700 max-w-2xl mx-auto">
+                買方追逐爆發力，賣方追求穩定機率。我們將透過視覺化數據，帶你深入了解這場「樂透」與「莊家」的博弈。
+            </p>
+        </div>
+
+        <!-- ★ 核心區塊：四大主題切換標籤 (Tab) ★ -->
+        <section class="px-2 md:px-0 flex flex-col items-center w-full">
+            
+            <!-- Tab 按鈕導覽列 -->
+            <div class="flex flex-wrap justify-center gap-3 md:gap-4 mb-8 w-full">
+                <button id="tab-btn-1" onclick="switchTab(1)" class="pop-btn active bg-[var(--c-secondary)] text-[var(--c-dark)] px-4 md:px-6 py-2 md:py-3 font-black text-sm md:text-lg flex items-center gap-2">
+                    ◎ 核心獲利邏輯
+                </button>
+                <button id="tab-btn-2" onclick="switchTab(2)" class="pop-btn bg-white text-gray-600 px-4 md:px-6 py-2 md:py-3 font-black text-sm md:text-lg flex items-center gap-2">
+                    📈 買方 (Long) 視角
+                </button>
+                <button id="tab-btn-3" onclick="switchTab(3)" class="pop-btn bg-white text-gray-600 px-4 md:px-6 py-2 md:py-3 font-black text-sm md:text-lg flex items-center gap-2">
+                    🛡️ 賣方 (Short) 視角
+                </button>
+                <button id="tab-btn-4" onclick="switchTab(4)" class="pop-btn bg-white text-gray-600 px-4 md:px-6 py-2 md:py-3 font-black text-sm md:text-lg flex items-center gap-2">
+                    📊 勝率量化分析
+                </button>
+            </div>
+
+            <!-- Content 1: 核心獲利邏輯 -->
+            <div id="tab-content-1" class="tab-content w-full">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full items-stretch">
+                    <!-- 左側：市場三種走勢分析 -->
+                    <div class="flex flex-col justify-center gap-6">
+                        <h3 class="text-2xl md:text-4xl font-black text-[var(--c-dark)] tracking-wide">
+                            時間是誰的朋友？
+                        </h3>
+                        <p class="text-base md:text-lg font-bold text-gray-700 leading-relaxed mb-2">
+                            價格變動不僅是方向問題。賣方之所以勝率高，是因為他們在市場<strong class="text-[var(--c-primary)] text-xl underline decoration-[var(--c-accent)] decoration-4 underline-offset-4">「不動」</strong>的時候也能賺錢。
+                        </p>
+
+                        <div class="bg-white pop-border pop-shadow p-6 md:p-8 rounded-2xl">
+                            <h4 class="text-xl font-black border-b-2 border-gray-200 pb-4 mb-6 text-[var(--c-dark)]">市場三種走勢分析</h4>
+                            
+                            <div class="flex items-start gap-4 mb-6">
+                                <div class="w-12 h-12 rounded-full bg-green-100 border-2 border-[var(--c-dark)] flex items-center justify-center text-xl shrink-0 shadow-sm text-green-600 font-black">↗</div>
+                                <div>
+                                    <div class="font-black text-lg text-[var(--c-dark)] mb-1">大漲 / 大跌</div>
+                                    <p class="text-sm md:text-base font-bold text-gray-600">買方有機會獲取數倍利潤，賣方風險大。</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4 bg-[var(--c-primary-light)] p-4 rounded-xl border-2 border-[var(--c-primary)] shadow-sm">
+                                <div class="w-12 h-12 rounded-full bg-[var(--c-dark)] border-2 border-[var(--c-primary)] flex items-center justify-center text-xl shrink-0 shadow-sm text-white font-black">➖</div>
+                                <div>
+                                    <div class="font-black text-lg text-[var(--c-primary)] mb-1 flex items-center gap-2">
+                                        橫盤盤整
+                                        <span class="bg-[var(--c-accent)] text-[var(--c-dark)] text-[10px] px-2 py-1 rounded-full border border-[var(--c-dark)] uppercase">機率最高</span>
+                                    </div>
+                                    <p class="text-sm md:text-base font-bold text-gray-800">買方每天流失時間價值，賣方穩收租金。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右側：機率分配圖 (黑卡設計) -->
+                    <div class="bg-[var(--c-dark)] pop-border pop-shadow-cyan p-6 md:p-8 rounded-2xl flex flex-col text-white relative overflow-hidden" id="chart-container">
+                        <!-- 裝飾文字 -->
+                        <div class="absolute top-4 right-4 text-xs font-black tracking-widest text-[#334155] border border-[#334155] px-2 py-1 rounded uppercase hidden sm:block">Probability Distribution</div>
+                        
+                        <h4 class="text-xl md:text-2xl font-black mb-8 text-center text-white mt-4 tracking-widest">
+                            機率分配圖 <span class="text-[var(--c-secondary)]">(常態分配)</span>
+                        </h4>
+
+                        <!-- 動態 SVG 柱狀圖 -->
+                        <div class="w-full flex-grow flex justify-center items-end relative h-48 md:h-64 mt-4 min-h-[200px]">
+                            <svg viewBox="0 0 500 250" class="w-full h-full overflow-visible">
+                                <!-- X 軸底線 -->
+                                <line x1="20" y1="210" x2="480" y2="210" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+                                
+                                <!-- 極端左側 (暗色) -->
+                                <rect class="anim-bar" style="animation-delay: 0.1s;" x="40" y="180" width="30" height="30" fill="#334155" rx="4"/>
+                                <rect class="anim-bar" style="animation-delay: 0.15s;" x="80" y="150" width="30" height="60" fill="#334155" rx="4"/>
+                                <rect class="anim-bar" style="animation-delay: 0.2s;" x="120" y="110" width="30" height="100" fill="#475569" rx="4"/>
+                                
+                                <!-- 常態中心區域 (亮藍色) -->
+                                <rect class="anim-bar" style="animation-delay: 0.25s;" x="160" y="70" width="30" height="140" fill="#3B82F6" opacity="0.7" rx="4"/>
+                                <rect class="anim-bar" style="animation-delay: 0.3s;" x="200" y="30" width="30" height="180" fill="#3B82F6" opacity="0.9" rx="4"/>
+                                <rect class="anim-bar" style="animation-delay: 0.35s;" x="240" y="10" width="30" height="200" fill="#60A5FA" rx="4"/>
+                                <rect class="anim-bar" style="animation-delay: 0.4s;" x="280" y="30" width="30" height="180" fill="#3B82F6" opacity="0.9" rx="4"/>
+                                <rect class="anim-bar" style="animation-delay: 0.45s;" x="320" y="70" width="30" height="140" fill="#3B82F6" opacity="0.7" rx="4"/>
+                                
+                                <!-- 極端右側 (暗色) -->
+                                <rect class="anim-bar" style="animation-delay: 0.5s;" x="360" y="110" width="30" height="100" fill="#475569" rx="4"/>
+                                <rect class="anim-bar" style="animation-delay: 0.55s;" x="400" y="150" width="30" height="60" fill="#334155" rx="4"/>
+                                <rect class="anim-bar" style="animation-delay: 0.6s;" x="440" y="180" width="30" height="30" fill="#334155" rx="4"/>
+
+                                <!-- 標籤 -->
+                                <text x="60" y="240" fill="#64748B" font-size="12" font-weight="bold" font-family="sans-serif" text-anchor="middle">極端行情</text>
+                                <text x="255" y="240" fill="#60A5FA" font-size="14" font-weight="900" font-family="sans-serif" text-anchor="middle" class="tracking-widest">常態波動 (70%)</text>
+                                <text x="450" y="240" fill="#64748B" font-size="12" font-weight="bold" font-family="sans-serif" text-anchor="middle">極端行情</text>
+                            </svg>
+                        </div>
+
+                        <!-- 備註說明 -->
+                        <div class="mt-6 pt-4 border-t border-gray-700 text-xs md:text-sm text-gray-400 font-bold italic">
+                            * 統計顯示市場約有 70% 的時間處於盤整，這就是賣方「高勝率」的科學依據。
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content 2: 買方視角 -->
+            <div id="tab-content-2" class="tab-content hidden w-full">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full items-stretch">
+                    
+                    <!-- 左側：文字解說卡 -->
+                    <div class="flex flex-col justify-center gap-6">
+                        <h3 class="text-3xl md:text-4xl font-black text-[var(--c-profit)] tracking-wide">
+                            買方：風險有限，獲利無限
+                        </h3>
+                        <p class="text-base md:text-lg font-bold text-gray-700 leading-relaxed mb-4">
+                            你是權利的擁有者。你支付「保費」來換取一個可能爆發的機會。
+                        </p>
+
+                        <!-- 勝率卡片 -->
+                        <div class="bg-[var(--c-dark)] text-white p-5 rounded-2xl flex items-start gap-4 border-l-8 border-[var(--c-secondary)] shadow-sm">
+                            <div class="w-10 h-10 rounded-full bg-[#1E293B] flex items-center justify-center text-[var(--c-secondary)] shrink-0 border border-[#334155]">
+                                ⚠️
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-black mb-1 tracking-wide">勝率約 25%</h4>
+                                <p class="text-sm font-bold text-gray-400">你需要方向看對，且幅度要夠大才能 cover 成本。</p>
+                            </div>
+                        </div>
+
+                        <!-- 獲利卡片 -->
+                        <div class="bg-[var(--c-dark)] text-white p-5 rounded-2xl flex items-start gap-4 border-l-8 border-[var(--c-profit)] shadow-sm">
+                            <div class="w-10 h-10 rounded-full bg-[#1E293B] flex items-center justify-center text-[var(--c-profit)] shrink-0 border border-[#334155]">
+                                🎯
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-black mb-1 tracking-wide">獲利爆發力強</h4>
+                                <p class="text-sm font-bold text-gray-400">最大損失僅為權利金，但獲利可以翻好幾倍。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右側：SVG Payoff 圖表 -->
+                    <div class="bg-[var(--c-dark)] pop-border pop-shadow-cyan p-6 md:p-8 rounded-2xl flex flex-col text-white relative">
+                        <div class="absolute top-4 right-4 text-xs font-black tracking-widest text-[#334155] uppercase hidden sm:block">Long Call Payoff Diagram</div>
+                        <div class="absolute top-4 right-4 sm:top-auto sm:bottom-4 sm:left-4 bg-[#1E293B] border border-[#334155] px-3 py-1 rounded-full text-xs font-black text-gray-300">
+                            買方：風險有限
+                        </div>
+
+                        <div class="w-full flex-grow flex justify-center items-center h-64 mt-6">
+                            <svg viewBox="0 0 400 300" class="w-full h-full overflow-visible">
+                                <!-- 虛線軸心 -->
+                                <line x1="50" y1="200" x2="350" y2="200" stroke="#334155" stroke-width="2" stroke-dasharray="6 6"/>
+                                <line x1="150" y1="50" x2="150" y2="250" stroke="#334155" stroke-width="2" stroke-dasharray="6 6"/>
+                                
+                                <!-- 標籤 -->
+                                <text x="170" y="60" fill="#94A3B8" font-size="12" font-weight="bold">獲利 ↑</text>
+                                <text x="170" y="245" fill="#94A3B8" font-size="12" font-weight="bold">虧損 ↓</text>
+                                <text x="350" y="190" fill="#94A3B8" font-size="12" font-weight="bold" text-anchor="end">股價 →</text>
+                                
+                                <!-- Payoff 折線 (買權 Long Call) -->
+                                <path d="M 50 220 L 150 220 L 330 80" stroke="var(--c-profit)" stroke-width="6" fill="none" stroke-linejoin="round"/>
+                                
+                                <!-- 履約價黃點 -->
+                                <circle cx="150" cy="220" r="6" fill="var(--c-accent)"/>
+                                <text x="150" y="245" fill="var(--c-accent)" font-size="14" font-weight="bold" text-anchor="middle">履約價</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Content 3: 賣方視角 -->
+            <div id="tab-content-3" class="tab-content hidden w-full">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full items-stretch">
+                    
+                    <!-- 左側：SVG Payoff 圖表 -->
+                    <div class="bg-[var(--c-dark)] pop-border pop-shadow-pink p-6 md:p-8 rounded-2xl flex flex-col text-white relative order-2 lg:order-1">
+                        <div class="absolute top-4 right-4 text-xs font-black tracking-widest text-[#334155] uppercase hidden sm:block">Short Call Payoff Diagram</div>
+                        <div class="absolute top-4 right-4 sm:top-auto sm:bottom-4 sm:left-4 bg-[#1E293B] border border-[#334155] px-3 py-1 rounded-full text-xs font-black text-gray-300">
+                            賣方：獲利有限
+                        </div>
+
+                        <div class="w-full flex-grow flex justify-center items-center h-64 mt-6">
+                            <svg viewBox="0 0 400 300" class="w-full h-full overflow-visible">
+                                <!-- 虛線軸心 -->
+                                <line x1="50" y1="180" x2="350" y2="180" stroke="#334155" stroke-width="2" stroke-dasharray="6 6"/>
+                                <line x1="150" y1="50" x2="150" y2="280" stroke="#334155" stroke-width="2" stroke-dasharray="6 6"/>
+                                
+                                <!-- 標籤 -->
+                                <text x="170" y="60" fill="#94A3B8" font-size="12" font-weight="bold">獲利 ↑</text>
+                                <text x="170" y="275" fill="#94A3B8" font-size="12" font-weight="bold">虧損 ↓</text>
+                                <text x="350" y="170" fill="#94A3B8" font-size="12" font-weight="bold" text-anchor="end">股價 →</text>
+                                
+                                <!-- Payoff 折線 (賣出買權 Short Call) -->
+                                <path d="M 50 140 L 150 140 L 330 280" stroke="var(--c-loss)" stroke-width="6" fill="none" stroke-linejoin="round"/>
+                                
+                                <!-- 履約價黃點 -->
+                                <circle cx="150" cy="140" r="6" fill="var(--c-accent)"/>
+                                <text x="150" y="125" fill="var(--c-accent)" font-size="14" font-weight="bold" text-anchor="middle">履約價</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- 右側：文字解說卡 -->
+                    <div class="flex flex-col justify-center gap-6 order-1 lg:order-2">
+                        <h3 class="text-3xl md:text-4xl font-black text-[var(--c-loss)] tracking-wide">
+                            賣方：獲利有限，風險巨大
+                        </h3>
+                        <p class="text-base md:text-lg font-bold text-gray-700 leading-relaxed mb-4">
+                            你是義務的承擔者。你像保險公司，收取保費並承擔小機率的賠償風險。
+                        </p>
+
+                        <!-- 勝率卡片 -->
+                        <div class="bg-[var(--c-dark)] text-white p-5 rounded-2xl flex items-start gap-4 border-l-8 border-[var(--c-loss)] shadow-sm">
+                            <div class="w-10 h-10 rounded-full bg-[#1E293B] flex items-center justify-center text-[var(--c-loss)] shrink-0 border border-[#334155]">
+                                🛡️
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-black mb-1 tracking-wide">勝率約 75%</h4>
+                                <p class="text-sm font-bold text-gray-400">只要行情不要漲過「損益平衡點」，你都能獲利。</p>
+                            </div>
+                        </div>
+
+                        <!-- 風險卡片 -->
+                        <div class="bg-[var(--c-dark)] text-white p-5 rounded-2xl flex items-start gap-4 border-l-8 border-[var(--c-accent)] shadow-sm">
+                            <div class="w-10 h-10 rounded-full bg-[#1E293B] flex items-center justify-center text-[var(--c-accent)] shrink-0 border border-[#334155]">
+                                ⚠️
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-black mb-1 tracking-wide">風險控制是關鍵</h4>
+                                <p class="text-sm font-bold text-gray-400">平時穩定收租，但一旦大象翻身，必須果斷停損。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Content 4: 勝率量化分析 -->
+            <div id="tab-content-4" class="tab-content hidden w-full">
+                <div class="bg-[var(--c-dark)] pop-border pop-shadow-yellow p-4 md:p-8 rounded-3xl w-full text-white overflow-hidden">
+                    <div class="w-full overflow-x-auto pb-4">
+                        <table class="w-full text-left min-w-[600px]">
+                            <thead>
+                                <tr class="border-b border-[#334155]">
+                                    <th class="py-4 px-4 text-gray-500 font-bold text-sm tracking-widest">核心特徵</th>
+                                    <th class="py-4 px-4 text-2xl font-black text-[var(--c-profit)] w-1/3">買方 (Buyer)</th>
+                                    <th class="py-4 px-4 text-2xl font-black text-[var(--c-loss)] w-1/3">賣方 (Seller)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#1E293B]">
+                                <!-- Row 1 -->
+                                <tr class="hover:bg-[#1E293B] transition-colors">
+                                    <td class="py-6 px-4 font-black text-lg text-gray-300">獲利機率</td>
+                                    <td class="py-6 px-4">
+                                        <span class="bg-green-900/30 text-[var(--c-profit)] border border-green-800 px-3 py-1 rounded-full text-sm font-black tracking-wider">低勝率</span>
+                                    </td>
+                                    <td class="py-6 px-4">
+                                        <span class="bg-red-900/30 text-[var(--c-loss)] border border-red-800 px-3 py-1 rounded-full text-sm font-black tracking-wider">高勝率</span>
+                                    </td>
+                                </tr>
+                                <!-- Row 2 -->
+                                <tr class="hover:bg-[#1E293B] transition-colors">
+                                    <td class="py-6 px-4 font-black text-lg text-gray-300">時間價值 (Theta)</td>
+                                    <td class="py-6 px-4 font-bold text-gray-400">
+                                        每日扣血 <span class="text-[var(--c-loss)]">(負 Theta)</span>
+                                    </td>
+                                    <td class="py-6 px-4 font-bold text-gray-400">
+                                        每日收租 <span class="text-[var(--c-profit)]">(正 Theta)</span>
+                                    </td>
+                                </tr>
+                                <!-- Row 3 -->
+                                <tr class="hover:bg-[#1E293B] transition-colors">
+                                    <td class="py-6 px-4 font-black text-lg text-gray-300">最大虧損</td>
+                                    <td class="py-6 px-4 font-bold text-gray-400">
+                                        權利金 <span class="text-sm">(已預知)</span>
+                                    </td>
+                                    <td class="py-6 px-4 font-bold text-[var(--c-loss)]">
+                                        理論無限 <span class="text-sm text-gray-400">(需保證金)</span>
+                                    </td>
+                                </tr>
+                                <!-- Row 4 -->
+                                <tr class="hover:bg-[#1E293B] transition-colors">
+                                    <td class="py-6 px-4 font-black text-lg text-gray-300">角色譬喻</td>
+                                    <td class="py-6 px-4 font-bold text-gray-400">
+                                        買樂透、買保險的人
+                                    </td>
+                                    <td class="py-6 px-4 font-bold text-gray-400">
+                                        開賭場、賣保險的公司
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- 視覺化解析：為什麼賣方勝率高？ (獲利條件四宮格) -->
+        <section class="px-2 md:px-0 flex flex-col items-center mt-4">
+            <h3 class="text-2xl md:text-4xl font-black mb-8 text-[var(--c-dark)] tracking-wide text-center">
+                🤔 為什麼賣方勝率比較高？
+            </h3>
+            
+            <div class="w-full pop-border pop-shadow-pink bg-white p-6 md:p-10 relative">
+                <p class="text-base md:text-lg font-bold text-gray-700 leading-relaxed mb-8">
+                    假設我們關注的是「看漲 (Call)」。未來股票的走勢通常只有四種可能：<br>
+                    <strong class="text-red-500">大漲</strong>、<strong class="text-red-400">微漲</strong>、<strong class="text-gray-500">盤整不動</strong>、<strong class="text-green-500">下跌</strong>。<br>
+                    讓我們看看買方與賣方在這些情境下的輸贏判定（包含權利金成本）：
+                </p>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
+                    <!-- 情境 1 -->
+                    <div class="border-4 border-[var(--c-dark)] rounded-xl overflow-hidden flex flex-col h-full">
+                        <div class="bg-gray-100 py-3 font-black text-lg border-b-4 border-[var(--c-dark)]">情境 1：大漲 🚀</div>
+                        <div class="p-4 flex-1 flex flex-col justify-center gap-4">
+                            <div>
+                                <div class="text-[var(--c-secondary)] font-black text-shadow-sm">買方 (Buy)</div>
+                                <div class="text-3xl mt-1">🤩 贏</div>
+                            </div>
+                            <div class="w-full h-[2px] bg-gray-200"></div>
+                            <div>
+                                <div class="text-[var(--c-primary)] font-black text-shadow-sm">賣方 (Sell)</div>
+                                <div class="text-3xl mt-1">慘 輸</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 情境 2 -->
+                    <div class="border-4 border-[var(--c-dark)] rounded-xl overflow-hidden flex flex-col h-full opacity-90">
+                        <div class="bg-gray-100 py-3 font-black text-lg border-b-4 border-[var(--c-dark)]">情境 2：微漲 📈</div>
+                        <div class="p-4 flex-1 flex flex-col justify-center gap-4">
+                            <div>
+                                <div class="text-gray-500 font-black">買方</div>
+                                <div class="text-base font-bold text-gray-600 mt-1">輸 (未過成本)</div>
+                            </div>
+                            <div class="w-full h-[2px] bg-gray-200"></div>
+                            <div>
+                                <div class="text-[var(--c-primary)] font-black text-shadow-sm">賣方</div>
+                                <div class="text-3xl mt-1">😎 贏</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 情境 3 -->
+                    <div class="border-4 border-[var(--c-dark)] rounded-xl overflow-hidden flex flex-col h-full opacity-90">
+                        <div class="bg-gray-100 py-3 font-black text-lg border-b-4 border-[var(--c-dark)]">情境 3：盤整 ➖</div>
+                        <div class="p-4 flex-1 flex flex-col justify-center gap-4">
+                            <div>
+                                <div class="text-gray-500 font-black">買方</div>
+                                <div class="text-base font-bold text-gray-600 mt-1">輸 (時間流失)</div>
+                            </div>
+                            <div class="w-full h-[2px] bg-gray-200"></div>
+                            <div>
+                                <div class="text-[var(--c-primary)] font-black text-shadow-sm">賣方</div>
+                                <div class="text-3xl mt-1">😎 贏</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 情境 4 -->
+                    <div class="border-4 border-[var(--c-dark)] rounded-xl overflow-hidden flex flex-col h-full opacity-90">
+                        <div class="bg-gray-100 py-3 font-black text-lg border-b-4 border-[var(--c-dark)]">情境 4：下跌 📉</div>
+                        <div class="p-4 flex-1 flex flex-col justify-center gap-4">
+                            <div>
+                                <div class="text-gray-500 font-black">買方</div>
+                                <div class="text-base font-bold text-gray-600 mt-1">輸 (放棄履約)</div>
+                            </div>
+                            <div class="w-full h-[2px] bg-gray-200"></div>
+                            <div>
+                                <div class="text-[var(--c-primary)] font-black text-shadow-sm">賣方</div>
+                                <div class="text-3xl mt-1">😎 贏</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 總結體驗：策略光譜拉桿 -->
+        <section class="px-2 md:px-0 flex flex-col items-center mt-4">
+            <h3 class="text-2xl md:text-4xl font-black mb-8 text-[var(--c-dark)] tracking-wide relative inline-block text-center w-full">
+                <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-5xl md:text-7xl opacity-20 whitespace-nowrap" style="z-index:-1;">SPECTRUM</span>
+                🎚️ 總結：你的策略光譜
+            </h3>
+
+            <div class="bg-white pop-border pop-shadow p-6 md:p-10 w-full flex flex-col items-center">
+                
+                <!-- 動態天平 SVG -->
+                <div class="w-full max-w-sm h-40 relative flex justify-center items-end mb-8">
+                    <svg viewBox="0 0 300 150" class="w-full h-full overflow-visible">
+                        <!-- 底座 -->
+                        <path d="M 120 140 L 180 140 L 150 90 Z" fill="var(--c-dark)"/>
+                        
+                        <!-- 動態翹翹板 -->
+                        <g id="balance-beam" class="balance-beam" transform="rotate(-15 150 90)">
+                            <!-- 橫桿 -->
+                            <rect x="30" y="85" width="240" height="10" fill="var(--c-dark)" rx="5"/>
+                            
+                            <!-- 左側托盤 (買方) -->
+                            <line x1="50" y1="95" x2="50" y2="120" stroke="var(--c-dark)" stroke-width="4"/>
+                            <path d="M 30 120 L 70 120" stroke="var(--c-dark)" stroke-width="8" stroke-linecap="round"/>
+                            <text x="50" y="80" text-anchor="middle" font-size="30">🏹</text>
+                            
+                            <!-- 右側托盤 (賣方) -->
+                            <line x1="250" y1="95" x2="250" y2="120" stroke="var(--c-dark)" stroke-width="4"/>
+                            <path d="M 230 120 L 270 120" stroke="var(--c-dark)" stroke-width="8" stroke-linecap="round"/>
+                            <text x="250" y="80" text-anchor="middle" font-size="30">🏦</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- 數據面板 -->
+                <div class="grid grid-cols-2 gap-4 w-full text-center mb-8">
+                    <div class="p-4 border-2 border-gray-200 rounded-xl">
+                        <div class="text-xs font-black text-gray-500 mb-1 tracking-widest">當前勝率</div>
+                        <div id="display-winrate" class="text-3xl md:text-5xl font-black text-[var(--c-secondary)] fade-text">25%</div>
+                    </div>
+                    <div class="p-4 border-2 border-gray-200 rounded-xl">
+                        <div class="text-xs font-black text-gray-500 mb-1 tracking-widest">獲利潛力</div>
+                        <div id="display-payoff" class="text-2xl md:text-4xl font-black text-[var(--c-dark)] mt-2 fade-text">無限大</div>
+                    </div>
+                </div>
+
+                <!-- 拉桿 -->
+                <div class="w-full max-w-2xl">
+                    <input type="range" id="strategySlider" min="0" max="100" value="0">
+                    <div class="flex justify-between mt-4 font-black text-sm md:text-base">
+                        <span class="text-[var(--c-dark)] bg-[var(--c-secondary)] px-3 py-1 rounded-md border-2 border-[var(--c-dark)] shadow-sm">極端買方</span>
+                        <span class="text-white bg-[var(--c-primary)] px-3 py-1 rounded-md border-2 border-[var(--c-dark)] shadow-sm">極端賣方</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="w-full flex justify-center mt-16 pb-10 relative z-10 px-2">
+        <div class="capsule-container footer-capsule text-center">
+            <div class="flex flex-wrap items-center justify-center gap-2 md:gap-4 mb-3">
+                <div class="w-8 h-8 md:w-12 md:h-12 rounded-full border-2 border-gray-200 overflow-hidden shadow-sm shrink-0 bg-white">
+                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/FF1493/FFFFFF?text=Logo&font=Nunito'">
+                </div>
+                <div class="flex items-center flex-wrap justify-center">
+                    <span class="text-lg md:text-2xl font-black tracking-tight text-[var(--c-dark)]">JOPTION</span>
+                    <span class="mx-2 md:mx-4 text-gray-300 font-light text-xl hidden sm:inline">|</span>
+                    <span class="text-base md:text-xl font-bold text-[var(--c-dark)] w-full sm:w-auto mt-1 sm:mt-0">歐大選擇權教室</span>
+                </div>
+            </div>
+            <div class="text-center w-full mt-2">
+                <p class="text-[10px] md:text-sm text-gray-400 font-bold tracking-tight">
+                    © 2026 Joption Academy - 金融教育僅供參考，投資有風險，操作需謹慎。
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 互動邏輯腳本 -->
+    <script>
+        // 1. 切換 Tab 邏輯
+        function switchTab(index) {
+            // 隱藏所有內容與還原按鈕樣式
+            for(let i=1; i<=4; i++) {
+                document.getElementById(`tab-content-${i}`).classList.add('hidden');
+                
+                let btn = document.getElementById(`tab-btn-${i}`);
+                btn.classList.remove('bg-[var(--c-secondary)]', 'text-[var(--c-dark)]', 'active');
+                btn.classList.add('bg-white', 'text-gray-600');
+            }
+            
+            // 顯示目標內容與啟動按鈕樣式
+            document.getElementById(`tab-content-${index}`).classList.remove('hidden');
+            let activeBtn = document.getElementById(`tab-btn-${index}`);
+            activeBtn.classList.remove('bg-white', 'text-gray-600');
+            
+            // 如果是點擊「勝率量化分析」，按鈕顏色改成藍色感，其他維持閃電青
+            if(index === 4 || index === 2) {
+                 activeBtn.classList.add('bg-[#60A5FA]', 'text-white', 'active');
+            } else if (index === 3) {
+                 activeBtn.classList.add('bg-[var(--c-loss)]', 'text-white', 'active');
+            } else {
+                 activeBtn.classList.add('bg-[var(--c-secondary)]', 'text-[var(--c-dark)]', 'active');
+            }
+
+            // 重新觸發第一頁的柱狀圖動畫
+            if(index === 1) {
+                const animBars = document.querySelectorAll('.anim-bar');
+                animBars.forEach(bar => {
+                    bar.classList.remove('play-anim');
+                    void bar.offsetWidth; // Trigger reflow 重新計算
+                    bar.classList.add('play-anim');
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 2. 策略拉桿邏輯
+            const slider = document.getElementById('strategySlider');
+            const winRateDisplay = document.getElementById('display-winrate');
+            const payoffDisplay = document.getElementById('display-payoff');
+            const beam = document.getElementById('balance-beam');
+
+            function updateUI() {
+                const val = parseInt(slider.value);
+                const angle = -15 + (val / 100) * 30;
+                beam.setAttribute('transform', `rotate(${angle} 150 90)`);
+
+                if (val < 40) {
+                    winRateDisplay.innerText = '~ 25%';
+                    winRateDisplay.style.color = 'var(--c-secondary)';
+                    payoffDisplay.innerText = '無限大 🚀';
+                } else if (val >= 40 && val <= 60) {
+                    winRateDisplay.innerText = '~ 50%';
+                    winRateDisplay.style.color = '#94A3B8';
+                    payoffDisplay.innerText = '區間獲利 ⚖️';
+                } else {
+                    winRateDisplay.innerText = '~ 75%+';
+                    winRateDisplay.style.color = 'var(--c-primary)';
+                    payoffDisplay.innerText = '有限 (權利金) 💰';
+                }
+            }
+
+            slider.addEventListener('input', updateUI);
+            updateUI(); // 初始呼叫
+
+            // 3. 第一次進入網頁時的 Intersection Observer 動畫觸發
+            const chartContainer = document.getElementById('chart-container');
+            const animBars = document.querySelectorAll('.anim-bar');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animBars.forEach(bar => {
+                            bar.classList.add('play-anim');
+                        });
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            if (chartContainer) observer.observe(chartContainer);
+            
+            // 確保第一個 Tab 被選中並觸發正確顏色
+            switchTab(1);
+        });
+    </script>
+</body>
+</html>

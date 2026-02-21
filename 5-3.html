@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歐大選擇權教室 - JOPTION</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ghibli-bg: #f0fdf4; /* 極淺綠 */
+            --ghibli-forest: #166534; /* 深森林綠 */
+            --ghibli-accent: #10b981; /* 翠綠色 */
+            --ghibli-profit: #d1fae5; /* 獲利區淺綠 */
+        }
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(180deg, var(--ghibli-bg) 0%, #ffffff 100%);
+            color: #334155;
+            scroll-behavior: smooth;
+        }
+        .ghibli-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 2px solid #dcfce7; 
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(22, 101, 52, 0.05);
+        }
+        .chart-line {
+            stroke-dasharray: 2000;
+            stroke-dashoffset: 2000;
+            animation: dash 3s linear forwards;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: 0; }
+        }
+        input[type="range"] {
+            accent-color: var(--ghibli-accent);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-green-100">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <img src="ip標籤.jpg" alt="Logo" class="w-10 h-10 rounded-full object-cover border-2 border-green-100" onerror="this.src='https://via.placeholder.com/40?text=JP'">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold tracking-tighter text-slate-800">JOPTION</span>
+                    <div class="h-6 w-[1px] bg-slate-300 mx-3"></div>
+                    <span class="text-lg font-medium text-slate-600">歐大選擇權教室</span>
+                </div>
+            </div>
+            <div class="hidden md:flex space-x-8 text-slate-600 font-medium">
+                <a href="#definition" class="hover:text-green-600">買方定義</a>
+                <a href="#strategy" class="hover:text-green-600">避險策略</a>
+                <a href="#interactive" class="hover:text-green-600">台指模擬</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative py-16 px-4 text-center overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-20">
+            <div class="absolute top-10 right-10 w-32 h-32 bg-green-200 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-10 left-10 w-48 h-48 bg-emerald-200 rounded-full blur-3xl"></div>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight">空頭市場的防護傘：買進賣權</h1>
+        <p class="text-lg text-slate-600 max-w-2xl mx-auto">在 Joption 教室，學會如何利用 Long Put 在下跌行情中守護財富，甚至反敗為勝。</p>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 space-y-12 pb-24">
+        
+        <!-- Section 1: Definition -->
+        <section id="definition" class="ghibli-card p-8 md:p-12 border-l-8 border-l-emerald-500">
+            <div class="flex flex-col md:flex-row items-center gap-8">
+                <div class="flex-1">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
+                        <span class="bg-emerald-100 text-emerald-600 p-2 rounded-lg mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                        </span>
+                        什麼是買進賣權 (Long Put)？
+                    </h2>
+                    <div class="space-y-4 text-slate-600 leading-relaxed">
+                        <p>
+                            <strong>買進賣權</strong>是看跌策略。當你預期台指期將會下跌，或是希望為手中的現貨部位進行「避險」時，你可以支付權利金，獲得未來以約定價格賣出的權利。
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-green-50">
+                                <div class="text-emerald-500 font-bold text-sm">最大風險</div>
+                                <div class="text-slate-800 font-medium">權利金(有限)</div>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-green-50">
+                                <div class="text-emerald-500 font-bold text-sm">獲利潛力</div>
+                                <div class="text-slate-800 font-medium">隨跌幅巨大獲利</div>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-green-50">
+                                <div class="text-emerald-500 font-bold text-sm">損益平衡</div>
+                                <div class="text-slate-800 font-medium">履約價 - 權利金</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/3 bg-emerald-50 p-6 rounded-2xl border-2 border-emerald-100 italic text-emerald-700/70">
+                    "在 選擇權 的視野裡，買進賣權就像是買保險。當外面的暴風雨（股市大跌）來臨時，你的資產依然能受到妥善保護。"
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Interactive Simulator -->
+        <section id="interactive" class="ghibli-card p-8 md:p-12 overflow-hidden">
+            <div class="flex justify-between items-start mb-10">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800 mb-2">台指空方損益模擬</h2>
+                    <p class="text-slate-500">調整滑桿，觀察股價下跌如何帶動「粉綠獲利區」。</p>
+                </div>
+                <span class="bg-emerald-100 text-emerald-600 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Long Put Position</span>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-12 items-center">
+                <!-- Controls -->
+                <div class="space-y-8">
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <label class="text-sm font-bold text-slate-700">履約價 (Strike)</label>
+                            <span class="text-emerald-600 font-mono font-bold" id="val-strike">30000</span>
+                        </div>
+                        <input type="range" id="strike-price" min="28000" max="32000" step="100" value="30000" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <label class="text-sm font-bold text-slate-700">支付權利金 (Premium)</label>
+                            <span class="text-emerald-600 font-mono font-bold" id="val-premium">150</span>
+                        </div>
+                        <input type="range" id="premium" min="10" max="1000" step="10" value="150" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <label class="text-sm font-bold text-slate-700">結算股價 (Settlement)</label>
+                            <span class="text-emerald-600 font-mono font-bold" id="val-current">29500</span>
+                        </div>
+                        <input type="range" id="current-price" min="28000" max="32000" step="100" value="29500" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    
+                    <div class="p-6 rounded-2xl bg-gradient-to-br from-white to-emerald-50 border border-emerald-100 shadow-sm relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="text-xs text-slate-400 mb-1 uppercase tracking-tighter">當前預估損益</div>
+                            <div class="text-4xl font-black" id="profit-result">+350</div>
+                            <div class="mt-4 pt-4 border-t border-emerald-100 flex justify-between items-center">
+                                <span class="text-xs text-slate-400">損益平衡點</span>
+                                <span class="text-sm font-bold text-slate-600" id="breakeven">29850</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualization -->
+                <div class="lg:col-span-2 relative h-80 bg-white rounded-3xl border-2 border-emerald-50 shadow-inner flex items-center justify-center p-4">
+                    <svg id="chart" viewBox="0 0 500 250" class="w-full h-full">
+                        <defs>
+                            <linearGradient id="profitGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#d1fae5" stop-opacity="0.9" />
+                                <stop offset="100%" stop-color="#d1fae5" stop-opacity="0" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Grid Lines -->
+                        <line x1="0" y1="125" x2="500" y2="125" stroke="#f1f5f9" stroke-width="1" />
+                        
+                        <!-- Profit Area (Green) -->
+                        <path id="profit-area" d="" fill="url(#profitGradient)" />
+                        
+                        <!-- Payoff Line -->
+                        <path id="payoff-path" d="" fill="none" stroke="#059669" stroke-width="4" stroke-linecap="round" class="chart-line" />
+                        
+                        <!-- Vertical Breakeven Line -->
+                        <line id="breakeven-line" x1="0" y1="0" x2="0" y2="250" stroke="#10b981" stroke-width="1" stroke-dasharray="4" />
+
+                        <!-- Current Position Marker -->
+                        <circle id="marker" cx="0" cy="0" r="8" fill="#059669" stroke="white" stroke-width="3" />
+                        
+                        <!-- Labels -->
+                        <text x="10" y="30" font-size="12" font-weight="bold" fill="#059669">獲利區(跌勢)</text>
+                        <text x="400" y="235" font-size="12" font-weight="bold" fill="#94a3b8">虧損區(有限)</text>
+                    </svg>
+                    <div class="absolute bottom-4 left-6 text-[10px] text-slate-300 font-mono">
+                        X: 台指點數 / Y: 買方損益
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Tips -->
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white/60 p-6 rounded-2xl border border-emerald-50">
+                <h4 class="font-bold text-emerald-800 mb-2">💡 避險的小秘密</h4>
+                <p class="text-sm text-slate-600 leading-relaxed">Long Put 最常被法人用來當作現貨部位的「避險工具」。當股市大跌時，現貨部位雖然虧損，但 Long Put 的獲利能有效抵銷損失。</p>
+            </div>
+            <div class="bg-white/60 p-6 rounded-2xl border border-emerald-50">
+                <h4 class="font-bold text-emerald-800 mb-2">🎯 買方的天敵</h4>
+                <p class="text-sm text-slate-600 leading-relaxed">和買進買權一樣，時間價值流逝是買方的最大敵人。如果行情只是緩跌、甚至不跌反漲，權利金將會隨著時間一天天縮水。</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#fcfcfc] border-t border-gray-100 pt-12 pb-10 px-4">
+        <div class="max-w-6xl mx-auto flex flex-col items-center">
+            <!-- Footer Brand Area -->
+            <div class="flex items-center space-x-3 mb-4">
+                <img src="ip標籤.jpg" alt="Logo" class="w-8 h-8 rounded-full object-cover shadow-sm" onerror="this.src='https://via.placeholder.com/32?text=JP'">
+                <div class="flex items-center text-lg font-bold tracking-wider">
+                    <span class="text-gray-500 uppercase">JOPTION</span>
+                    <span class="text-gray-400 mx-2 font-light">|</span>
+                    <span class="text-gray-500 font-medium">歐大選擇權教室</span>
+                </div>
+            </div>
+            
+            <!-- Disclaimer -->
+            <div class="text-[13px] text-gray-400 text-center font-normal tracking-normal">
+                © 2026 Joption Academy - 金融教育僅供參考，投資有風險，操作需謹慎。
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const strikeInput = document.getElementById('strike-price');
+        const premiumInput = document.getElementById('premium');
+        const currentInput = document.getElementById('current-price');
+        
+        const valStrike = document.getElementById('val-strike');
+        const valPremium = document.getElementById('val-premium');
+        const valCurrent = document.getElementById('val-current');
+        const profitResult = document.getElementById('profit-result');
+        const breakEvenEl = document.getElementById('breakeven');
+        
+        const payoffPath = document.getElementById('payoff-path');
+        const profitArea = document.getElementById('profit-area');
+        const marker = document.getElementById('marker');
+        const beLine = document.getElementById('breakeven-line');
+
+        function updateSimulation() {
+            const strike = parseInt(strikeInput.value);
+            const premium = parseInt(premiumInput.value);
+            const current = parseInt(currentInput.value);
+            const breakeven = strike - premium;
+
+            valStrike.innerText = strike.toLocaleString();
+            valPremium.innerText = premium.toLocaleString();
+            valCurrent.innerText = current.toLocaleString();
+            breakEvenEl.innerText = breakeven.toLocaleString();
+
+            // Long Put Profit: Max(0, strike - current) - premium
+            const profit = Math.max(0, strike - current) - premium;
+            profitResult.innerText = profit > 0 ? `+${profit.toLocaleString()}` : profit.toLocaleString();
+            profitResult.className = `text-4xl font-black ${profit > 0 ? 'text-emerald-600' : (profit < 0 ? 'text-red-400' : 'text-slate-800')}`;
+
+            const minX = 28000;
+            const maxX = 32000;
+            const chartWidth = 500;
+            const zeroY = 125;
+            const scaleX = chartWidth / (maxX - minX);
+            const scaleY = 0.2; 
+
+            // Draw Payoff Path for Long Put
+            const strikeX = (strike - minX) * scaleX;
+            const premiumY = zeroY + (premium * scaleY);
+            
+            // Point at Left (Price Min)
+            const leftProfit = (strike - minX) - premium;
+            const leftY = zeroY - (leftProfit * scaleY);
+            
+            let d = `M 0 ${leftY}`;
+            d += ` L ${strikeX} ${premiumY}`; // At strike price, profit is -premium
+            d += ` L ${chartWidth} ${premiumY}`; // After strike, profit stays -premium
+            payoffPath.setAttribute('d', d);
+
+            // Draw Profit Area (Where profit > 0, from minX to breakeven)
+            const beX = (breakeven - minX) * scaleX;
+            if (beX > 0) {
+                let areaD = `M 0 ${zeroY}`;
+                areaD += ` L 0 ${leftY}`;
+                areaD += ` L ${beX} ${zeroY}`;
+                areaD += ` Z`;
+                profitArea.setAttribute('d', areaD);
+            } else {
+                profitArea.setAttribute('d', "");
+            }
+
+            // Update Breakeven Line
+            beLine.setAttribute('x1', beX);
+            beLine.setAttribute('x2', beX);
+
+            // Update Marker
+            const markerX = (current - minX) * scaleX;
+            const markerY = zeroY - (profit * scaleY);
+            marker.setAttribute('cx', markerX);
+            marker.setAttribute('cy', markerY);
+        }
+
+        [strikeInput, premiumInput, currentInput].forEach(input => {
+            input.addEventListener('input', updateSimulation);
+        });
+
+        window.onload = updateSimulation;
+    </script>
+
+</body>
+</html>

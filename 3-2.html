@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM! 時間流逝完全圖解 | 歐大選擇權教室</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 噴漆普普風專屬色調 */
+        :root {
+            --c-bg: #F0F4F8;
+            --c-primary: #FF00FF; /* 桃紅 */
+            --c-secondary: #00FFFF; /* 電光青 */
+            --c-accent: #FFFF00; /* 亮黃 */
+            --c-dark: #111827;
+            --c-glass: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--c-bg);
+            color: var(--c-dark);
+            background-image: radial-gradient(#CBD5E1 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+
+        .font-comic {
+            font-family: 'Bangers', 'Noto Sans TC', cursive;
+            letter-spacing: 0.05em;
+        }
+
+        /* 普普風卡通框線 */
+        .pop-card {
+            border: 5px solid var(--c-dark);
+            border-radius: 1.5rem;
+            background-color: white;
+            box-shadow: 12px 12px 0px var(--c-dark);
+            transition: all 0.2s ease;
+        }
+
+        .pop-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 15px 15px 0px var(--c-dark);
+        }
+
+        /* 膠囊容器 */
+        .capsule-container {
+            background: white;
+            border: 4px solid var(--c-dark);
+            border-radius: 9999px;
+            box-shadow: 0 8px 0 var(--c-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* 互動拉桿 */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 20px;
+            background: var(--c-dark);
+            border-radius: 10px;
+            border: 2px solid white;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            background: var(--c-accent);
+            cursor: pointer;
+            margin-top: -16px;
+            border: 5px solid var(--c-dark);
+            box-shadow: 0 5px 0 var(--c-dark);
+        }
+
+        /* 電池能量動畫 */
+        .energy-bar {
+            transition: height 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+
+        /* 按鈕激活態 */
+        .mode-btn.active {
+            background-color: var(--c-dark);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 640px) {
+            .pop-card { border-width: 4px; box-shadow: 8px 8px 0px var(--c-dark); }
+            input[type=range]::-webkit-slider-thumb { height: 40px; width: 40px; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4 sm:p-8">
+
+    <!-- 頁首 -->
+    <header class="w-full flex justify-center mb-12">
+        <div class="capsule-container px-6 py-3 flex-row gap-4">
+            <div class="w-14 h-14 rounded-xl border-4 border-[var(--c-dark)] overflow-hidden bg-white shrink-0">
+                <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/FF00FF/FFFFFF?text=Logo&font=Bangers'">
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-2xl sm:text-3xl font-black text-[var(--c-dark)] leading-none tracking-tight">歐大選擇權教室</h1>
+                <p class="text-xs font-black text-[var(--c-primary)] tracking-[0.2em] uppercase mt-1 font-comic">THETA MASTERCLASS</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-6xl flex flex-col gap-12">
+        
+        <!-- 大標題 -->
+        <div class="text-center">
+            <div class="inline-block bg-[var(--c-accent)] px-8 py-5 pop-card transform -rotate-1 relative">
+                <div class="absolute -top-8 -right-8 text-6xl md:text-8xl transform rotate-12">🔥</div>
+                <h2 class="text-4xl sm:text-6xl md:text-7xl font-black text-[var(--c-dark)] tracking-wide font-comic uppercase text-shadow-sm">
+                    Theta Decay
+                </h2>
+                <div class="mt-2 text-xl md:text-3xl font-black text-white bg-[var(--c-primary)] px-5 py-2 inline-block rounded-xl border-4 border-black shadow-[4px_4px_0_#000]">
+                    時間價值流逝規律
+                </div>
+            </div>
+        </div>
+
+        <!-- ★ 核心互動：時間價值電池模擬器 ★ -->
+        <section class="flex flex-col items-center mt-6">
+            <div class="w-full pop-card bg-white p-6 md:p-12 relative overflow-hidden">
+                <div class="absolute -top-10 -left-10 text-9xl font-black font-comic opacity-5">30000</div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    
+                    <!-- 左側：垂直能量電池 (拆解動畫) -->
+                    <div class="lg:col-span-3 flex flex-col items-center">
+                        <div class="relative w-32 h-80 border-[6px] border-[var(--c-dark)] rounded-3xl bg-gray-100 p-2 shadow-inner">
+                            <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 w-12 h-5 bg-[var(--c-dark)] rounded-t-lg"></div>
+                            
+                            <div class="w-full h-full flex flex-col justify-end overflow-hidden rounded-2xl bg-gray-200">
+                                <!-- 時間價值 (上層：融化中) -->
+                                <div id="batteryTime" class="energy-bar w-full bg-[var(--c-primary)] border-b-4 border-black/20 relative" style="height: 60%;">
+                                    <span class="absolute top-2 left-0 w-full text-center text-[10px] font-black text-white uppercase tracking-tighter">Time Value</span>
+                                    <div class="absolute bottom-0 left-1/4 w-2 h-4 bg-white/30 rounded-full animate-bounce"></div>
+                                </div>
+                                <!-- 內涵價值 (下層：固定實體) -->
+                                <div id="batteryIntrinsic" class="energy-bar w-full bg-[var(--c-secondary)]" style="height: 20%;">
+                                    <span class="absolute bottom-2 left-0 w-full text-center text-[10px] font-black text-black/60 uppercase">Intrinsic</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 bg-[var(--c-dark)] text-white px-6 py-2 rounded-full font-black text-sm shadow-lg">權利金能量拆解</div>
+                    </div>
+
+                    <!-- 中間：互動與數據面板 -->
+                    <div class="lg:col-span-9 flex flex-col gap-8">
+                        
+                        <!-- 數據看板 -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-gray-50 border-4 border-black p-6 rounded-2xl relative overflow-hidden">
+                                <span class="text-gray-400 font-black text-xs uppercase tracking-widest block mb-2">距離結算日還有</span>
+                                <div class="flex items-baseline gap-2">
+                                    <span id="daysNum" class="text-6xl font-black text-[var(--c-dark)] font-comic">14</span>
+                                    <span class="text-xl font-bold text-gray-500">天</span>
+                                </div>
+                                <div class="absolute -right-4 -bottom-4 text-6xl opacity-10">⏳</div>
+                            </div>
+                            <div class="bg-[var(--c-dark)] p-6 rounded-2xl flex flex-col justify-center relative overflow-hidden">
+                                <span class="text-gray-500 font-black text-xs uppercase tracking-widest block mb-2">今日流失金額 (Theta)</span>
+                                <div id="thetaVal" class="text-4xl font-black text-[var(--c-accent)] font-comic">-$1,250</div>
+                                <p class="text-[10px] text-gray-500 mt-1 font-bold">(* 假設台指選 1 點 = 50 元)</p>
+                                <div class="absolute -right-4 -bottom-4 text-6xl opacity-10 text-white">💸</div>
+                            </div>
+                        </div>
+
+                        <!-- 狀態選擇器 -->
+                        <div class="flex flex-wrap gap-4">
+                            <button onclick="setMode('otm')" id="btn-otm" class="mode-btn flex-1 py-4 border-4 border-black rounded-2xl font-black text-lg bg-gray-100 transition-all hover:bg-white active:scale-95">🎈 價外 (OTM)</button>
+                            <button onclick="setMode('atm')" id="btn-atm" class="mode-btn active flex-1 py-4 border-4 border-black rounded-2xl font-black text-lg bg-gray-100 transition-all hover:bg-white active:scale-95">🔥 價平 (ATM)</button>
+                            <button onclick="setMode('itm')" id="btn-itm" class="mode-btn flex-1 py-4 border-4 border-black rounded-2xl font-black text-lg bg-gray-100 transition-all hover:bg-white active:scale-95">💎 價內 (ITM)</button>
+                        </div>
+
+                        <!-- 時間拉桿 (由左向右模擬時間流逝) -->
+                        <div class="relative pt-6">
+                            <input type="range" id="timeSlider" min="0" max="14" step="1" value="0">
+                            <div class="flex justify-between mt-6 px-2">
+                                <div class="flex flex-col items-start">
+                                    <span class="text-[10px] font-black text-gray-400">OPENING</span>
+                                    <span class="text-sm font-black text-green-500">第 14 天 (剛開倉)</span>
+                                </div>
+                                <div class="flex flex-col items-end">
+                                    <span class="text-[10px] font-black text-gray-400">SETTLEMENT</span>
+                                    <span class="text-sm font-black text-red-500">第 0 天 (結算日)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 動態評論框 -->
+                        <div id="commentary" class="bg-yellow-50 border-l-8 border-[var(--c-accent)] p-5 rounded-r-2xl italic font-bold text-gray-700 shadow-sm">
+                            「價平合約」是時間流逝的重災區！目前還有 14 天，流速尚可，但請做好準備。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ★ 5 大流逝規律總結卡片 (擴展至 5 個規律) ★ -->
+        <section class="w-full">
+            <h3 class="text-2xl md:text-3xl font-black mb-8 text-center bg-white px-8 py-3 pop-card inline-block border-dashed">
+                🔥 時間價值流逝的 5 大規律
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-4">
+                <!-- 規律 1 -->
+                <div class="pop-card p-8 bg-white border-t-8 border-t-[var(--c-primary)]">
+                    <div class="text-4xl mb-4 font-comic">01</div>
+                    <h3 class="text-xl font-black mb-3">越接近到期，流逝越快</h3>
+                    <p class="font-bold text-gray-600 leading-relaxed text-sm">衰減不是直線。前期緩慢，到期前 30 天開始加速，最後 7 天則是「跳水式」流失。</p>
+                </div>
+                <!-- 規律 2 -->
+                <div class="pop-card p-8 bg-white border-t-8 border-t-[var(--c-accent)]">
+                    <div class="text-4xl mb-4 font-comic">02</div>
+                    <h3 class="text-xl font-black mb-3">價平 (ATM) 衰減最快</h3>
+                    <p class="font-bold text-gray-600 leading-relaxed text-sm">30,000 點附近不確定性最高 (50%)。一旦時間流逝，不確定性驟降，價值崩塌也最猛烈。</p>
+                </div>
+                <!-- 規律 3 (新增) -->
+                <div class="pop-card p-8 bg-white border-t-8 border-t-[var(--c-secondary)]">
+                    <div class="text-4xl mb-4 font-comic text-[var(--c-secondary)]">03</div>
+                    <h3 class="text-xl font-black mb-3">價內 & 價外衰減較慢</h3>
+                    <p class="font-bold text-gray-600 leading-relaxed text-sm">深價內多為「內涵價值」，深價外本來就沒剩多少。真正被殺最慘的是「價平附近」。</p>
+                </div>
+                <!-- 規律 4 -->
+                <div class="pop-card p-8 bg-white border-t-8 border-t-green-500">
+                    <div class="text-4xl mb-4 text-green-500 font-comic">04</div>
+                    <h3 class="text-xl font-black mb-3">波動率 (IV) 的影響</h3>
+                    <p class="font-bold text-gray-600 leading-relaxed text-sm">IV 升 = 膨脹，IV 降 = 壓縮。有時候帳面縮水不是時間的問題，是 IV 崩盤在殺你。</p>
+                </div>
+                <!-- 規律 5 (新增) -->
+                <div class="pop-card p-8 bg-[var(--c-dark)] text-white border-t-8 border-t-white">
+                    <div class="text-4xl mb-4 text-[var(--c-accent)] font-comic">05</div>
+                    <h3 class="text-xl font-black mb-3 text-[var(--c-accent)]">到期日 = 歸零</h3>
+                    <p class="font-bold text-gray-300 leading-relaxed text-sm italic">審判之日降臨。無論漲跌，時間價值一定歸零。這時只剩下貨真價實的「內涵價值」。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 一張表秒懂表格 -->
+        <section class="w-full">
+            <h3 class="text-2xl md:text-3xl font-black mb-8 text-center font-comic uppercase tracking-widest">📊 Quick Summary Table</h3>
+            <div class="pop-card p-0 overflow-hidden">
+                <div class="w-full overflow-x-auto">
+                    <table class="w-full text-center border-collapse">
+                        <thead>
+                            <tr class="bg-[var(--c-dark)] text-white">
+                                <th class="py-6 px-6 font-black text-lg">類型 (Type)</th>
+                                <th class="py-6 px-6 font-black text-lg border-x border-gray-700">內涵價值</th>
+                                <th class="py-6 px-6 font-black text-lg">時間流逝影響 (Theta)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="font-bold text-sm md:text-base divide-y-4 divide-gray-100">
+                            <tr>
+                                <td class="py-6 px-6 bg-gray-50 text-blue-600">深價內 ITM</td>
+                                <td class="py-6 px-6">有 (極高實體)</td>
+                                <td class="py-6 px-6 text-gray-400">🐢 慢速融化</td>
+                            </tr>
+                            <tr class="bg-pink-50">
+                                <td class="py-6 px-6 font-black text-[var(--c-primary)] italic">價平 ATM</td>
+                                <td class="py-6 px-6 text-gray-400">0</td>
+                                <td class="py-6 px-6 text-[var(--c-primary)] text-xl">⚡ 暴衝式消失！</td>
+                            </tr>
+                            <tr>
+                                <td class="py-6 px-6 bg-gray-50 text-gray-500">深價外 OTM</td>
+                                <td class="py-6 px-6 text-gray-400">0</td>
+                                <td class="py-6 px-6 text-yellow-600">🐎 普通衰減</td>
+                            </tr>
+                            <tr class="bg-red-50">
+                                <td class="py-6 px-6 font-black text-red-600 uppercase">結算日當天</td>
+                                <td class="py-6 px-6 italic">只剩內涵價值</td>
+                                <td class="py-6 px-6 text-red-600 font-comic text-2xl uppercase">ZERO 絕對歸零</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="w-full flex justify-center mt-20 pb-12 px-4">
+        <div class="capsule-container px-8 py-4 flex-col gap-2">
+            <div class="flex items-center gap-4">
+                <span class="text-2xl font-black text-[var(--c-dark)] font-comic tracking-widest uppercase">JOPTION</span>
+                <div class="w-1 h-8 bg-gray-300"></div>
+                <span class="text-lg font-bold text-gray-600">歐大選擇權教室</span>
+            </div>
+            <p class="text-[10px] text-gray-400 font-black italic tracking-wider">© 2026 金融教育僅供參考。時間流逝為必然，掌握規律是核心。</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentMode = 'atm';
+        const slider = document.getElementById('timeSlider');
+        const daysNum = document.getElementById('daysNum');
+        const thetaText = document.getElementById('thetaVal');
+        const barTime = document.getElementById('batteryTime');
+        const barIntrinsic = document.getElementById('batteryIntrinsic');
+        const commentary = document.getElementById('commentary');
+
+        // 模擬數據設定 (以 14 天為例)
+        const configs = {
+            atm: { initialTime: 400, intrinsic: 0, scale: 1.0 },
+            otm: { initialTime: 120, intrinsic: 0, scale: 0.6 },
+            itm: { initialTime: 180, intrinsic: 300, scale: 0.4 }
+        };
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-[var(--c-primary)]', 'text-white');
+            });
+            const activeBtn = document.getElementById(`btn-${mode}`);
+            activeBtn.classList.add('active');
+            if (mode === 'atm') activeBtn.classList.add('bg-[var(--c-primary)]', 'text-white');
+            
+            update();
+        }
+
+        function update() {
+            // Slider 從 0 到 14 代表時間流逝 (0 表示剩下 14 天)
+            const elapsed = parseInt(slider.value);
+            const remaining = 14 - elapsed;
+            daysNum.innerText = remaining;
+
+            const config = configs[currentMode];
+            
+            // 核心公式：時間價值 = 初始 * sqrt(剩餘天數 / 14) -> 模擬非線性衰減
+            const timeRatio = Math.sqrt(remaining / 14);
+            const currentTimeVal = config.initialTime * timeRatio;
+            
+            // 計算 Theta (簡化估計：每前進一天流失多少權利金)
+            // 越接近 0 越抖峭
+            let thetaPoints = 0;
+            if (remaining > 0) {
+                // 微分近似
+                thetaPoints = (config.initialTime / (2 * Math.sqrt(14 * remaining))) * config.scale;
+            } else {
+                thetaPoints = 0; // 結算日當天已經沒東西可以流了
+            }
+            
+            // 更新 UI
+            thetaText.innerText = (remaining === 0) ? "$0" : `-$${Math.round(thetaPoints * 50).toLocaleString()}`;
+            
+            // 更新電池高度 (總權利金上限設為 600 為 100%)
+            const maxH = 600;
+            const timeH = (remaining === 0) ? 0 : (currentTimeVal / maxH) * 100;
+            const intrinsicH = (config.intrinsic / maxH) * 100;
+
+            barTime.style.height = `${timeH}%`;
+            barIntrinsic.style.height = `${intrinsicH}%`;
+
+            // 更新評論
+            if (remaining > 7) {
+                commentary.innerHTML = `🚶 <strong>目前為緩步期：</strong> 還有 ${remaining} 天，流速穩定。買方此時壓力較小，方向是勝負關鍵。`;
+                commentary.className = "bg-green-50 border-l-8 border-green-400 p-5 rounded-r-2xl italic font-bold text-gray-700 shadow-sm";
+            } else if (remaining > 2) {
+                commentary.innerHTML = `🏃 <strong>目前為加速期：</strong> 剩 ${remaining} 天！時間開始跑步了。賣方每天領取的「租金」非常有感。`;
+                commentary.className = "bg-orange-50 border-l-8 border-orange-400 p-5 rounded-r-2xl italic font-bold text-gray-700 shadow-sm";
+            } else if (remaining > 0) {
+                commentary.innerHTML = `💀 <strong>目前為斷崖崩塌期：</strong> 只剩 ${remaining} 天！每一秒都在消失。這就是買方的噩夢「Theta 殺手」。`;
+                commentary.className = "bg-red-50 border-l-8 border-red-500 p-5 rounded-r-2xl italic font-bold text-gray-700 animate-pulse shadow-sm";
+            } else {
+                commentary.innerHTML = `🏁 <strong>今日結算日：</strong> 時間價值精準歸零！${currentMode === 'itm' ? '恭喜，僅剩下實體的「內涵價值」參與結算。' : '很遺憾，合約已無任何價值，淪為廢紙一份。'}`;
+                commentary.className = "bg-gray-100 border-l-8 border-gray-600 p-5 rounded-r-2xl italic font-bold text-gray-700 shadow-sm";
+            }
+        }
+
+        slider.addEventListener('input', update);
+        
+        // 初始狀態
+        setMode('atm');
+    </script>
+</body>
+</html>
