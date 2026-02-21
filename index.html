@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- 網頁標題 -->
     <title>歐大選擇權教室</title>
 
-    <!-- LINE / Facebook 分享預覽設定 (OG Tags) -->
     <meta property="og:title" content="歐大選擇權教室" />
     <meta property="og:description" content="專業的選擇權教育與策略模擬平台，從基礎入門到實戰交易體系。" />
     <meta property="og:type" content="website" />
@@ -15,12 +13,9 @@
     <meta property="og:image" content="https://www.joption.com.tw/ip標籤.jpg" />
     <meta property="og:site_name" content="Joption" />
 
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React & ReactDOM CDN -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Babel for JSX Compilation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <style>
@@ -113,26 +108,21 @@
             text-decoration: none;
         }
 
-        /* 造訪計數器的精緻樣式 */
         .visitor-badge {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 99px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 700;
-            color: #f0fdf4;
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            transition: all 0.3s ease;
         }
     </style>
 </head>
 <body class="text-stone-800">
     <div id="root" class="h-full"></div>
 
-    <!-- Firebase SDK Modular -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -158,7 +148,8 @@
             ClipboardCheck: () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>,
             Leaf: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 11a9 9 0 019 9M4 11a9 9 0 019-9m-9 9l9 9m0-18l-9 9"></path></svg>,
             ArrowRight: () => <svg className="w-6 h-6 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>,
-            Users: () => <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            Users: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>,
+            Clock: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         };
 
         const App = () => {
@@ -166,16 +157,14 @@
             const [activeSubIndex, setActiveSubIndex] = useState(null);
             const [isMenuOpen, setIsMenuOpen] = useState(false);
             const [user, setUser] = useState(null);
-            const [visitorCount, setVisitorCount] = useState(0);
+            const [visitorStats, setVisitorStats] = useState({ total: null, daily: null });
 
-            const ipImageUrl = "ip標籤.jpg";
+            const ipImageUrl = "https://www.joption.com.tw/ip%E6%A8%99%E7%B1%A4.jpg";
 
-            // Firebase Logic
             useEffect(() => {
-                let unsubscribeAuth, unsubscribeStats;
+                let unsubscribeAuth, unsubscribeTotal, unsubscribeDaily;
                 
                 const initFirebase = async () => {
-                    // 等待 Firebase SDK 模組載入
                     if (!window.FirebaseSDK) {
                         setTimeout(initFirebase, 200);
                         return;
@@ -184,15 +173,24 @@
                     const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp } = window.FirebaseSDK;
                     
                     try {
-                        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-                        if (!firebaseConfig) return;
+                        if (typeof __firebase_config === 'undefined') {
+                            setVisitorStats({ total: 0, daily: 0 });
+                            return;
+                        }
 
+                        const firebaseConfig = JSON.parse(__firebase_config);
                         const app = initializeApp(firebaseConfig);
                         const auth = getAuth(app);
                         const db = getFirestore(app);
                         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-                        // Auth
+                        const dateKey = new Intl.DateTimeFormat('zh-TW', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            timeZone: 'Asia/Taipei'
+                        }).format(new Date()).replace(/\//g, '');
+
                         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                             await signInWithCustomToken(auth, __initial_auth_token);
                         } else {
@@ -202,36 +200,39 @@
                         unsubscribeAuth = onAuthStateChanged(auth, (u) => {
                             setUser(u);
                             if (u) {
-                                // 成功登入後設定監聽與計數
-                                const counterDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', 'visitorStats');
+                                const totalDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', 'totalStats');
+                                const dailyDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', `daily_${dateKey}`);
                                 
-                                // 造訪紀錄 (Session Based)
                                 if (!sessionStorage.getItem('v_tracked')) {
-                                    setDoc(counterDocRef, {
-                                        count: increment(1),
-                                        lastUpdated: serverTimestamp()
-                                    }, { merge: true }).catch(console.error);
+                                    const updateData = { count: increment(1), lastUpdated: serverTimestamp() };
+                                    setDoc(totalDocRef, updateData, { merge: true }).catch(console.error);
+                                    setDoc(dailyDocRef, updateData, { merge: true }).catch(console.error);
                                     sessionStorage.setItem('v_tracked', 'true');
                                 }
 
-                                // 監聽即時數據
-                                unsubscribeStats = onSnapshot(counterDocRef, (docSnap) => {
-                                    if (docSnap.exists()) {
-                                        setVisitorCount(docSnap.data().count || 0);
-                                    }
-                                }, (err) => {});
+                                unsubscribeTotal = onSnapshot(totalDocRef, (snap) => {
+                                    const val = snap.exists() ? snap.data().count : 0;
+                                    setVisitorStats(prev => ({ ...prev, total: val }));
+                                }, () => setVisitorStats(prev => ({ ...prev, total: 0 })));
+
+                                unsubscribeDaily = onSnapshot(dailyDocRef, (snap) => {
+                                    const val = snap.exists() ? snap.data().count : 0;
+                                    setVisitorStats(prev => ({ ...prev, daily: val }));
+                                }, () => setVisitorStats(prev => ({ ...prev, daily: 0 })));
                             }
                         });
 
                     } catch (e) {
-                        console.warn("Firebase Stats unavailable:", e);
+                        console.warn("Firebase stats error:", e);
+                        setVisitorStats({ total: 0, daily: 0 });
                     }
                 };
 
                 initFirebase();
                 return () => {
                     if (unsubscribeAuth) unsubscribeAuth();
-                    if (unsubscribeStats) unsubscribeStats();
+                    if (unsubscribeTotal) unsubscribeTotal();
+                    if (unsubscribeDaily) unsubscribeDaily();
                 };
             }, []);
 
@@ -342,11 +343,10 @@
 
             return (
                 <div className="h-full flex flex-col md:flex-row bg-[#f7f9f4] overflow-hidden">
-                    {/* Sidebar */}
                     <aside className={`fixed inset-y-0 left-0 z-50 w-[280px] lg:w-[320px] bg-[#fffcf5] border-r-2 border-[#e7e5e4] transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 md:sticky md:top-0 md:h-screen overflow-y-auto`}>
                         <div className="flex flex-col h-full">
                             <div className="p-8 pb-10 flex items-center gap-4 cursor-pointer group" onClick={() => {setActiveChapterId('home'); setActiveSubIndex(null); setIsMenuOpen(false);}}>
-                                <div className="w-14 h-14 shrink-0 overflow-hidden rounded-[1.2rem] shadow-md shadow-amber-200/50 border-4 border-white group-hover:scale-105 group-hover:rotate-3 transition-transform duration-300">
+                                <div className="w-14 h-14 shrink-0 overflow-hidden rounded-[1.2rem] shadow-md shadow-amber-200/50 border-4 border-white group-hover:scale-105 group-hover:rotate-3 transition-transform duration-300 bg-stone-100">
                                     <img src={ipImageUrl} alt="Logo" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="flex flex-col min-w-0">
@@ -356,7 +356,7 @@
                             </div>
 
                             <nav className="flex-1 px-4 py-2 space-y-2 mb-8">
-                                {chapters.map((ch, idx) => (
+                                {chapters.map((ch) => (
                                     <div key={ch.id} className="space-y-1">
                                         <button 
                                             onClick={() => {setActiveChapterId(ch.id); setActiveSubIndex(null);}}
@@ -398,11 +398,10 @@
                         </div>
                     </aside>
 
-                    {/* Main Workspace */}
                     <main className="flex-1 flex flex-col h-[100dvh] relative min-w-0 overflow-hidden bg-[#f7f9f4]">
                         <header className="md:hidden flex items-center justify-between px-6 py-4 bg-[#fffcf5] border-b-2 border-stone-200 shrink-0 z-40 w-full shadow-sm">
                             <div className="flex items-center gap-3 overflow-hidden" onClick={() => {setActiveChapterId('home'); setActiveSubIndex(null);}}>
-                                <img src={ipImageUrl} alt="Logo" className="w-10 h-10 shrink-0 rounded-xl object-cover shadow-sm border-2 border-white" />
+                                <img src={ipImageUrl} alt="Logo" className="w-10 h-10 shrink-0 rounded-xl object-cover shadow-sm border-2 border-white bg-stone-100" />
                                 <span className="font-extrabold text-emerald-900 text-lg tracking-tight truncate">歐大選擇權教室</span>
                             </div>
                             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-stone-600 bg-stone-100 rounded-xl transition-colors active:scale-95">
@@ -413,17 +412,13 @@
                         <div className="scroll-container">
                             <div className={`flex-1 flex flex-col ${activeSubIndex !== null ? 'p-0 h-full' : 'p-4 md:p-8 lg:p-12'}`}>
                                 {activeChapterId === 'home' ? (
-                                    <div key="home" className="animate-fade-in space-y-12 max-w-6xl mx-auto w-full">
-                                        {/* HERO SECTION */}
+                                    <div key="home" className="animate-fade-in space-y-12 max-w-6xl mx-auto w-full pb-12">
                                         <div className="forest-gradient text-white p-8 md:p-16 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl shadow-emerald-900/20 flex flex-col lg:flex-row items-center gap-12 relative overflow-hidden">
                                             <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-emerald-400 rounded-full blur-[100px] opacity-20"></div>
                                             <div className="flex-1 text-center lg:text-left space-y-8 relative z-10">
                                                 <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
                                                     <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 text-emerald-50 text-sm font-bold tracking-widest shadow-inner">
                                                         <Icons.Leaf /> JOPTION ACADEMY
-                                                    </div>
-                                                    <div className="visitor-badge">
-                                                        <Icons.Users /> 累計造訪：{visitorCount > 0 ? visitorCount.toLocaleString() : '讀取中...'}
                                                     </div>
                                                 </div>
                                                 <h1 className="text-4xl md:text-6xl font-black leading-[1.2] tracking-tight text-[#f0fdf4]">
@@ -440,7 +435,6 @@
                                             </div>
                                         </div>
 
-                                        {/* QUANT SECTION */}
                                         <div className="card-sage-darker p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-stone-300/20">
                                             <div className="flex flex-col lg:flex-row gap-12 items-center">
                                                 <div className="lg:w-full text-center lg:text-left space-y-8">
@@ -486,6 +480,21 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+
+                                        {/* 造訪計數器與頁尾年份 */}
+                                        <div className="flex flex-col items-center justify-center gap-4 pt-4 animate-fade-in">
+                                            <div className="h-[2px] w-24 bg-stone-200 rounded-full mb-2"></div>
+                                            <div className="flex flex-wrap justify-center gap-3">
+                                                <div className="visitor-badge bg-emerald-50 border border-emerald-100 text-emerald-800 shadow-sm">
+                                                    <Icons.Users /> 累積造訪：<span className="font-black">{visitorStats.total !== null ? visitorStats.total.toLocaleString() : '...'}</span>
+                                                </div>
+                                                <div className="visitor-badge bg-amber-50 border border-amber-100 text-amber-800 shadow-sm">
+                                                    <Icons.Clock /> 今日造訪：<span className="font-black">{visitorStats.daily !== null ? visitorStats.daily.toLocaleString() : '...'}</span>
+                                                </div>
+                                            </div>
+                                            {/* 已更新年份至 2026 */}
+                                            <p className="text-[11px] font-bold text-stone-400 tracking-widest uppercase">© JOPTION ACADEMY - Since 2026</p>
                                         </div>
                                     </div>
                                 ) : (
