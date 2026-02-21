@@ -9,7 +9,7 @@
 
     <!-- LINE / Facebook 分享預覽設定 (OG Tags) -->
     <meta property="og:title" content="歐大選擇權教室" />
-    <meta property="og:description" content="專業的選擇權 education 與策略模擬平台，從基礎入門到實戰交易體系。" />
+    <meta property="og:description" content="專業的選擇權教育與策略模擬平台，從基礎入門到實戰交易體系。" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.joption.com.tw/" />
     <meta property="og:image" content="https://www.joption.com.tw/ip標籤.jpg" />
@@ -40,8 +40,14 @@
             color: #292524;
         }
 
-        .animate-fade-in { animation: fadeIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { 
+            animation: fadeIn 0.4s ease-out forwards; 
+            opacity: 0;
+        }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
 
         .submenu-enter { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .submenu-open { max-height: 2000px; }
@@ -54,7 +60,6 @@
             background: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%);
         }
 
-        /* 優化捲動容器 */
         .scroll-container {
             flex: 1;
             overflow-y: auto;
@@ -80,7 +85,6 @@
             flex: 1;
         }
 
-        /* 量化交易區塊使用協調的灰色綠 */
         .card-sage-darker {
             background-color: #edf2e7;
             border: 2px solid #dde5d5;
@@ -91,7 +95,6 @@
             border: 1px solid #e2eadd;
         }
 
-        /* 漂亮按鈕的自定義樣式 */
         .btn-premium-amber {
             background: linear-gradient(to bottom right, #fbbf24, #d97706);
             box-shadow: 0 4px 15px -1px rgba(217, 119, 6, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
@@ -102,9 +105,6 @@
             transform: translateY(-3px) scale(1.02);
             box-shadow: 0 10px 20px -2px rgba(217, 119, 6, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.4);
         }
-        .btn-premium-amber:active {
-            transform: translateY(1px) scale(0.98);
-        }
 
         .btn-premium-dark {
             background: linear-gradient(to bottom right, #2d4a3e, #1a2e25);
@@ -112,20 +112,37 @@
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-decoration: none;
         }
-        .btn-premium-dark:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 25px -2px rgba(26, 46, 37, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.2);
-        }
-        .btn-premium-dark:active {
-            transform: translateY(1px) scale(0.98);
+
+        /* 造訪計數器的精緻樣式 */
+        .visitor-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #f0fdf4;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
     </style>
 </head>
 <body class="text-stone-800">
     <div id="root" class="h-full"></div>
 
+    <!-- Firebase SDK Modular -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        window.FirebaseSDK = { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp };
+    </script>
+
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useMemo } = React;
 
         const Icons = {
             Home: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>,
@@ -140,17 +157,85 @@
             X: () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>,
             ClipboardCheck: () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>,
             Leaf: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 11a9 9 0 019 9M4 11a9 9 0 019-9m-9 9l9 9m0-18l-9 9"></path></svg>,
-            ArrowRight: () => <svg className="w-6 h-6 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            ArrowRight: () => <svg className="w-6 h-6 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>,
+            Users: () => <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
         };
 
         const App = () => {
             const [activeChapterId, setActiveChapterId] = useState('home');
             const [activeSubIndex, setActiveSubIndex] = useState(null);
             const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const [user, setUser] = useState(null);
+            const [visitorCount, setVisitorCount] = useState(0);
 
             const ipImageUrl = "ip標籤.jpg";
 
-            const chapters = [
+            // Firebase Logic
+            useEffect(() => {
+                let unsubscribeAuth, unsubscribeStats;
+                
+                const initFirebase = async () => {
+                    // 等待 Firebase SDK 模組載入
+                    if (!window.FirebaseSDK) {
+                        setTimeout(initFirebase, 200);
+                        return;
+                    }
+
+                    const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp } = window.FirebaseSDK;
+                    
+                    try {
+                        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+                        if (!firebaseConfig) return;
+
+                        const app = initializeApp(firebaseConfig);
+                        const auth = getAuth(app);
+                        const db = getFirestore(app);
+                        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+                        // Auth
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+
+                        unsubscribeAuth = onAuthStateChanged(auth, (u) => {
+                            setUser(u);
+                            if (u) {
+                                // 成功登入後設定監聽與計數
+                                const counterDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', 'visitorStats');
+                                
+                                // 造訪紀錄 (Session Based)
+                                if (!sessionStorage.getItem('v_tracked')) {
+                                    setDoc(counterDocRef, {
+                                        count: increment(1),
+                                        lastUpdated: serverTimestamp()
+                                    }, { merge: true }).catch(console.error);
+                                    sessionStorage.setItem('v_tracked', 'true');
+                                }
+
+                                // 監聽即時數據
+                                unsubscribeStats = onSnapshot(counterDocRef, (docSnap) => {
+                                    if (docSnap.exists()) {
+                                        setVisitorCount(docSnap.data().count || 0);
+                                    }
+                                }, (err) => {});
+                            }
+                        });
+
+                    } catch (e) {
+                        console.warn("Firebase Stats unavailable:", e);
+                    }
+                };
+
+                initFirebase();
+                return () => {
+                    if (unsubscribeAuth) unsubscribeAuth();
+                    if (unsubscribeStats) unsubscribeStats();
+                };
+            }, []);
+
+            const chapters = useMemo(() => [
                 {
                     id: 'ch1',
                     title: 'CH 1 選擇權入門',
@@ -239,20 +324,16 @@
                         { title: '歐大的自我介紹', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E6%AD%90%E5%A4%A7%E7%9A%84%E8%87%AA%E6%88%91%E4%BB%8B%E7%B4%B9' }
                     ]
                 }
-            ];
+            ], []);
 
-            const currentChapter = chapters.find(c => c.id === activeChapterId);
+            const currentChapter = useMemo(() => chapters.find(c => c.id === activeChapterId), [activeChapterId, chapters]);
 
             const handleSubPageClick = (index) => {
-                // 取得目標 URL
-                const targetUrl = index === 'test' ? currentChapter.testUrl : currentChapter.subpages[index].url;
-                
-                // 如果是外部連結（http開頭），直接在新視窗開啟，不進入 iframe
+                const targetUrl = index === 'test' ? currentChapter?.testUrl : currentChapter?.subpages[index].url;
                 if (targetUrl && targetUrl.startsWith('http')) {
                     window.open(targetUrl, '_blank');
                     return;
                 }
-
                 setActiveSubIndex(index);
                 if (window.innerWidth < 768) setIsMenuOpen(false);
                 const container = document.querySelector('.scroll-container');
@@ -332,13 +413,18 @@
                         <div className="scroll-container">
                             <div className={`flex-1 flex flex-col ${activeSubIndex !== null ? 'p-0 h-full' : 'p-4 md:p-8 lg:p-12'}`}>
                                 {activeChapterId === 'home' ? (
-                                    <div className="space-y-12 max-w-6xl mx-auto w-full">
+                                    <div key="home" className="animate-fade-in space-y-12 max-w-6xl mx-auto w-full">
                                         {/* HERO SECTION */}
-                                        <div className="animate-fade-in forest-gradient text-white p-8 md:p-16 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl shadow-emerald-900/20 flex flex-col lg:flex-row items-center gap-12 relative overflow-hidden">
+                                        <div className="forest-gradient text-white p-8 md:p-16 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl shadow-emerald-900/20 flex flex-col lg:flex-row items-center gap-12 relative overflow-hidden">
                                             <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-emerald-400 rounded-full blur-[100px] opacity-20"></div>
                                             <div className="flex-1 text-center lg:text-left space-y-8 relative z-10">
-                                                <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 text-emerald-50 text-sm font-bold tracking-widest shadow-inner">
-                                                    <Icons.Leaf /> JOPTION ACADEMY
+                                                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
+                                                    <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 text-emerald-50 text-sm font-bold tracking-widest shadow-inner">
+                                                        <Icons.Leaf /> JOPTION ACADEMY
+                                                    </div>
+                                                    <div className="visitor-badge">
+                                                        <Icons.Users /> 累計造訪：{visitorCount > 0 ? visitorCount.toLocaleString() : '讀取中...'}
+                                                    </div>
                                                 </div>
                                                 <h1 className="text-4xl md:text-6xl font-black leading-[1.2] tracking-tight text-[#f0fdf4]">
                                                     掌握選擇權：<br/><span className="text-amber-300">獲利與風險的平衡魔法</span>
@@ -355,7 +441,7 @@
                                         </div>
 
                                         {/* QUANT SECTION */}
-                                        <div className="animate-fade-in card-sage-darker p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-stone-300/20">
+                                        <div className="card-sage-darker p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-stone-300/20">
                                             <div className="flex flex-col lg:flex-row gap-12 items-center">
                                                 <div className="lg:w-full text-center lg:text-left space-y-8">
                                                     <div className="space-y-6">
@@ -365,7 +451,7 @@
                                                                 <span className="text-emerald-700">Joption 雙賣平衡下單機</span>
                                                             </h2>
                                                             <p className="text-stone-600 font-medium text-lg leading-relaxed max-w-2xl">
-                                                                不僅僅是一個工具，更是您交易策略的數位守護者。讓選擇權操作不再靠運氣。
+                                                                透過系統化的量化工具，讓您的交易策略更具紀律，專注於長期穩健的獲利。
                                                             </p>
                                                             <a 
                                                                 href="https://www.joption.com.tw/" 
@@ -373,24 +459,29 @@
                                                                 rel="noopener noreferrer" 
                                                                 className="btn-premium-dark px-10 py-5 rounded-[2rem] font-black text-white inline-flex items-center justify-center gap-3 text-xl mx-auto lg:mx-0 group"
                                                             >
-                                                                前往 Joption <Icons.ArrowRight />
+                                                                前往 Joption 官網 <Icons.ArrowRight />
                                                             </a>
                                                         </div>
                                                     </div>
                                                     
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full pt-4">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full pt-4">
                                                         {[
-                                                            { emoji: "🚀", title: "智能交易助手", desc: "讓選擇權操作不再靠運氣，而是靠數據與策略！" },
-                                                            { emoji: "📈", title: "即時監控平衡", desc: "風險即時監控、部位自動平衡，幫你把複雜的交易變成簡單的流程。" },
-                                                            { emoji: "🔒", title: "專注穩健獲利", desc: "降低人為失誤、杜絕情緒干擾，專注於穩健獲利。" },
-                                                            { emoji: "🎯", title: "一鍵策略啟動", desc: "自動調整策略，比你更快一步守護保證金安全。" },
-                                                            { emoji: "💡", title: "最佳交易拍檔", desc: "Joption = 選擇權雙賣+平衡的最佳拍檔，陪你從新手到高手一路成長。" }
+                                                            { emoji: "🧐", title: "Joption是什麼", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E6%98%AF%E4%BB%80%E9%BA%BC", desc: "了解 Joption 的開發初衷與核心功能。" },
+                                                            { emoji: "🧠", title: "Joption策略核心", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E7%AD%96%E7%95%A5%E6%A0%B8%E5%BF%83", desc: "深入探討量化交易的邏輯與雙賣平衡策略。" },
+                                                            { emoji: "📥", title: "訂閱與下載", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E4%B8%8B%E8%BC%89%E5%8F%8A%E5%AE%89%E8%A3%9D%E8%AA%AA%E6%98%8E", desc: "立即開啟您的量化交易之旅，獲取最新版軟體。" },
+                                                            { emoji: "👨‍🏫", title: "歐大的自我介紹", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E6%AD%90%E5%A4%A7%E7%9A%84%E8%87%AA%E6%88%91%E4%BB%8B%E7%B4%B9", desc: "認識歐大，分享多年來的選擇權實戰經驗。" }
                                                         ].map((item, i) => (
-                                                            <div key={i} className={`p-6 feature-item-bg rounded-3xl transition-all hover:border-emerald-300 hover:shadow-lg ${i === 4 ? 'md:col-span-2 lg:col-span-1' : ''}`}>
-                                                                <div className="text-3xl mb-3">{item.emoji}</div>
+                                                            <a 
+                                                                key={i} 
+                                                                href={item.url} 
+                                                                target="_blank" 
+                                                                rel="noopener noreferrer"
+                                                                className="p-6 feature-item-bg rounded-3xl transition-all hover:border-emerald-300 hover:shadow-lg hover:scale-[1.02] block text-left group"
+                                                            >
+                                                                <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">{item.emoji}</div>
                                                                 <h4 className="font-black text-emerald-900 mb-2 text-lg">{item.title}</h4>
                                                                 <p className="text-stone-600 text-sm leading-relaxed font-medium">{item.desc}</p>
-                                                            </div>
+                                                            </a>
                                                         ))}
                                                     </div>
                                                 </div>
@@ -398,21 +489,21 @@
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className={`animate-fade-in flex-1 flex flex-col bg-white overflow-hidden transition-all ${activeSubIndex !== null ? 'rounded-none shadow-none border-none' : 'rounded-[2rem] md:rounded-[2.5rem] border-4 border-white shadow-xl shadow-stone-200/50 mb-8'}`}>
+                                    <div key={activeChapterId} className={`animate-fade-in flex-1 flex flex-col bg-white overflow-hidden transition-all ${activeSubIndex !== null ? 'rounded-none shadow-none border-none' : 'rounded-[2rem] md:rounded-[2.5rem] border-4 border-white shadow-xl shadow-stone-200/50 mb-8'}`}>
                                         {activeSubIndex === null ? (
                                             <div className="p-8 md:p-16 flex flex-col items-center flex-1 justify-center relative min-h-fit">
                                                 <div className="mb-4 text-emerald-500 font-extrabold tracking-[0.3em] text-xs md:text-sm uppercase bg-emerald-50 px-4 py-1.5 rounded-full border border-emerald-100">Joption CHAPTER</div>
                                                 <h2 className="text-3xl md:text-5xl font-black mb-12 text-emerald-950 text-center leading-tight">
-                                                    {currentChapter.title.replace('CH', 'CHAPTER')}
+                                                    {(currentChapter?.title || "CHAPTER").replace('CH', 'CHAPTER')}
                                                 </h2>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8 w-full max-w-6xl mx-auto relative z-10">
-                                                    {currentChapter.subpages.map((sub, i) => (
+                                                    {currentChapter?.subpages.map((sub, i) => (
                                                         <button key={i} onClick={() => handleSubPageClick(i)} className="group p-6 rounded-[1.5rem] md:rounded-[2rem] border-2 border-[#e7e5e4] bg-[#fafaf9] hover:bg-emerald-50 hover:border-emerald-300 hover:shadow-xl transition-all text-left flex flex-col gap-4">
                                                             <span className="w-10 h-10 md:w-12 md:h-12 rounded-[1rem] bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-base md:text-lg border-2 border-emerald-200 group-hover:bg-emerald-500 group-hover:text-white transition-all">{i+1}</span>
                                                             <span className="font-extrabold text-stone-700 text-lg md:text-xl group-hover:text-emerald-950">{sub.title}</span>
                                                         </button>
                                                     ))}
-                                                    {currentChapter.id !== 'ch7' && (
+                                                    {currentChapter?.id !== 'ch7' && currentChapter?.testUrl && (
                                                         <button onClick={() => handleSubPageClick('test')} className="group p-6 rounded-[1.5rem] md:rounded-[2rem] border-2 border-amber-200 bg-amber-50 hover:bg-amber-100 hover:border-amber-400 hover:shadow-xl transition-all text-left flex flex-col gap-4">
                                                             <span className="w-10 h-10 md:w-12 md:h-12 rounded-[1rem] bg-amber-400 text-amber-950 flex items-center justify-center font-black text-lg shadow-sm">?</span>
                                                             <span className="font-extrabold text-amber-900 text-lg md:text-xl">旅途試煉</span>
@@ -423,7 +514,7 @@
                                         ) : (
                                             <div className="iframe-container">
                                                 <iframe 
-                                                    src={activeSubIndex === 'test' ? currentChapter.testUrl : currentChapter.subpages[activeSubIndex].url} 
+                                                    src={activeSubIndex === 'test' ? currentChapter?.testUrl : currentChapter?.subpages[activeSubIndex].url} 
                                                     title="Course Content"
                                                     sandbox="allow-scripts allow-same-origin allow-forms"
                                                     loading="lazy"
