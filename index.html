@@ -9,10 +9,9 @@
 
     <!-- LINE / Facebook 分享預覽設定 (OG Tags) -->
     <meta property="og:title" content="歐大選擇權教室" />
-    <meta property="og:description" content="專業的選擇權教育與策略模擬平台，從基礎入門到實戰交易體系。" />
+    <meta property="og:description" content="專業的選擇權 education 與策略模擬平台，從基礎入門到實戰交易體系。" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.joption.com.tw/" />
-    <!-- 預覽圖建議使用完整網址 -->
     <meta property="og:image" content="https://www.joption.com.tw/ip標籤.jpg" />
     <meta property="og:site_name" content="Joption" />
 
@@ -31,7 +30,6 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            /* 防止 iOS 橡皮筋效應影響外層 */
             overflow: hidden; 
         }
 
@@ -39,10 +37,11 @@
             font-family: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif; 
             -webkit-tap-highlight-color: transparent;
             background-color: #f7f9f4;
+            color: #292524;
         }
 
-        .animate-fade-in { animation: fadeIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .submenu-enter { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .submenu-open { max-height: 2000px; }
@@ -80,6 +79,46 @@
             display: block;
             flex: 1;
         }
+
+        /* 量化交易區塊使用協調的灰色綠 */
+        .card-sage-darker {
+            background-color: #edf2e7;
+            border: 2px solid #dde5d5;
+        }
+
+        .feature-item-bg {
+            background-color: #f7faf2;
+            border: 1px solid #e2eadd;
+        }
+
+        /* 漂亮按鈕的自定義樣式 */
+        .btn-premium-amber {
+            background: linear-gradient(to bottom right, #fbbf24, #d97706);
+            box-shadow: 0 4px 15px -1px rgba(217, 119, 6, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+        }
+        .btn-premium-amber:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 20px -2px rgba(217, 119, 6, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+        }
+        .btn-premium-amber:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        .btn-premium-dark {
+            background: linear-gradient(to bottom right, #2d4a3e, #1a2e25);
+            box-shadow: 0 4px 15px -1px rgba(26, 46, 37, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+        }
+        .btn-premium-dark:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px -2px rgba(26, 46, 37, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+        }
+        .btn-premium-dark:active {
+            transform: translateY(1px) scale(0.98);
+        }
     </style>
 </head>
 <body class="text-stone-800">
@@ -95,11 +134,13 @@
             TrendingUp: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>,
             Shield: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>,
             Zap: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>,
+            Code: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>,
             ChevronDown: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7"></path></svg>,
             Menu: () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>,
             X: () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>,
             ClipboardCheck: () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>,
-            Leaf: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 11a9 9 0 019 9M4 11a9 9 0 019-9m-9 9l9 9m0-18l-9 9"></path></svg>
+            Leaf: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 11a9 9 0 019 9M4 11a9 9 0 019-9m-9 9l9 9m0-18l-9 9"></path></svg>,
+            ArrowRight: () => <svg className="w-6 h-6 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
         };
 
         const App = () => {
@@ -112,7 +153,7 @@
             const chapters = [
                 {
                     id: 'ch1',
-                    title: 'CHAPTER 1 選擇權入門',
+                    title: 'CH 1 選擇權入門',
                     icon: <Icons.Book />,
                     testUrl: 'chap1-test.html',
                     subpages: [
@@ -123,7 +164,7 @@
                 },
                 {
                     id: 'ch2',
-                    title: 'CHAPTER 2 基礎知識',
+                    title: 'CH 2 基礎知識',
                     icon: <Icons.Target />,
                     testUrl: 'chap2-test.html',
                     subpages: [
@@ -134,7 +175,7 @@
                 },
                 {
                     id: 'ch3',
-                    title: 'CHAPTER 3 權利金的秘密',
+                    title: 'CH 3 權利金的秘密',
                     icon: <Icons.Zap />,
                     testUrl: 'chap3-test.html',
                     subpages: [
@@ -144,7 +185,7 @@
                 },
                 {
                     id: 'ch4',
-                    title: 'CHAPTER 4 希臘字母實戰力',
+                    title: 'CH 4 希臘字母實戰力',
                     icon: <Icons.TrendingUp />,
                     testUrl: 'chap4-test.html',
                     subpages: [
@@ -156,7 +197,7 @@
                 },
                 {
                     id: 'ch5',
-                    title: 'CHAPTER 5 選擇權的九九乘法表',
+                    title: 'CH 5 選擇權的九九乘法表',
                     icon: <Icons.Zap />,
                     testUrl: 'chap5-merged-test.html',
                     subpages: [
@@ -174,12 +215,24 @@
                 },
                 {
                     id: 'ch6',
-                    title: 'CHAPTER 6 常見問題集',
+                    title: 'CH 6 常見問題集',
                     icon: <Icons.Shield />,
                     testUrl: 'chap6-test.html',
                     subpages: [
                         { title: '部位管理技巧', url: './10-1.html' },
                         { title: '動態救火與轉倉', url: './10-2.html' }
+                    ]
+                },
+                {
+                    id: 'ch7',
+                    title: '進階 : Joption量化交易',
+                    icon: <Icons.Code />,
+                    testUrl: 'chap7-test.html',
+                    subpages: [
+                        { title: 'Joption是什麼', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E6%98%AF%E4%BB%80%E9%BA%BC' },
+                        { title: 'Joption策略核心', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E7%AD%96%E7%95%A5%E6%A0%B8%E5%BF%83' },
+                        { title: '訂閱與下載', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E4%B8%8B%E8%BC%89%E5%8F%8A%E5%AE%89%E8%A3%9D%E8%AA%AA%E6%98%8E' },
+                        { title: '歐大的自我介紹', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E6%AD%90%E5%A4%A7%E7%9A%84%E8%87%AA%E6%88%91%E4%BB%8B%E7%B4%B9' }
                     ]
                 }
             ];
@@ -187,9 +240,17 @@
             const currentChapter = chapters.find(c => c.id === activeChapterId);
 
             const handleSubPageClick = (index) => {
+                // 取得目標 URL
+                const targetUrl = index === 'test' ? currentChapter.testUrl : currentChapter.subpages[index].url;
+                
+                // 如果是外部連結（http開頭），直接在新視窗開啟，不進入 iframe
+                if (targetUrl && targetUrl.startsWith('http')) {
+                    window.open(targetUrl, '_blank');
+                    return;
+                }
+
                 setActiveSubIndex(index);
                 if (window.innerWidth < 768) setIsMenuOpen(false);
-                // 點擊後重置內容區域的捲動位置
                 const container = document.querySelector('.scroll-container');
                 if (container) container.scrollTop = 0;
             };
@@ -236,12 +297,14 @@
                                                         {sub.title}
                                                     </button>
                                                 ))}
-                                                <button
-                                                    onClick={() => handleSubPageClick('test')}
-                                                    className={`w-full text-left py-2.5 px-4 rounded-xl text-sm font-bold transition-all flex items-center gap-2 mt-2 ${activeChapterId === ch.id && activeSubIndex === 'test' ? 'bg-amber-400 text-amber-900 shadow-sm' : 'text-amber-600 hover:bg-amber-50'}`}
-                                                >
-                                                    <Icons.ClipboardCheck /> 旅途試煉
-                                                </button>
+                                                {ch.id !== 'ch7' && (
+                                                    <button
+                                                        onClick={() => handleSubPageClick('test')}
+                                                        className={`w-full text-left py-2.5 px-4 rounded-xl text-sm font-bold transition-all flex items-center gap-2 mt-2 ${activeChapterId === ch.id && activeSubIndex === 'test' ? 'bg-amber-400 text-amber-900 shadow-sm' : 'text-amber-600 hover:bg-amber-50'}`}
+                                                    >
+                                                        <Icons.ClipboardCheck /> 旅途試煉
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -262,46 +325,95 @@
                             </button>
                         </header>
 
-                        {/* 此區域負責捲動 */}
                         <div className="scroll-container">
                             <div className={`flex-1 flex flex-col ${activeSubIndex !== null ? 'p-0 h-full' : 'p-4 md:p-8 lg:p-12'}`}>
                                 {activeChapterId === 'home' ? (
-                                    <div className="animate-fade-in forest-gradient text-white p-8 md:p-16 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl shadow-emerald-900/20 flex flex-col lg:flex-row items-center gap-12 relative overflow-hidden mb-8">
-                                        <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-emerald-400 rounded-full blur-[100px] opacity-20"></div>
-                                        <div className="flex-1 text-center lg:text-left space-y-8 relative z-10">
-                                            <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 text-emerald-50 text-sm font-bold tracking-widest shadow-inner">
-                                                <Icons.Leaf /> JOPTION ACADEMY
+                                    <div className="space-y-12 max-w-6xl mx-auto w-full">
+                                        {/* HERO SECTION */}
+                                        <div className="animate-fade-in forest-gradient text-white p-8 md:p-16 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl shadow-emerald-900/20 flex flex-col lg:flex-row items-center gap-12 relative overflow-hidden">
+                                            <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-emerald-400 rounded-full blur-[100px] opacity-20"></div>
+                                            <div className="flex-1 text-center lg:text-left space-y-8 relative z-10">
+                                                <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 text-emerald-50 text-sm font-bold tracking-widest shadow-inner">
+                                                    <Icons.Leaf /> JOPTION ACADEMY
+                                                </div>
+                                                <h1 className="text-4xl md:text-6xl font-black leading-[1.2] tracking-tight text-[#f0fdf4]">
+                                                    掌握選擇權：<br/><span className="text-amber-300">獲利與風險的平衡魔法</span>
+                                                </h1>
+                                                <p className="text-lg md:text-xl text-emerald-100/90 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed">
+                                                    從基礎出發，建立您的專業交易體系
+                                                </p>
+                                                <div className="pt-4 pb-4">
+                                                    <button onClick={() => setActiveChapterId('ch1')} className="btn-premium-amber px-10 py-5 rounded-[2rem] font-black text-white flex items-center justify-center gap-3 text-xl mx-auto lg:mx-0 group">
+                                                        進入 歐大選擇權教室 <Icons.ArrowRight />
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <h1 className="text-4xl md:text-6xl font-black leading-[1.2] tracking-tight text-[#f0fdf4]">
-                                                掌握選擇權：<br/><span className="text-amber-300">獲利與風險的平衡魔法</span>
-                                            </h1>
-                                            <p className="text-lg md:text-xl text-emerald-100/90 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed">
-                                                從基礎咒語出發，建立您的專業交易體系。
-                                            </p>
-                                            <div className="pt-4 pb-4">
-                                                <button onClick={() => setActiveChapterId('ch1')} className="bg-amber-400 text-amber-950 px-10 py-5 rounded-[2rem] font-black shadow-[0_8px_0_#b45309] hover:translate-y-1 hover:shadow-[0_4px_0_#b45309] active:translate-y-2 transition-all flex items-center justify-center gap-3 text-xl mx-auto lg:mx-0 group">
-                                                    進入 歐大選擇權教室
-                                                </button>
+                                        </div>
+
+                                        {/* QUANT SECTION */}
+                                        <div className="animate-fade-in card-sage-darker p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-stone-300/20">
+                                            <div className="flex flex-col lg:flex-row gap-12 items-center">
+                                                <div className="lg:w-full text-center lg:text-left space-y-8">
+                                                    <div className="space-y-6">
+                                                        <div className="space-y-4">
+                                                            <h2 className="text-3xl md:text-4xl font-black text-emerald-950 leading-tight">
+                                                                進入量化交易的世界<br/>
+                                                                <span className="text-emerald-700">Joption 雙賣平衡下單機</span>
+                                                            </h2>
+                                                            <p className="text-stone-600 font-medium text-lg leading-relaxed max-w-2xl">
+                                                                不僅僅是一個工具，更是您交易策略的數位守護者。讓選擇權操作不再靠運氣。
+                                                            </p>
+                                                            <a 
+                                                                href="https://www.joption.com.tw/" 
+                                                                target="_blank" 
+                                                                rel="noopener noreferrer" 
+                                                                className="btn-premium-dark px-10 py-5 rounded-[2rem] font-black text-white inline-flex items-center justify-center gap-3 text-xl mx-auto lg:mx-0 group"
+                                                            >
+                                                                前往 Joption <Icons.ArrowRight />
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full pt-4">
+                                                        {[
+                                                            { emoji: "🚀", title: "智能交易助手", desc: "讓選擇權操作不再靠運氣，而是靠數據與策略！" },
+                                                            { emoji: "📈", title: "即時監控平衡", desc: "風險即時監控、部位自動平衡，幫你把複雜的交易變成簡單的流程。" },
+                                                            { emoji: "🔒", title: "專注穩健獲利", desc: "降低人為失誤、杜絕情緒干擾，專注於穩健獲利。" },
+                                                            { emoji: "🎯", title: "一鍵策略啟動", desc: "自動調整策略，比你更快一步守護保證金安全。" },
+                                                            { emoji: "💡", title: "最佳交易拍檔", desc: "Joption = 選擇權雙賣+平衡的最佳拍檔，陪你從新手到高手一路成長。" }
+                                                        ].map((item, i) => (
+                                                            <div key={i} className={`p-6 feature-item-bg rounded-3xl transition-all hover:border-emerald-300 hover:shadow-lg ${i === 4 ? 'md:col-span-2 lg:col-span-1' : ''}`}>
+                                                                <div className="text-3xl mb-3">{item.emoji}</div>
+                                                                <h4 className="font-black text-emerald-900 mb-2 text-lg">{item.title}</h4>
+                                                                <p className="text-stone-600 text-sm leading-relaxed font-medium">{item.desc}</p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className={`animate-fade-in flex-1 flex flex-col bg-white overflow-hidden transition-all ${activeSubIndex !== null ? 'rounded-none shadow-none' : 'rounded-[2rem] md:rounded-[2.5rem] border-4 border-white shadow-xl shadow-stone-200/50 mb-8'}`}>
+                                    <div className={`animate-fade-in flex-1 flex flex-col bg-white overflow-hidden transition-all ${activeSubIndex !== null ? 'rounded-none shadow-none border-none' : 'rounded-[2rem] md:rounded-[2.5rem] border-4 border-white shadow-xl shadow-stone-200/50 mb-8'}`}>
                                         {activeSubIndex === null ? (
                                             <div className="p-8 md:p-16 flex flex-col items-center flex-1 justify-center relative min-h-fit">
-                                                <div className="mb-4 text-emerald-500 font-extrabold tracking-[0.3em] text-xs md:text-sm uppercase bg-emerald-50 px-4 py-1.5 rounded-full border border-emerald-100">Joption Chapter</div>
-                                                <h2 className="text-3xl md:text-5xl font-black mb-12 text-emerald-950 text-center leading-tight">{currentChapter.title}</h2>
+                                                <div className="mb-4 text-emerald-500 font-extrabold tracking-[0.3em] text-xs md:text-sm uppercase bg-emerald-50 px-4 py-1.5 rounded-full border border-emerald-100">Joption CHAPTER</div>
+                                                <h2 className="text-3xl md:text-5xl font-black mb-12 text-emerald-950 text-center leading-tight">
+                                                    {currentChapter.title.replace('CH', 'CHAPTER')}
+                                                </h2>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8 w-full max-w-6xl mx-auto relative z-10">
                                                     {currentChapter.subpages.map((sub, i) => (
-                                                        <button key={i} onClick={() => handleSubPageClick(i)} className="group p-6 rounded-[1.5rem] md:rounded-[2rem] border-2 border-[#e7e5e4] bg-white hover:bg-emerald-50 hover:border-emerald-300 hover:shadow-xl transition-all text-left flex flex-col gap-4">
-                                                            <span className="w-10 h-10 md:w-12 md:h-12 rounded-[1rem] bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-base md:text-lg border-2 border-emerald-200">{i+1}</span>
-                                                            <span className="font-extrabold text-stone-700 text-lg md:text-xl">{sub.title}</span>
+                                                        <button key={i} onClick={() => handleSubPageClick(i)} className="group p-6 rounded-[1.5rem] md:rounded-[2rem] border-2 border-[#e7e5e4] bg-[#fafaf9] hover:bg-emerald-50 hover:border-emerald-300 hover:shadow-xl transition-all text-left flex flex-col gap-4">
+                                                            <span className="w-10 h-10 md:w-12 md:h-12 rounded-[1rem] bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-base md:text-lg border-2 border-emerald-200 group-hover:bg-emerald-500 group-hover:text-white transition-all">{i+1}</span>
+                                                            <span className="font-extrabold text-stone-700 text-lg md:text-xl group-hover:text-emerald-950">{sub.title}</span>
                                                         </button>
                                                     ))}
-                                                    <button onClick={() => handleSubPageClick('test')} className="group p-6 rounded-[1.5rem] md:rounded-[2rem] border-2 border-amber-200 bg-amber-50 hover:bg-amber-100 hover:border-amber-400 hover:shadow-xl transition-all text-left flex flex-col gap-4">
-                                                        <span className="w-10 h-10 md:w-12 md:h-12 rounded-[1rem] bg-amber-400 text-amber-950 flex items-center justify-center font-black text-lg shadow-sm">?</span>
-                                                        <span className="font-extrabold text-amber-900 text-lg md:text-xl">旅途試煉</span>
-                                                    </button>
+                                                    {currentChapter.id !== 'ch7' && (
+                                                        <button onClick={() => handleSubPageClick('test')} className="group p-6 rounded-[1.5rem] md:rounded-[2rem] border-2 border-amber-200 bg-amber-50 hover:bg-amber-100 hover:border-amber-400 hover:shadow-xl transition-all text-left flex flex-col gap-4">
+                                                            <span className="w-10 h-10 md:w-12 md:h-12 rounded-[1rem] bg-amber-400 text-amber-950 flex items-center justify-center font-black text-lg shadow-sm">?</span>
+                                                            <span className="font-extrabold text-amber-900 text-lg md:text-xl">旅途試煉</span>
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </div>
                                         ) : (
