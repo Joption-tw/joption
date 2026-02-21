@@ -127,8 +127,9 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
-        window.FirebaseSDK = { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp };
+        window.FirebaseSDK = { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp, getAnalytics };
     </script>
 
     <script type="text/babel">
@@ -158,8 +159,8 @@
             const [isMenuOpen, setIsMenuOpen] = useState(false);
             const [user, setUser] = useState(null);
             const [visitorStats, setVisitorStats] = useState({ total: null, daily: null });
-            const hasIncremented = useRef(false);
-
+            
+            const hasIncrementedRef = useRef(false);
             const ipImageUrl = "https://www.joption.com.tw/ip%E6%A8%99%E7%B1%A4.jpg";
 
             useEffect(() => {
@@ -171,19 +172,26 @@
                         return;
                     }
 
-                    const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp } = window.FirebaseSDK;
+                    const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp, getAnalytics } = window.FirebaseSDK;
                     
                     try {
-                        if (typeof __firebase_config === 'undefined') {
-                            setVisitorStats({ total: 0, daily: 0 });
-                            return;
-                        }
+                        // 使用你提供的配置
+                        const firebaseConfig = {
+                            apiKey: "AIzaSyAkr2zItSSI9Saon6QikeUqGF_ufypXXYw",
+                            authDomain: "fir-console-9e02e.firebaseapp.com",
+                            projectId: "fir-console-9e02e",
+                            storageBucket: "fir-console-9e02e.firebasestorage.app",
+                            messagingSenderId: "652108941349",
+                            appId: "1:652108941349:web:ac058f3f692e841e7c97cc",
+                            measurementId: "G-6XLH1XF07J"
+                        };
 
-                        const firebaseConfig = JSON.parse(__firebase_config);
                         const app = initializeApp(firebaseConfig);
+                        const analytics = getAnalytics(app);
                         const auth = getAuth(app);
                         const db = getFirestore(app);
-                        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                        
+                        const appId = typeof __app_id !== 'undefined' ? __app_id : 'fir-console-9e02e';
 
                         const now = new Date();
                         const taiwanTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Taipei"}));
@@ -192,44 +200,65 @@
                         const d = String(taiwanTime.getDate()).padStart(2, '0');
                         const dateKey = `${y}${m}${d}`;
 
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
+                        const performSignIn = async () => {
+                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                                return await signInWithCustomToken(auth, __initial_auth_token);
+                            } else {
+                                return await signInAnonymously(auth);
+                            }
+                        };
+                        
+                        await performSignIn();
 
                         unsubscribeAuth = onAuthStateChanged(auth, async (u) => {
                             setUser(u);
-                            if (u) {
-                                const totalDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', 'totalStats');
-                                const dailyDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', `daily_${dateKey}`);
+                            if (!u) return;
+
+                            const totalDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', 'totalStats');
+                            const dailyDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', `daily_${dateKey}`);
+                            
+                            if (!hasIncrementedRef.current) {
+                                hasIncrementedRef.current = true;
+                                const updatePayload = { 
+                                    count: increment(1), 
+                                    lastUpdated: serverTimestamp() 
+                                };
                                 
-                                // 原則：刷新畫面都算新的造訪。
-                                // 使用 useRef 確保在單次組件生命週期內只加一次，但「刷新」會重設所有內容，進而觸發加法。
-                                if (!hasIncremented.current) {
-                                    hasIncremented.current = true;
-                                    const updatePayload = { count: increment(1), lastUpdated: serverTimestamp() };
-                                    try {
-                                        await Promise.all([
-                                            setDoc(totalDocRef, updatePayload, { merge: true }),
-                                            setDoc(dailyDocRef, updatePayload, { merge: true })
-                                        ]);
-                                    } catch (err) {
-                                        console.error("Firestore Write Error:", err);
-                                    }
+                                try {
+                                    await Promise.all([
+                                        setDoc(totalDocRef, updatePayload, { merge: true }),
+                                        setDoc(dailyDocRef, updatePayload, { merge: true })
+                                    ]);
+                                } catch (writeErr) {
+                                    console.error("計數寫入失敗:", writeErr);
                                 }
-
-                                unsubscribeTotal = onSnapshot(totalDocRef, (snap) => {
-                                    setVisitorStats(prev => ({ ...prev, total: snap.exists() ? (snap.data().count || 0) : 0 }));
-                                }, () => setVisitorStats(prev => ({ ...prev, total: 0 })));
-
-                                unsubscribeDaily = onSnapshot(dailyDocRef, (snap) => {
-                                    setVisitorStats(prev => ({ ...prev, daily: snap.exists() ? (snap.data().count || 0) : 0 }));
-                                }, () => setVisitorStats(prev => ({ ...prev, daily: 0 })));
                             }
+
+                            unsubscribeTotal = onSnapshot(totalDocRef, (snap) => {
+                                if (snap.exists()) {
+                                    setVisitorStats(prev => ({ ...prev, total: snap.data().count }));
+                                } else {
+                                    setVisitorStats(prev => ({ ...prev, total: 0 }));
+                                }
+                            }, (err) => {
+                                console.error("累積監聽失敗:", err);
+                                setVisitorStats(prev => ({ ...prev, total: 0 }));
+                            });
+
+                            unsubscribeDaily = onSnapshot(dailyDocRef, (snap) => {
+                                if (snap.exists()) {
+                                    setVisitorStats(prev => ({ ...prev, daily: snap.data().count }));
+                                } else {
+                                    setVisitorStats(prev => ({ ...prev, daily: 0 }));
+                                }
+                            }, (err) => {
+                                console.error("今日監聽失敗:", err);
+                                setVisitorStats(prev => ({ ...prev, daily: 0 }));
+                            });
                         });
 
                     } catch (e) {
+                        console.error("Firebase 初始化失敗:", e);
                         setVisitorStats({ total: 0, daily: 0 });
                     }
                 };
@@ -492,10 +521,10 @@
                                             <div className="h-[2px] w-24 bg-stone-200 rounded-full mb-2"></div>
                                             <div className="flex flex-wrap justify-center gap-3">
                                                 <div className="visitor-badge bg-emerald-50 border border-emerald-100 text-emerald-800 shadow-sm">
-                                                    <Icons.Users /> 累積造訪：<span className="font-black">{visitorStats.total !== null ? visitorStats.total.toLocaleString() : '讀取中...'}</span>
+                                                    <Icons.Users /> 累積造訪：<span className="font-black">{visitorStats.total !== null ? visitorStats.total.toLocaleString() : '連線中...'}</span>
                                                 </div>
                                                 <div className="visitor-badge bg-amber-50 border border-amber-100 text-amber-800 shadow-sm">
-                                                    <Icons.Clock /> 今日造訪：<span className="font-black">{visitorStats.daily !== null ? visitorStats.daily.toLocaleString() : '讀取中...'}</span>
+                                                    <Icons.Clock /> 今日造訪：<span className="font-black">{visitorStats.daily !== null ? visitorStats.daily.toLocaleString() : '連線中...'}</span>
                                                 </div>
                                             </div>
                                             <p className="text-[11px] font-bold text-stone-400 tracking-widest uppercase">© JOPTION ACADEMY - Since 2026</p>
