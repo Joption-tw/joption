@@ -10,7 +10,7 @@
     <meta property="og:description" content="專業的選擇權教育與策略模擬平台，從基礎入門到實戰交易體系。" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.joption.com.tw/" />
-    <meta property="og:image" content="https://www.joption.com.tw/ip標籤.jpg" />
+    <meta property="og:image" content="https://www.joption.com.tw/IP標籤.jpg" />
     <meta property="og:site_name" content="Joption" />
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -125,11 +125,11 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
-        window.FirebaseSDK = { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp, getAnalytics };
+        window.FirebaseSDK = { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp, getAnalytics, collection };
     </script>
 
     <script type="text/babel">
@@ -161,7 +161,9 @@
             const [visitorStats, setVisitorStats] = useState({ total: null, daily: null });
             
             const hasIncrementedRef = useRef(false);
-            const ipImageUrl = "https://www.joption.com.tw/ip%E6%A8%99%E7%B1%A4.jpg";
+            
+            // 優先設定為本地檔案路徑
+            const ipImageUrl = "IP標籤.jpg";
 
             useEffect(() => {
                 let unsubscribeAuth, unsubscribeTotal, unsubscribeDaily;
@@ -172,10 +174,9 @@
                         return;
                     }
 
-                    const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp, getAnalytics } = window.FirebaseSDK;
+                    const { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp, getAnalytics, collection } = window.FirebaseSDK;
                     
                     try {
-                        // 使用你提供的配置
                         const firebaseConfig = {
                             apiKey: "AIzaSyAkr2zItSSI9Saon6QikeUqGF_ufypXXYw",
                             authDomain: "fir-console-9e02e.firebaseapp.com",
@@ -187,11 +188,11 @@
                         };
 
                         const app = initializeApp(firebaseConfig);
-                        const analytics = getAnalytics(app);
                         const auth = getAuth(app);
                         const db = getFirestore(app);
+                        const analytics = getAnalytics(app);
                         
-                        const appId = typeof __app_id !== 'undefined' ? __app_id : 'fir-console-9e02e';
+                        const appId = 'fir-console-9e02e'; 
 
                         const now = new Date();
                         const taiwanTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Taipei"}));
@@ -200,22 +201,15 @@
                         const d = String(taiwanTime.getDate()).padStart(2, '0');
                         const dateKey = `${y}${m}${d}`;
 
-                        const performSignIn = async () => {
-                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                                return await signInWithCustomToken(auth, __initial_auth_token);
-                            } else {
-                                return await signInAnonymously(auth);
-                            }
-                        };
-                        
-                        await performSignIn();
+                        await signInAnonymously(auth);
 
                         unsubscribeAuth = onAuthStateChanged(auth, async (u) => {
-                            setUser(u);
                             if (!u) return;
+                            setUser(u);
 
-                            const totalDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', 'totalStats');
-                            const dailyDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'analytics', `daily_${dateKey}`);
+                            const statsCol = collection(db, 'artifacts', appId, 'public', 'data', 'analytics');
+                            const totalDocRef = doc(statsCol, 'totalStats');
+                            const dailyDocRef = doc(statsCol, `daily_${dateKey}`);
                             
                             if (!hasIncrementedRef.current) {
                                 hasIncrementedRef.current = true;
@@ -230,36 +224,29 @@
                                         setDoc(dailyDocRef, updatePayload, { merge: true })
                                     ]);
                                 } catch (writeErr) {
-                                    console.error("計數寫入失敗:", writeErr);
+                                    console.error("Firestore 寫入權限錯誤:", writeErr);
                                 }
                             }
 
                             unsubscribeTotal = onSnapshot(totalDocRef, (snap) => {
                                 if (snap.exists()) {
-                                    setVisitorStats(prev => ({ ...prev, total: snap.data().count }));
+                                    setVisitorStats(prev => ({ ...prev, total: snap.data().count || 0 }));
                                 } else {
                                     setVisitorStats(prev => ({ ...prev, total: 0 }));
                                 }
-                            }, (err) => {
-                                console.error("累積監聽失敗:", err);
-                                setVisitorStats(prev => ({ ...prev, total: 0 }));
-                            });
+                            }, (err) => console.error("累積數字抓取失敗:", err));
 
                             unsubscribeDaily = onSnapshot(dailyDocRef, (snap) => {
                                 if (snap.exists()) {
-                                    setVisitorStats(prev => ({ ...prev, daily: snap.data().count }));
+                                    setVisitorStats(prev => ({ ...prev, daily: snap.data().count || 0 }));
                                 } else {
                                     setVisitorStats(prev => ({ ...prev, daily: 0 }));
                                 }
-                            }, (err) => {
-                                console.error("今日監聽失敗:", err);
-                                setVisitorStats(prev => ({ ...prev, daily: 0 }));
-                            });
+                            }, (err) => console.error("今日數字抓取失敗:", err));
                         });
 
                     } catch (e) {
-                        console.error("Firebase 初始化失敗:", e);
-                        setVisitorStats({ total: 0, daily: 0 });
+                        console.error("Firebase 啟動失敗:", e);
                     }
                 };
 
@@ -376,13 +363,33 @@
                 if (container) container.scrollTop = 0;
             };
 
+            const LogoImage = ({ className }) => (
+                <img 
+                    src={ipImageUrl} 
+                    alt="Logo" 
+                    className={className} 
+                    onError={(e) => {
+                        const currentSrc = e.target.src;
+                        // 輪詢嘗試不同的路徑變體與大小寫
+                        if (currentSrc.includes('IP%E6%A8%99%E7%B1%A4.jpg') || currentSrc.endsWith('IP標籤.jpg')) {
+                            e.target.src = 'ip標籤.jpg'; // 試小寫
+                        } else if (currentSrc.endsWith('ip標籤.jpg')) {
+                            e.target.src = 'IP標籤.JPG'; // 試大寫副檔名
+                        } else {
+                            // 最後備援：雲端網址
+                            e.target.src = "https://www.joption.com.tw/IP%E6%A8%99%E7%B1%A4.jpg";
+                        }
+                    }}
+                />
+            );
+
             return (
                 <div className="h-full flex flex-col md:flex-row bg-[#f7f9f4] overflow-hidden">
                     <aside className={`fixed inset-y-0 left-0 z-50 w-[280px] lg:w-[320px] bg-[#fffcf5] border-r-2 border-[#e7e5e4] transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 md:sticky md:top-0 md:h-screen overflow-y-auto`}>
                         <div className="flex flex-col h-full">
                             <div className="p-8 pb-10 flex items-center gap-4 cursor-pointer group" onClick={() => {setActiveChapterId('home'); setActiveSubIndex(null); setIsMenuOpen(false);}}>
                                 <div className="w-14 h-14 shrink-0 overflow-hidden rounded-[1.2rem] shadow-md shadow-amber-200/50 border-4 border-white group-hover:scale-105 group-hover:rotate-3 transition-transform duration-300 bg-stone-100">
-                                    <img src={ipImageUrl} alt="Logo" className="w-full h-full object-cover" />
+                                    <LogoImage className="w-full h-full object-cover" />
                                 </div>
                                 <div className="flex flex-col min-w-0">
                                     <h2 className="text-xl font-extrabold tracking-tight text-emerald-900 leading-none truncate">歐大選擇權教室</h2>
@@ -436,7 +443,9 @@
                     <main className="flex-1 flex flex-col h-[100dvh] relative min-w-0 overflow-hidden bg-[#f7f9f4]">
                         <header className="md:hidden flex items-center justify-between px-6 py-4 bg-[#fffcf5] border-b-2 border-stone-200 shrink-0 z-40 w-full shadow-sm">
                             <div className="flex items-center gap-3 overflow-hidden" onClick={() => {setActiveChapterId('home'); setActiveSubIndex(null);}}>
-                                <img src={ipImageUrl} alt="Logo" className="w-10 h-10 shrink-0 rounded-xl object-cover shadow-sm border-2 border-white bg-stone-100" />
+                                <div className="w-10 h-10 shrink-0">
+                                    <LogoImage className="w-full h-full rounded-xl object-cover shadow-sm border-2 border-white bg-stone-100" />
+                                </div>
                                 <span className="font-extrabold text-emerald-900 text-lg tracking-tight truncate">歐大選擇權教室</span>
                             </div>
                             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-stone-600 bg-stone-100 rounded-xl transition-colors active:scale-95">
