@@ -2,10 +2,14 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>歐大選擇權教室 - JOPTION</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>雙賣組合 (Short Strangle) 損益圖解 | 歐大選擇權教室</title>
+    <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --ghibli-bg: #f0f9ff; /* 極淺藍 */
@@ -13,222 +17,281 @@
             --ghibli-accent: #3b82f6; /* 亮藍 */
             --ghibli-profit: #dbeafe; /* 獲利區淺藍 */
         }
+
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background: linear-gradient(180deg, var(--ghibli-bg) 0%, #ffffff 100%);
             color: #334155;
             scroll-behavior: smooth;
+            overflow-x: hidden;
         }
+
         .ghibli-card {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
             border: 2px solid #dbeafe; 
-            border-radius: 24px;
+            border-radius: 1.5rem;
             box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.05);
+            transition: transform 0.2s ease;
         }
+
+        .font-comic {
+            font-family: 'Bangers', 'Noto Sans TC', cursive;
+            letter-spacing: 0.05em;
+        }
+
+        /* 響應式拉桿樣式 - 靜謐藍主題 */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 999px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 32px;
+            width: 32px;
+            border-radius: 999px;
+            background: var(--ghibli-accent);
+            margin-top: -10px;
+            border: 3px solid white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (min-width: 768px) {
+            input[type="range"]::-webkit-slider-thumb {
+                height: 36px;
+                width: 36px;
+                margin-top: -12px;
+            }
+        }
+
         .chart-line {
             stroke-dasharray: 2000;
             stroke-dashoffset: 2000;
-            animation: dash 3s linear forwards;
+            animation: dash 2.5s ease-out forwards;
         }
+
         @keyframes dash {
             to { stroke-dashoffset: 0; }
         }
-        input[type="range"] {
-            accent-color: var(--ghibli-accent);
+
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
         }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen pb-12">
 
-    <!-- Navigation -->
-    <nav class="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-blue-100">
-        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <img src="ip標籤.jpg" alt="Logo" class="w-10 h-10 rounded-full object-cover border-2 border-blue-100" onerror="this.src='https://via.placeholder.com/40?text=JP'">
-                <div class="flex items-center">
-                    <span class="text-xl font-bold tracking-tighter text-slate-800">JOPTION</span>
-                    <div class="h-6 w-[1px] bg-slate-300 mx-3"></div>
-                    <span class="text-lg font-medium text-slate-600">歐大選擇權教室</span>
+    <!-- 導覽列 -->
+    <nav class="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-blue-100 px-4">
+        <div class="max-w-6xl mx-auto h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full border-2 border-blue-100 overflow-hidden shadow-sm">
+                    <img src="ip標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/3B82F6/FFFFFF?text=JP'">
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-lg font-black tracking-tight text-slate-800 leading-none">JOPTION</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">歐大選擇權教室</span>
                 </div>
             </div>
-            <div class="hidden md:flex space-x-8 text-slate-600 font-medium">
-                <a href="#definition" class="hover:text-blue-600">雙賣定義</a>
-                <a href="#strategy" class="hover:text-blue-600">時間價值</a>
-                <a href="#interactive" class="hover:text-blue-600">台指模擬</a>
+            <div class="hidden sm:flex items-center gap-6 text-sm font-bold text-slate-600">
+                <a href="#definition" class="hover:text-blue-600 transition-colors">雙賣定義</a>
+                <a href="#interactive" class="hover:text-blue-600 transition-colors">損益模擬</a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <header class="relative py-16 px-4 text-center overflow-hidden">
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-20">
-            <div class="absolute top-10 left-10 w-32 h-32 bg-blue-200 rounded-full blur-3xl"></div>
-            <div class="absolute bottom-10 right-10 w-48 h-48 bg-cyan-200 rounded-full blur-3xl"></div>
-        </div>
-        <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight">靜謐的收租時光：雙賣組合</h1>
-        <p class="text-lg text-slate-600 max-w-2xl mx-auto">在 Joption 教室，學會如何利用「賣出跨勒式」策略，在震盪盤整中穩定獲利。</p>
-    </header>
-
-    <main class="max-w-5xl mx-auto px-4 space-y-12 pb-24">
+    <main class="max-w-5xl mx-auto px-4 sm:px-6">
         
-        <!-- Section 1: Definition -->
-        <section id="definition" class="ghibli-card p-8 md:p-12 border-l-8 border-l-blue-500">
-            <div class="flex flex-col md:flex-row items-center gap-8">
-                <div class="flex-1">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
-                        <span class="bg-blue-100 text-blue-600 p-2 rounded-lg mr-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13v-1m4 1v-3m4 3V8M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" /></svg>
+        <!-- Hero Section -->
+        <header class="py-12 sm:py-20 text-center relative overflow-hidden">
+            <div class="absolute inset-0 -z-10 opacity-30">
+                <div class="absolute top-0 left-1/4 w-48 h-48 bg-blue-100 rounded-full blur-3xl"></div>
+                <div class="absolute bottom-0 right-1/4 w-64 h-64 bg-cyan-100 rounded-full blur-3xl"></div>
+            </div>
+            <h1 class="text-3xl sm:text-5xl md:text-6xl font-black text-slate-800 tracking-tight leading-tight px-4">
+                靜謐的收租時光：<br class="sm:hidden"><span class="text-blue-600">雙賣組合</span>
+            </h1>
+            <p class="mt-4 text-slate-500 text-sm sm:text-lg max-w-2xl mx-auto font-medium px-4">
+                在 Joption 教室，學會如何利用「賣出跨勒式」策略，<br>在震盪盤整中像地主一樣穩定獲利。
+            </p>
+        </header>
+
+        <!-- 基礎定義 -->
+        <section id="definition" class="ghibli-card p-6 sm:p-10 border-l-[6px] sm:border-l-[12px] border-l-blue-500 mb-12">
+            <div class="flex flex-col md:flex-row items-center gap-8 sm:gap-12">
+                <div class="flex-1 w-full">
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 mb-6 flex items-center gap-3">
+                        <span class="bg-blue-600 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shadow-lg shadow-blue-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 sm:w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13v-1m4 1v-3m4 3V8M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                            </svg>
                         </span>
                         什麼是雙賣組合 (Short Strangle)？
                     </h2>
-                    <div class="space-y-4 text-slate-600 leading-relaxed">
-                        <p>
-                            <strong>雙賣組合</strong>（跨勒式賣出）是一種中性策略。你同時賣出一筆較高履約價的買權 (Call) 與一筆較低履約價的賣權 (Put)。只要台指期在到期前維持在兩者之間，你就能賺取雙倍的權利金。
-                        </p>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-                            <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-50">
-                                <div class="text-blue-500 font-bold text-sm">最大獲利</div>
-                                <div class="text-slate-800 font-medium">兩筆收取的權利金總和</div>
-                            </div>
-                            <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-50">
-                                <div class="text-blue-500 font-bold text-sm">獲利區間</div>
-                                <div class="text-slate-800 font-medium">兩履約價之間 + 權利金</div>
-                            </div>
-                            <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-50">
-                                <div class="text-blue-500 font-bold text-sm">最大風險</div>
-                                <div class="text-slate-800 font-medium">大幅噴出或大幅重挫</div>
-                            </div>
+                    <p class="text-slate-600 font-medium leading-relaxed mb-8">
+                        這是一種<strong>中性策略</strong>。你同時賣出一筆較高履約價的 Call 與一筆較低履約價的 Put。只要行情在到期前維持在圍欄之間，你就能賺取雙倍的權利金。
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-2xl border border-blue-50 shadow-sm">
+                            <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">最大獲利</div>
+                            <div class="text-slate-700 font-black">權利金總和</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-blue-50 shadow-sm">
+                            <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">獲利區間</div>
+                            <div class="text-slate-700 font-black">兩履約價之間</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-blue-50 shadow-sm">
+                            <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">核心敵人</div>
+                            <div class="text-slate-700 font-black">大幅噴出或重挫</div>
                         </div>
                     </div>
                 </div>
-                <div class="w-full md:w-1/3 bg-blue-50 p-6 rounded-2xl border-2 border-blue-100 italic text-blue-700/70">
-                    "在 選擇權 的視野裡，雙賣組合就像是在森林邊緣搭起一道圍欄。只要羊群（行情）不跑出圍欄，你就能收穫時間帶來的報酬。"
+                <div class="w-full md:w-1/3 bg-blue-50 p-6 rounded-2xl border-2 border-dashed border-blue-100 relative">
+                    <span class="absolute -top-4 -left-4 text-4xl no-select">🐑</span>
+                    <p class="italic text-blue-800/60 font-medium text-sm sm:text-base leading-relaxed">
+                        「雙賣組合就像是在草原邊緣搭起圍欄。只要羊群（行情）不跑出範圍，你就能收穫時間帶來的報酬。」
+                    </p>
                 </div>
             </div>
         </section>
 
-        <!-- Section 3: Interactive Simulator -->
-        <section id="interactive" class="ghibli-card p-8 md:p-12 overflow-hidden">
-            <div class="flex justify-between items-start mb-10">
+        <!-- 損益模擬器 -->
+        <section id="interactive" class="ghibli-card p-6 sm:p-10 mb-12">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-800 mb-2">雙賣策略動態模擬</h2>
-                    <p class="text-slate-500">調整兩端履約價，觀察藍色的「獲利高原區」。</p>
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 mb-1">雙賣策略動態模擬</h2>
+                    <p class="text-slate-400 text-xs sm:text-sm font-medium">調整兩端履約價，觀察藍色的「獲利高原區」。</p>
                 </div>
-                <span class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Short Strangle</span>
+                <div class="px-4 py-1 bg-blue-600 text-white text-[10px] font-black rounded-full uppercase tracking-widest shadow-md">
+                    Short Strangle
+                </div>
             </div>
 
-            <div class="grid lg:grid-cols-3 gap-12 items-center">
-                <!-- Controls -->
-                <div class="space-y-8">
-                    <div>
-                        <div class="flex justify-between mb-2">
-                            <label class="text-sm font-bold text-slate-700">賣權履約價 (Put Strike)</label>
-                            <span class="text-blue-600 font-mono font-bold" id="val-put-strike">29800</span>
+            <div class="flex flex-col lg:grid lg:grid-cols-12 gap-10 sm:gap-16 items-center">
+                <!-- 控制面板 -->
+                <div class="lg:col-span-5 w-full space-y-8">
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-end">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">賣權履約價 (Put Strike)</label>
+                            <span class="text-2xl font-black text-blue-600 font-comic" id="val-put-strike">29800</span>
                         </div>
-                        <input type="range" id="put-strike" min="28000" max="30000" step="100" value="29800" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                        <input type="range" id="put-strike" min="28000" max="30000" step="100" value="29800">
                     </div>
-                    <div>
-                        <div class="flex justify-between mb-2">
-                            <label class="text-sm font-bold text-slate-700">買權履約價 (Call Strike)</label>
-                            <span class="text-blue-600 font-mono font-bold" id="val-call-strike">30200</span>
+
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-end">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">買權履約價 (Call Strike)</label>
+                            <span class="text-2xl font-black text-blue-600 font-comic" id="val-call-strike">30200</span>
                         </div>
-                        <input type="range" id="call-strike" min="30000" max="32000" step="100" value="30200" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                    <div>
-                        <div class="flex justify-between mb-2">
-                            <label class="text-sm font-bold text-slate-700">總權利金收入 (Premium)</label>
-                            <span class="text-blue-600 font-mono font-bold" id="val-premium">300</span>
-                        </div>
-                        <input type="range" id="premium" min="50" max="1000" step="10" value="300" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                    <div>
-                        <div class="flex justify-between mb-2">
-                            <label class="text-sm font-bold text-slate-700">結算股價 (Settlement)</label>
-                            <span class="text-blue-600 font-mono font-bold" id="val-current">30000</span>
-                        </div>
-                        <input type="range" id="current-price" min="28000" max="32000" step="100" value="30000" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                        <input type="range" id="call-strike" min="30000" max="32000" step="100" value="30200">
                     </div>
                     
-                    <div class="p-6 rounded-2xl bg-gradient-to-br from-white to-blue-50 border border-blue-100 shadow-sm relative overflow-hidden">
-                        <div class="relative z-10">
-                            <div class="text-xs text-slate-400 mb-1 uppercase tracking-tighter">當前組合損益</div>
-                            <div class="text-4xl font-black" id="profit-result">+300</div>
-                            <div class="mt-4 pt-4 border-t border-blue-100 flex justify-between items-center text-xs text-slate-400">
-                                <span>區間: <span id="be-low">29500</span> - <span id="be-high">30500</span></span>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-end">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">總權利金收入 (Premium)</label>
+                            <span class="text-2xl font-black text-blue-600 font-comic" id="val-premium">300</span>
+                        </div>
+                        <input type="range" id="premium" min="50" max="1000" step="10" value="300">
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-end">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">結算點數 (Settlement)</label>
+                            <span class="text-2xl font-black text-slate-700 font-comic" id="val-current">30000</span>
+                        </div>
+                        <input type="range" id="current-price" min="28000" max="32000" step="100" value="30000">
+                    </div>
+
+                    <div class="p-6 rounded-3xl bg-gradient-to-br from-white to-blue-50 border-2 border-blue-100 shadow-inner relative overflow-hidden">
+                        <div class="relative z-10 flex justify-between items-center">
+                            <div>
+                                <div class="text-[10px] font-black text-slate-400 uppercase tracking-tighter mb-1">當前組合損益</div>
+                                <div class="text-4xl sm:text-5xl font-black font-comic tracking-tight" id="profit-result">+300</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-[10px] font-black text-slate-400 uppercase mb-1">安全獲利區間</div>
+                                <div class="text-sm font-black text-blue-600 font-comic">
+                                    <span id="be-low">29500</span> - <span id="be-high">30500</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Visualization -->
-                <div class="lg:col-span-2 relative h-80 bg-white rounded-3xl border-2 border-blue-50 shadow-inner flex items-center justify-center p-4">
-                    <svg id="chart" viewBox="0 0 500 250" class="w-full h-full">
+                <!-- 圖表可視化 -->
+                <div class="lg:col-span-7 w-full h-[280px] sm:h-[400px] bg-white rounded-3xl border-2 border-blue-50 shadow-inner relative p-4 flex items-center justify-center">
+                    <svg id="chart" viewBox="0 0 500 250" class="w-full h-full overflow-visible">
                         <defs>
                             <linearGradient id="profitGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="#dbeafe" stop-opacity="0.9" />
+                                <stop offset="0%" stop-color="#dbeafe" stop-opacity="0.8" />
                                 <stop offset="100%" stop-color="#dbeafe" stop-opacity="0" />
                             </linearGradient>
                         </defs>
-                        <!-- Grid Lines -->
-                        <line x1="0" y1="125" x2="500" y2="125" stroke="#f1f5f9" stroke-width="1" />
+                        <!-- 網格與軸 -->
+                        <line x1="0" y1="125" x2="500" y2="125" stroke="#f1f5f9" stroke-width="2" />
                         
-                        <!-- Profit Area (Blue) -->
+                        <!-- 獲利填充區 -->
                         <path id="profit-area" d="" fill="url(#profitGradient)" />
                         
-                        <!-- Payoff Line -->
-                        <path id="payoff-path" d="" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round" class="chart-line" />
+                        <!-- 損益線 -->
+                        <path id="payoff-path" d="" fill="none" stroke="#2563eb" stroke-width="5" stroke-linecap="round" class="chart-line" />
                         
-                        <!-- Vertical Breakeven Lines -->
-                        <line id="be-line-low" x1="0" y1="0" x2="0" y2="250" stroke="#3b82f6" stroke-width="1" stroke-dasharray="4" />
-                        <line id="be-line-high" x1="0" y1="0" x2="0" y2="250" stroke="#3b82f6" stroke-width="1" stroke-dasharray="4" />
+                        <!-- 損益平衡垂直線 -->
+                        <line id="be-line-low" x1="0" y1="20" x2="0" y2="230" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 4" />
+                        <line id="be-line-high" x1="0" y1="20" x2="0" y2="230" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 4" />
 
-                        <!-- Current Position Marker -->
-                        <circle id="marker" cx="0" cy="0" r="8" fill="#2563eb" stroke="white" stroke-width="3" />
+                        <!-- 當前標記點 -->
+                        <circle id="marker" cx="0" cy="0" r="10" fill="#2563eb" stroke="white" stroke-width="4" />
                         
-                        <!-- Labels -->
-                        <text x="210" y="30" font-size="12" font-weight="bold" fill="#2563eb">獲利高原</text>
-                        <text x="10" y="235" font-size="11" fill="#94a3b8">下跌風險</text>
-                        <text x="440" y="235" font-size="11" fill="#94a3b8">上漲風險</text>
+                        <!-- 標籤 -->
+                        <text x="210" y="40" font-size="12" font-weight="900" fill="#2563eb" class="no-select">獲利高原</text>
+                        <text x="10" y="230" font-size="11" font-weight="900" fill="#94a3b8" class="no-select">下跌風險</text>
+                        <text x="440" y="230" font-size="11" font-weight="900" fill="#94a3b8" class="no-select">上漲風險</text>
                     </svg>
-                    <div class="absolute bottom-4 left-6 text-[10px] text-slate-300 font-mono">
-                        X: 台指點數 / Y: 組合損益
+                    <div class="absolute bottom-4 left-6 text-[8px] sm:text-[10px] text-slate-300 font-black uppercase tracking-widest no-select">
+                        X: Index / Y: Portfolio P/L
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Section 4: Strategy Tips -->
-        <div class="grid md:grid-cols-2 gap-6">
-            <div class="bg-white/60 p-6 rounded-2xl border border-blue-50">
-                <h4 class="font-bold text-blue-800 mb-2">💡 雙賣的核心秘密</h4>
-                <p class="text-sm text-slate-600 leading-relaxed">雙賣策略最大的獲利來源是「時間價值的衰退」。只要行情不發生大波動，隨著時間一天天過去，這兩筆選擇權的價值會同步縮水，成為你的淨利潤。</p>
+        <!-- 技巧與重點 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="ghibli-card p-6 border-l-4 border-blue-300">
+                <div class="text-2xl mb-2">⏳</div>
+                <h4 class="font-black text-blue-800 mb-2">雙賣的核心秘密</h4>
+                <p class="text-sm text-slate-500 leading-relaxed font-medium">最大的獲利來源是<strong>「時間價值的衰退」</strong>。只要行情不發生大波動，這兩筆選擇權的價值會同步縮水，成為你的淨利潤。</p>
             </div>
-            <div class="bg-white/60 p-6 rounded-2xl border border-blue-50">
-                <h4 class="font-bold text-red-600 mb-2">⚠️ 風險控管</h4>
-                <p class="text-sm text-slate-600 leading-relaxed">雙賣組合最怕的是「波動率大增」。在 Joption 教室我們強烈提醒，若行情突破獲利區間，虧損將會隨著趨勢無限放大。賣方玩家務必設定好嚴格的停損機制。</p>
+            <div class="ghibli-card p-6 border-l-4 border-blue-300">
+                <div class="text-2xl mb-2">⚠️</div>
+                <h4 class="font-black text-red-600 mb-2">風險控管第一</h4>
+                <p class="text-sm text-slate-500 leading-relaxed font-medium">雙賣最怕的是「波動率大增」。若行情突破獲利區間，虧損將會隨著趨勢放大。務必設定好嚴格的停損機制。</p>
             </div>
         </div>
 
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-[#fcfcfc] border-t border-gray-100 pt-12 pb-10 px-4">
-        <div class="max-w-6xl mx-auto flex flex-col items-center">
-            <!-- Footer Brand Area -->
-            <div class="flex items-center space-x-3 mb-4">
-                <img src="ip標籤.jpg" alt="Logo" class="w-10 h-10 rounded-full object-cover shadow-sm border border-gray-100" onerror="this.src='https://via.placeholder.com/40?text=JP'">
-                <div class="flex items-center text-lg font-bold tracking-wider">
-                    <span class="text-gray-500 uppercase">JOPTION</span>
-                    <span class="text-gray-400 mx-3 font-light">|</span>
-                    <span class="text-gray-500 font-medium">歐大選擇權教室</span>
+    <!-- 頁尾 -->
+    <footer class="mt-24 pt-16 pb-12 bg-white/50 border-t border-blue-50">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col items-center">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 rounded-full border border-blue-100 overflow-hidden">
+                    <img src="ip標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/3B82F6/FFFFFF?text=JP'">
                 </div>
+                <div class="text-lg font-black tracking-widest text-slate-400">JOPTION ACADEMY</div>
             </div>
-            
-            <!-- Disclaimer -->
-            <div class="text-[13px] text-gray-400 text-center font-normal tracking-normal">
-                © 2026 Joption Academy - 金融教育僅供參考，投資有風險，操作需謹慎。
-            </div>
+            <p class="text-[10px] sm:text-xs text-slate-400 font-bold tracking-wider text-center px-8">
+                © 2026 歐大選擇權教室。投資有風險，操作需謹慎。本頁面僅供教學演示。
+            </p>
         </div>
     </footer>
 
@@ -261,6 +324,7 @@
             const beLow = putStrike - premium;
             const beHigh = callStrike + premium;
 
+            // 更新文字顯示
             valPut.innerText = putStrike.toLocaleString();
             valCall.innerText = callStrike.toLocaleString();
             valPremium.innerText = premium.toLocaleString();
@@ -268,21 +332,32 @@
             beLowEl.innerText = beLow.toLocaleString();
             beHighEl.innerText = beHigh.toLocaleString();
 
-            // Short Strangle Profit Calculation
-            // Profit = Premium - Max(0, PutStrike - Current) - Max(0, Current - CallStrike)
+            // 雙賣損益計算: 權利金 - Max(0, Put履約價 - 現價) - Max(0, 現價 - Call履約價)
             const profit = premium - Math.max(0, putStrike - current) - Math.max(0, current - callStrike);
             
-            profitResult.innerText = profit > 0 ? `+${profit.toLocaleString()}` : profit.toLocaleString();
-            profitResult.className = `text-4xl font-black ${profit > 0 ? 'text-blue-500' : (profit < 0 ? 'text-red-400' : 'text-slate-800')}`;
+            profitResult.innerText = profit >= 0 ? `+${profit.toLocaleString()}` : profit.toLocaleString();
+            
+            // 損益字體顏色
+            if (profit > 0) {
+                profitResult.classList.remove('text-red-400', 'text-slate-800');
+                profitResult.classList.add('text-blue-500');
+            } else if (profit < 0) {
+                profitResult.classList.remove('text-blue-500', 'text-slate-800');
+                profitResult.classList.add('text-red-400');
+            } else {
+                profitResult.classList.remove('text-blue-500', 'text-red-400');
+                profitResult.classList.add('text-slate-800');
+            }
 
+            // 圖表渲染邏輯
             const minX = 28000;
             const maxX = 32000;
             const chartWidth = 500;
             const zeroY = 125;
             const scaleX = chartWidth / (maxX - minX);
-            const scaleY = 0.2; 
+            const scaleY = 0.25; 
 
-            // Draw Payoff Path
+            // 計算路徑點
             const putStrikeX = (putStrike - minX) * scaleX;
             const callStrikeX = (callStrike - minX) * scaleX;
             const premiumY = zeroY - (premium * scaleY);
@@ -292,35 +367,39 @@
             const rightEndProfit = premium - (maxX - callStrike);
             const rightEndY = zeroY - (rightEndProfit * scaleY);
 
-            let d = `M 0 ${leftEndY} L ${putStrikeX} ${premiumY} L ${callStrikeX} ${premiumY} L 500 ${rightEndY}`;
+            // Path: 從左側無限虧損，到 Put 履約價的高原起始，到 Call 履約價的高原結束，到右側無限虧損
+            let d = `M 0,${leftEndY} L ${putStrikeX},${premiumY} L ${callStrikeX},${premiumY} L 500,${rightEndY}`;
             payoffPath.setAttribute('d', d);
 
-            // Draw Profit Area
+            // 繪製獲利區域填充
             const beLowX = (beLow - minX) * scaleX;
             const beHighX = (beHigh - minX) * scaleX;
             
-            let areaD = `M ${Math.max(0, beLowX)} ${zeroY}`;
-            areaD += ` L ${putStrikeX} ${premiumY}`;
-            areaD += ` L ${callStrikeX} ${premiumY}`;
-            areaD += ` L ${Math.min(500, beHighX)} ${zeroY}`;
-            areaD += ` Z`;
-            profitArea.setAttribute('d', areaD);
+            if (beHighX > beLowX) {
+                let areaD = `M ${Math.max(0, beLowX)},${zeroY} L ${putStrikeX},${premiumY} L ${callStrikeX},${premiumY} L ${Math.min(500, beHighX)},${zeroY} Z`;
+                profitArea.setAttribute('d', areaD);
+            } else {
+                profitArea.setAttribute('d', "");
+            }
 
-            // Update Breakeven Lines
-            beLineLow.setAttribute('x1', beLowX); beLineLow.setAttribute('x2', beLowX);
-            beLineHigh.setAttribute('x1', beHighX); beLineHigh.setAttribute('x2', beHighX);
+            // 更新平衡線與標記點
+            beLineLow.setAttribute('x1', beLowX);
+            beLineLow.setAttribute('x2', beLowX);
+            beLineHigh.setAttribute('x1', beHighX);
+            beLineHigh.setAttribute('x2', beHighX);
 
-            // Update Marker
             const markerX = (current - minX) * scaleX;
             const markerY = zeroY - (profit * scaleY);
             marker.setAttribute('cx', markerX);
             marker.setAttribute('cy', markerY);
         }
 
+        // 綁定事件
         [putStrikeInput, callStrikeInput, premiumInput, currentInput].forEach(input => {
             input.addEventListener('input', updateSimulation);
         });
 
+        // 初始化
         window.onload = updateSimulation;
     </script>
 
