@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歐大選擇權教室 - 策略全攻略 42題</title>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pop-bg: #FF00FF;      /* 預設螢光粉 */
+            --pop-header: #FFFF00;  /* 亮黃 */
+            --pop-card: #FFFFFF;    
+            --pop-btn: #FFD700;     /* 金色 */
+            --pop-red: #FF3131;     
+            --pop-purple: #9D50BB;  
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--pop-bg);
+            background-image: radial-gradient(#000000 2.5px, transparent 0);
+            background-size: 35px 35px;
+            background-attachment: fixed;
+            color: #1a1a1a;
+            transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-12px); }
+            75% { transform: translateX(12px); }
+        }
+        .animate-shake { animation: shake 0.2s ease-in-out infinite; }
+
+        .pop-card {
+            box-shadow: 15px 15px 0px 0px rgba(0,0,0,1);
+            border: 6px solid #000;
+        }
+
+        /* 藥丸型按鈕設計 */
+        .btn-option-pill {
+            box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+            border: 4px solid #000;
+            border-radius: 9999px;
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-option-pill:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+        }
+
+        .fluid-title { font-size: clamp(1.8rem, 6vw, 3.5rem); }
+        .fluid-question { font-size: clamp(1.1rem, 3.5vw, 1.8rem); }
+        .fluid-padding { padding: clamp(1rem, 5vw, 3rem); }
+
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const IconZap = () => <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>;
+        const IconCheck = () => <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="4"><path d="M5 13l4 4L19 7"></path></svg>;
+        const IconX = () => <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="4"><path d="M6 18L18 6M6 6l12 12"></path></svg>;
+
+        const quizData = [
+            // --- 5-1: 買入買權 (BC) ---
+            { cat: "買入買權 (BC)", q: "台指 30,000 點時，歐大支付 200 點買入 30,200 的 Call，他的看法為何？", options: ["看小跌", "看大漲", "看盤整", "看小漲"], ans: 1, exp: "歐大解析：買入買權 (BC) 是權利金買方，目的在於捕捉行情大幅向上的爆發力，並將最大損失鎖定在已支付的權利金。" },
+            { cat: "買入買權 (BC)", q: "接上題，當指數結算在 30,500 點時，歐大的總損益為何？", options: ["獲利 300 點", "獲利 100 點", "虧損 100 點", "虧損 200 點"], ans: 1, exp: "歐大解析：結算價值 = 30,500 - 30,200 = 300 點。扣除成本 200 點，純利為 100 點。" },
+            { cat: "買入買權 (BC)", q: "買入買權 (BC) 最怕遇到哪種市場狀況？", options: ["指數噴出", "指數急跌", "死魚盤（不漲不跌）", "波動率上升"], ans: 2, exp: "歐大解析：BC 雖然怕跌，但更怕不漲不跌的死魚盤，因為時間價值會天天消失，稱為融冰效應。" },
+            { cat: "買入買權 (BC)", q: "BC 的損益兩平點計算公式為何？", options: ["履約價 - 權利金", "履約價 + 權利金", "現價 + 權利金", "履約價 × 2"], ans: 1, exp: "歐大解析：買進看漲選擇權，結算必須超過履約價加上你付出的權利金，才能開始真正獲利。" },
+
+            // --- 5-2: 賣出買權 (SC) ---
+            { cat: "賣出買權 (SC)", q: "歐大認為台指 30,000 點是壓力，「漲不過」30,500 點，他最適合？", options: ["Buy Call", "Sell Call", "Buy Put", "Sell Put"], ans: 1, exp: "歐大解析：賣出買權 (SC) 是看不漲，只要結算在履約價以下，就能穩賺權利金租金。" },
+            { cat: "賣出買權 (SC)", q: "賣出買權 (SC) 的風險結構為何？", options: ["獲利無限/風險有限", "獲利有限/風險極大", "雙向無限", "保本"], ans: 1, exp: "歐大解析：賣方收取固定權利金，但若指數單向暴漲，損失會隨指數上漲而放大，且有保證金壓力。" },
+            { cat: "賣出買權 (SC)", q: "SC 策略在希臘字母中，最希望哪個數值發揮作用？", options: ["Delta 變大", "Theta (時間流逝)", "Vega 上升", "Gamma 爆發"], ans: 1, exp: "歐大解析：賣方就是時間的莊家，最喜歡看著 Theta 天天流逝，把權利金收進口袋。" },
+            { cat: "賣出買權 (SC)", q: "若歐大 Sell Call 30,500 收 100 點，結算在 30,700，他的損益為？", options: ["賺 100 點", "賠 100 點", "賠 200 點", "不賠不賺"], ans: 1, exp: "歐大解析：30,700 - 30,500 = 200 點義務。扣除收到的 100 點，淨損 100 點。" },
+
+            // --- 5-3: 買入賣權 (BP) ---
+            { cat: "買入賣權 (BP)", q: "歐大擔心台指 30,000 點有黑天鵝大跌風險，他可以操作？", options: ["Buy Call", "Sell Call", "Buy Put", "Sell Put"], ans: 2, exp: "歐大解析：買入賣權 (BP) 是看大跌。這也是一種為現貨部位買保險的功能。" },
+            { cat: "買入賣權 (BP)", q: "BP 策略的損益兩平點為何？", options: ["履約價 + 權利金", "履約價 - 權利金", "現價 - 權利金", "履約價 × 0.5"], ans: 1, exp: "歐大解析：買進看跌選擇權，結算必須低於履約價扣除成本，才是獲利區間。" },
+            { cat: "買入賣權 (BP)", q: "如果指數在 30,000 點，歐大 Buy Put 29,800 收 50 點，結算在 29,500，獲利多少？", options: ["300 點", "250 點", "200 點", "50 點"], ans: 1, exp: "歐大解析：實質價值 29,800 - 29,500 = 300 點。扣除 50 點成本，獲利 250 點。" },
+            { cat: "買入賣權 (BP)", q: "BP 對於波動率 (Vega) 的期待是？", options: ["期待波動率上升", "期待波動率下降", "不受影響", "期待盤整"], ans: 0, exp: "歐大解析：買方（Long）擁有正 Vega，當恐慌情緒增加、波動率上升時，權利金會變貴，對 BP 有利。" },
+
+            // --- 5-4: 賣出賣權 (SP) ---
+            { cat: "賣出賣權 (SP)", q: "歐大看好 29,500 點有強力支撐，「跌不破」，他應操作？", options: ["Buy Put", "Sell Put", "Sell Call", "Buy Call"], ans: 1, exp: "歐大解析：賣出賣權 (SP) 是看不跌，賺取支撐區間的租金收益。" },
+            { cat: "賣出賣權 (SP)", q: "SP 策略在結算日最理想的收盤點位是？", options: ["大於履約價", "小於履約價", "剛好等於現價", "跌破 0 點"], ans: 0, exp: "歐大解析：只要結算價大於履約價，Put 就會價值歸零，賣方可以收走全部權利金。" },
+            { cat: "賣出賣權 (SP)", q: "SP 策略的勝率通常？", options: ["極低", "約 50%", "通常較高", "0%"], ans: 2, exp: "歐大解析：因為市場大部分時間在盤整或緩漲，處理得當 SP 只要沒跌破防線就能賺錢，故勝率通常較高。" },
+            { cat: "賣出賣權 (SP)", q: "當歐大 Sell Put 29,500 收 80 點，結果大崩盤結算在 29,000，他的慘狀是？", options: ["賠 500 點", "賠 420 點", "賠 80 點", "不賠"], ans: 1, exp: "歐大解析：500 點價差虧損減去收到的 80 點保費，總損 420 點。" },
+
+            // --- 5-5: 雙賣組合策略 ---
+            { cat: "雙賣組合策略", q: "歐大預期結算日指數會在 30,000 點「死魚盤不動」，他可以使用哪種雙賣組合策略？", options: ["買 C + 買 P", "賣 C + 賣 P", "買 C + 賣 P", "賣 C + 買 P"], ans: 1, exp: "歐大解析：同時賣出 Call 與 Put 稱為雙賣組合策略。這是賭行情區間震盪收租的常用策略。" },
+            { cat: "雙賣組合策略", q: "雙賣組合策略的最大獲利點在哪？", options: ["無限遠處", "雙邊履約價當中", "兩平點外", "以上皆非"], ans: 1, exp: "歐大解析：若結算價精準落在雙邊履約價當中，權利金衰減最大，賣方能賺取最大收益。" },
+            { cat: "雙賣組合策略", q: "此雙賣策略最怕遇到什麼？", options: ["盤整", "波動率大減", "單邊大噴發", "時間流逝"], ans: 2, exp: "歐大解析：雙賣組合策略最怕大波動或隱含波動率暴增，這會導致履約義務產生的虧損超過權利金收益。" },
+            { cat: "雙賣組合策略", q: "如果歐大執行雙賣組合策略（履約價 30,000）共收 400 點，損益兩平區間為何？", options: ["30,000 點", "29,800~30,200", "29,600~30,400", "無限大"], ans: 2, exp: "歐大解析：兩平點 = 履約價 ± 總收取的點數。30,000 ± 400 = 29,600 及 30,400。" },
+
+            // --- 5-6: 買入跨式 (Long Straddle) ---
+            { cat: "買入跨式", q: "歐大預期聯準會公佈利率後「必有大動」，但不確定方向，他應？", options: ["賣出跨式", "買入跨式", "只買 Call", "只買 Put"], ans: 1, exp: "歐大解析：買入跨式 (Long Straddle) 是博弈波動率。只要大漲或大跌超過成本，就能獲利。" },
+            { cat: "買入跨式", q: "買入跨式的成本通常？", options: ["非常低", "固定 10 點", "較高（需付兩邊權利金）", "0 元"], ans: 2, exp: "歐大解析：因為要買 Call 又要買 Put，總權利金支出較大，所以需要大行情才能賺錢。" },
+            { cat: "買入跨式", q: "什麼時候適合使用買入跨式？", options: ["過年封關前", "重大事件（如選舉）前夕", "行情悶很久要突破時", "以上皆是"], ans: 3, exp: "歐大解析：只要預期未來波動率會爆炸，或是行情會出現斷崖/噴發，就是買入跨式的時機。" },
+            { cat: "買入跨式", q: "買入跨式的敵人是？", options: ["大漲", "大跌", "時間與盤整", "Vega 上升"], ans: 2, exp: "歐大解析：時間流逝（Theta）會同時吸乾兩邊權利金，如果指數盤整，損失會是雙倍的。" },
+
+            // --- 5-7: 多頭價差 (Bull Spread) ---
+            { cat: "多頭價差", q: "歐大看小漲，想買 30,000 Call 但覺得太貴，他可以同時賣出 30,200 Call，這稱為？", options: ["牛市價差", "熊市價差", "鐵蝴蝶", "鐵鷹"], ans: 0, exp: "歐大解析：買低履約價、賣高履約價的 Call，可以降低成本，但獲利也會被鎖定。" },
+            { cat: "多頭價差", q: "多頭價差（Call）的最大虧損是？", options: ["無限大", "履約價差點", "淨支付的權利金", "50 點"], ans: 2, exp: "歐大解析：價差策略的優點是風險有限。最大損失就是買進與賣出權利金後的淨支出。" },
+            { cat: "多頭價差", q: "多頭價差的最大獲利空間是？", options: ["(履約價差 - 淨成本)", "無限大", "權利金總額", "0"], ans: 0, exp: "歐大解析：當指數漲過高履約價後，獲利就被鎖定了。計算為兩履約價之差減去支出。" },
+            { cat: "多頭價差", q: "歐大買 30,000C(200點)，賣 30,200C(100點)，最大獲利多少？", options: ["100 點", "200 點", "300 點", "50 點"], ans: 0, exp: "歐大解析：履約價差 200 - 淨成本 100 = 100 點最大利潤。" },
+
+            // --- 5-8: 空頭價差 (Bear Spread) ---
+            { cat: "空頭價差", q: "歐大小資看空，買 30,000 Put 並賣出 29,800 Put 補貼，這稱為？", options: ["牛市價差", "熊市價差", "比率價差", "反向跨式"], ans: 1, exp: "歐大解析：買高賣低 Put 的組合稱為熊市價差，適合看小跌的情境。" },
+            { cat: "空頭價差", q: "空頭價差策略在保證金上的優勢？", options: ["不需保證金", "可降低保證金或僅需點數", "保證金加倍", "以上皆非"], ans: 1, exp: "歐大解析：因為已用買方部位鎖住風險，所需的保證金遠低於單純賣方策略。" },
+            { cat: "空頭價差", q: "若指數大跌 2000 點，空頭價差會大賺 2000 點嗎？", options: ["會", "不會，獲利有上限", "會，且翻倍", "會爆倉"], ans: 1, exp: "歐大解析：價差策略是犧牲部分獲利來換取低成本，所以獲利是有限額的。" },
+            { cat: "空頭價差", q: "歐大買 30,000P(150點)，賣 29,800P(80點)，最大風險是多少？", options: ["70 點", "150 點", "80 點", "無限大"], ans: 0, exp: "歐大解析：淨支出為 150 - 80 = 70 點。這就是你的最大損失。" },
+
+            // --- 5-9: 鐵鷹式 (Iron Condor) ---
+            { cat: "鐵鷹式策略", q: "歐大預期 30,000 點上下區間整理，同時建立一組賣權多頭價差與買權空頭價差，稱為？", options: ["鐵蝴蝶", "鐵鷹", "梯式", "海格"], ans: 1, exp: "歐大解析：鐵鷹 (Iron Condor) 是同時在兩端賣出 OTM 價差，是一種高勝率的精準區間收租策略。" },
+            { cat: "鐵鷹式策略", q: "鐵鷹式策略最適合哪種市場？", options: ["單邊噴發", "低波動、盤整市場", "跳空大跌", "V型反轉"], ans: 1, exp: "歐大解析：鐵鷹喜歡指數在兩組價差的中間橫盤，讓時間價值全部融化。" },
+            { cat: "鐵鷹式策略", q: "鐵鷹策略如果其中一邊被突破，該怎麼辦？", options: ["不用管它", "調整部位或停損", "加倍賣出", "買入現貨"], ans: 1, exp: "歐大解析：鐵鷹的風險在於兩端。一旦行情大動，必須對受威脅的一邊進行調整。" },
+            { cat: "鐵鷹式策略", q: "鐵鷹相對於單邊賣出部位的優點？", options: ["風險無限", "風險有限且有安全邊界", "不需手續費", "勝率較低"], ans: 1, exp: "歐大解析：鐵鷹使用價差組合，將賣方的無限風險鎖死，是更穩健的專業收租策略。" },
+
+            // --- 5-10: 鐵蝴蝶 (Iron Butterfly) ---
+            { cat: "鐵蝴蝶策略", q: "歐大精準預測結算會在 30,000 點附近，他可以使用哪種精準打擊策略？", options: ["鐵蝴蝶", "鐵鷹", "單邊買進", "比率策略"], ans: 0, exp: "歐大解析：鐵蝴蝶策略透過買入一端、賣出兩倍中間、買入另一端，可以在特定點位創造極高投報率。" },
+            { cat: "鐵蝴蝶策略", q: "鐵蝴蝶策略的成本特點？", options: ["極高", "極低（權利金互相補貼）", "0 元", "負成本"], ans: 1, exp: "歐大解析：鐵蝴蝶利用兩組價差抵銷，通常成本非常便宜，是「以小博大」的典型組合。" },
+            { cat: "鐵蝴蝶策略", q: "鐵蝴蝶價差在哪裡獲利最大？", options: ["無限遠處", "雙邊履約價當中", "邊緣履約價", "任意點位"], ans: 1, exp: "歐大解析：結算價若剛好等於中間賣出的履約價（雙邊履約價當中），獲利會達到最大峰值。" },
+            { cat: "鐵蝴蝶策略", q: "鐵蝴蝶策略最怕什麼？", options: ["結算在正中間", "結算在很遠的地方", "盤整", "沒手續費"], ans: 1, exp: "歐大解析：如果結算在翅膀之外，你的淨支出權利金會全部歸零（雖然不多）。" },
+
+            // --- 額外修正補償題 (41, 42) ---
+            { cat: "履約價與權利金", q: "台指選合約規格中，履約價間隔通常隨指數高低調整，目前 30,000 點附近的週選擇權間隔通常是？", options: ["10 點", "25 點", "50 點", "100 點"], ans: 2, exp: "歐大解析：隨著指數點數越高，權利金價值變動大，期交所為了交易靈活性，在指數高檔時近價位區間通常設定為 50 點。" },
+            { cat: "時間流失", q: "選擇權的時間流逝曲線，通常在什麼時候會開始「加速」衰退？", options: ["剛掛牌時", "瀕臨到期日", "行情大漲時", "盤整結束時"], ans: 1, exp: "歐大解析：時間價值衰減並非線性。通常在瀕臨到期日時，Theta 會呈現斷崖式的加速流逝。" }
+        ];
+
+        function App() {
+            const [currentIdx, setCurrentIdx] = useState(0);
+            const [selected, setSelected] = useState(null);
+            const [showExp, setShowExp] = useState(false);
+            const [score, setScore] = useState(0);
+            const [isWrong, setIsWrong] = useState(false);
+            const [quizDone, setQuizDone] = useState(false);
+            const [bgColor, setBgColor] = useState('#FF00FF');
+
+            const themes = ['#FF00FF', '#00FFFF', '#FF8C00', '#7FFF00', '#C77DFF', '#FF5733'];
+
+            useEffect(() => {
+                if (quizDone) {
+                    setBgColor('#FFFFFF');
+                } else {
+                    setBgColor(themes[currentIdx % themes.length]);
+                }
+            }, [currentIdx, quizDone]);
+
+            const handleAnswer = (idx) => {
+                if (showExp) return;
+                setSelected(idx);
+                setShowExp(true);
+                
+                if (idx === quizData[currentIdx].ans) {
+                    setScore(prev => prev + 1);
+                    setIsWrong(false);
+                } else {
+                    setIsWrong(true);
+                    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                }
+            };
+
+            const next = () => {
+                if (currentIdx < quizData.length - 1) {
+                    setCurrentIdx(currentIdx + 1);
+                    setSelected(null);
+                    setShowExp(false);
+                    setIsWrong(false);
+                } else {
+                    setQuizDone(true);
+                }
+            };
+
+            const reset = () => {
+                setCurrentIdx(0);
+                setSelected(null);
+                setShowExp(false);
+                setScore(0);
+                setIsWrong(false);
+                setQuizDone(false);
+            };
+
+            const q = quizData[currentIdx];
+
+            return (
+                <div className="min-h-screen flex items-center justify-center fluid-padding" style={{backgroundColor: bgColor}}>
+                    <div className="w-full max-w-4xl">
+                        {/* Header */}
+                        <header className="mb-8 transform rotate-[-2deg]">
+                            <div className="bg-[var(--pop-header)] pop-card p-6 relative overflow-hidden">
+                                <div className="absolute top-[-10px] right-[-10px] text-black opacity-10">
+                                    <IconZap />
+                                </div>
+                                <h1 className="fluid-title font-[900] italic uppercase tracking-tighter leading-none text-black drop-shadow-md">
+                                    歐大選擇權教室
+                                </h1>
+                                <div className="flex flex-wrap gap-2 mt-3">
+                                    <span className="bg-black text-white px-4 py-1 font-black text-sm border-2 border-white skew-x-[-10deg]">
+                                        全策略特訓
+                                    </span>
+                                    <span className="bg-[#00D1FF] text-black px-4 py-1 font-black text-sm border-2 border-black skew-x-[-10deg]">
+                                        42 題挑戰
+                                    </span>
+                                </div>
+                            </div>
+                        </header>
+
+                        {!quizDone ? (
+                            <main className={isWrong ? 'animate-shake' : ''}>
+                                {/* Question Card */}
+                                <div className={`pop-card fluid-padding mb-8 transition-all duration-300 ${isWrong ? 'bg-[var(--pop-red)]' : 'bg-[var(--pop-card)]'}`}>
+                                    <div className="flex justify-between items-center mb-6">
+                                        <div className="flex items-center gap-2">
+                                            <div className="bg-black text-white p-2 border-2 border-white rotate-[5deg]">
+                                                <IconZap />
+                                            </div>
+                                            <span className={`font-[900] text-sm md:text-lg uppercase tracking-widest ${isWrong ? 'text-white' : 'bg-black text-white px-3'}`}>
+                                                {q.cat}
+                                            </span>
+                                        </div>
+                                        <div className={`font-[900] text-xl md:text-2xl ${isWrong ? 'text-white' : 'text-black'}`}>
+                                            {currentIdx + 1} / {quizData.length}
+                                        </div>
+                                    </div>
+
+                                    <h2 className={`fluid-question font-[900] text-black leading-tight mb-10 ${isWrong ? 'text-white' : 'text-black'}`}>
+                                        {q.q}
+                                    </h2>
+
+                                    <div className="grid grid-cols-1 gap-5">
+                                        {q.options.map((opt, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleAnswer(idx)}
+                                                disabled={showExp}
+                                                className={`
+                                                    btn-option-pill text-left p-4 md:p-6 font-[900] text-lg md:text-2xl flex items-center gap-6
+                                                    ${showExp 
+                                                        ? (idx === q.ans 
+                                                            ? 'bg-[#39FF14] text-black scale-[1.03] z-10' 
+                                                            : (selected === idx ? 'bg-black text-white border-white' : 'bg-gray-200 text-gray-500 border-gray-400 opacity-50'))
+                                                        : 'bg-[#FFD700] text-black hover:bg-[#00D1FF]'
+                                                    }
+                                                `}
+                                            >
+                                                <span className="shrink-0 w-10 h-10 border-4 border-black bg-white flex items-center justify-center text-black font-[900] italic rounded-full">
+                                                    {String.fromCharCode(65 + idx)}
+                                                </span>
+                                                {opt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Explanation Area */}
+                                {showExp && (
+                                    <div className="pop-card bg-[#9D50BB] fluid-padding animate-in fade-in slide-in-from-bottom-6 duration-500 mb-28 relative transform rotate-[1deg]">
+                                        <div className="absolute -top-6 left-12 bg-black text-[#FFFF00] px-6 py-1 font-[900] italic skew-x-[-15deg] border-4 border-white shadow-lg text-xl">
+                                            歐大點評：
+                                        </div>
+                                        <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+                                            <div className="shrink-0 bg-white border-4 border-black p-4 rotate-[-5deg]">
+                                                {selected === q.ans ? <IconCheck className="text-[#39FF14]" /> : <IconX className="text-[#FF3131]" />}
+                                            </div>
+                                            <div className="flex-1 text-center md:text-left text-white">
+                                                <p className="text-xl md:text-2xl font-[900] leading-snug mb-8">
+                                                    {q.exp}
+                                                </p>
+                                                <button
+                                                    onClick={next}
+                                                    className="w-full md:w-auto bg-black text-[#39FF14] px-12 py-4 font-[900] text-2xl btn-option-pill hover:bg-white hover:text-black uppercase italic tracking-widest"
+                                                >
+                                                    {currentIdx === quizData.length - 1 ? "看總結 RESULT" : "下一題 NEXT"}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </main>
+                        ) : (
+                            /* Final Summary */
+                            <div className="pop-card bg-white fluid-padding text-center rotate-[1deg] mb-24 relative overflow-hidden">
+                                <h2 className="text-4xl md:text-6xl font-[900] mb-8 uppercase italic tracking-tighter text-black">
+                                    特訓大成功！
+                                </h2>
+                                <div className="inline-block relative mb-12">
+                                    <div className="absolute inset-0 bg-[#00D1FF] translate-x-4 translate-y-4 border-4 border-black rounded-full"></div>
+                                    <div className="relative bg-white border-8 border-black px-12 py-8 text-7xl md:text-9xl font-[900] text-[#FF3131] rounded-full leading-none flex items-baseline gap-2">
+                                        {Math.round((score / quizData.length) * 100)}<span className="text-4xl md:text-5xl text-black">%</span>
+                                    </div>
+                                </div>
+                                <p className="text-2xl md:text-4xl font-[900] mb-12 leading-tight text-black">
+                                    歐大教室全策略結業！
+                                    <br />
+                                    <span className="bg-yellow-400 border-4 border-black px-6 py-2 mt-8 inline-block shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] rotate-[-2deg]">
+                                        {score === quizData.length ? "🚀 傳奇莊家！歐大把位子交給你了！" : (score >= (quizData.length * 0.75) ? "🔥 高手！市場就是你的收租房！" : "🧘 基礎還行，多看兩次策略解析喔！")}
+                                    </span>
+                                </p>
+                                <button
+                                    onClick={reset}
+                                    className="flex items-center gap-5 mx-auto bg-black text-white px-16 py-7 font-[900] text-3xl btn-option-pill hover:bg-[#7FFF00] hover:text-black transition-all shadow-2xl"
+                                >
+                                    重新特訓 RETRY
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Progress Bar */}
+                        {!quizDone && (
+                            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-xl z-50">
+                                <div className="flex items-center gap-6">
+                                    <div className="flex-1 bg-white border-4 border-black h-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden rounded-full">
+                                        <div 
+                                            className="h-full bg-[#FF3131] transition-all duration-700 border-r-4 border-black" 
+                                            style={{ width: `${(currentIdx / quizData.length) * 100}%` }}
+                                        ></div>
+                                    </div>
+                                    <div className="bg-black text-[#39FF14] px-6 py-2 font-[900] border-4 border-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-2xl rounded-xl">
+                                        {score}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

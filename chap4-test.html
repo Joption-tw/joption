@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歐大選擇權教室 - 希臘字母戰鬥營</title>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pop-bg: #FF8C00;      /* 熱力橘 */
+            --pop-header: #7FFF00;  /* 螢光綠 */
+            --pop-card: #FFFFFF;    /* 白色卡片 */
+            --pop-btn: #FFD700;     /* 金色按鈕 */
+            --pop-red: #FF3131;     /* 警示紅 */
+            --pop-purple: #9D50BB;  /* 詳解紫 */
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--pop-bg);
+            /* 普普風點陣背景 */
+            background-image: radial-gradient(#000000 2px, transparent 0);
+            background-size: 30px 30px;
+            background-attachment: fixed;
+            color: #1a1a1a;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-12px); }
+            75% { transform: translateX(12px); }
+        }
+        .animate-shake { animation: shake 0.2s ease-in-out infinite; }
+
+        .pop-card {
+            box-shadow: 15px 15px 0px 0px rgba(0,0,0,1);
+            border: 5px solid #000;
+        }
+
+        /* 藥丸型按鈕設計 */
+        .btn-option-pill {
+            box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+            border: 4px solid #000;
+            border-radius: 9999px;
+            transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-option-pill:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+        }
+
+        .fluid-title { font-size: clamp(2rem, 8vw, 4.5rem); }
+        .fluid-question { font-size: clamp(1.2rem, 4vw, 2.2rem); }
+        .fluid-padding { padding: clamp(1.2rem, 6vw, 4rem); }
+
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const IconLightning = () => <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>;
+        const IconCorrect = () => <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="4"><path d="M5 13l4 4L19 7"></path></svg>;
+        const IconWrong = () => <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="4"><path d="M6 18L18 6M6 6l12 12"></path></svg>;
+
+        const quizData = [
+            // --- Delta 方向感 ---
+            {
+                q: "當標的物指數跳動 100 點，而 Delta 為 0.5 時。該選擇權理論上會漲多少點？",
+                options: ["100 點", "50 點", "200 點", "0.5 點"],
+                ans: 1,
+                exp: "歐大解析：Delta 衡量權利金隨標的物變動的線性關係。Delta 0.5 代表標的漲 1 點，權利金漲 0.5 點。100 × 0.5 = 50 點。"
+            },
+            {
+                q: "關於 Delta 的正負號特性，下列敘述何者正確？",
+                options: ["Call 的 Delta 為負，Put 為正", "買方 Delta 永遠為正", "Call 的 Delta 為正，Put 為負", "賣方 Delta 永遠為負"],
+                ans: 2,
+                exp: "歐大解析：Call 與標的正向變動（Delta 為正），Put 與標的反向變動（Delta 為負）。這決定了你的「方向感」。"
+            },
+            {
+                q: "深度價外 (Deep OTM) 的選擇權，其 Delta 數值通常最接近？",
+                options: ["1.0", "0.5", "0", "-1.0"],
+                ans: 2,
+                exp: "歐大解析：離履約價太遠的選擇權，對指數跳動極度不敏感，Delta 趨近於 0，獲利機率極低。"
+            },
+            {
+                q: "歐大想建立一個「Delta 中性」的部位，其核心目的是？",
+                options: ["追求大漲大跌獲利", "消除方向性風險，賺取時間價值", "增加槓桿倍數", "只單純看波動率"],
+                ans: 1,
+                exp: "歐大解析：Delta 中性代表部位不受指數小幅漲跌影響，通常是賣方為了穩賺時間價值而設計的對沖策略。"
+            },
+            {
+                q: "價平 (ATM) 選擇權的 Delta 數值，其常態分佈通常約為？",
+                options: ["0.2", "0.5", "0.8", "1.0"],
+                ans: 1,
+                exp: "歐大解析：價平處於中間，漲跌機率各半，Delta 通常在 0.5 附近徘徊。"
+            },
+            // --- Gamma 加速度 ---
+            {
+                q: "Gamma 這個希臘字母，主要是衡量誰的變動速度？",
+                options: ["Theta", "Vega", "Delta", "Rho"],
+                ans: 2,
+                exp: "歐大解析：Gamma 是 Delta 的加速度。當指數移動時，Gamma 會讓你的 Delta 跟著變大或變小。"
+            },
+            {
+                q: "哪一種交易身份會面臨「負 Gamma」風險，導致行情噴發時虧損加速？",
+                options: ["選擇權買方", "選擇權賣方", "期貨投機者", "現貨持有者"],
+                ans: 1,
+                exp: "歐大解析：賣方是「負 Gamma」，當指數往不利方向噴出時，你的虧損速度會像踩了油門一樣越來越快！"
+            },
+            {
+                q: "在結算日當天，哪種位置的選擇權 Gamma 值最具備爆發力？",
+                options: ["深度價內", "價平 (ATM) 附近", "深度價外", "都一樣"],
+                ans: 1,
+                exp: "歐大解析：價平選擇權在結算日 Gamma 極大，只要指数一動，Delta 會瞬間從 0 噴向 1，這就是「樂透」的由來。"
+            },
+            {
+                q: "當 Gamma 值極大時，權利金的表現通常呈現何種特性？",
+                options: ["線性且穩定", "非線性爆發力強", "完全不隨指數變動", "只隨時間緩慢減少"],
+                ans: 1,
+                exp: "歐大解析：Gamma 越高，代表選擇權的槓桿與損益變化越劇烈，具備強大的非線性加速度。"
+            },
+            {
+                q: "若歐大想利用「Gamma 爆發」來追求倍數獲利，他應該？",
+                options: ["當買方 (Buy)", "當賣方 (Sell)", "空手觀望", "做 Delta 中性賣方"],
+                ans: 0,
+                exp: "歐大解析：買方擁有正 Gamma，最喜歡標的物出現劇烈跳動來加速獲利。"
+            },
+            // --- Theta 時間吸血 ---
+            {
+                q: "歐大常說「時間是買方的毒藥」，對應的希臘字母是？",
+                options: ["Delta", "Gamma", "Theta", "Vega"],
+                ans: 2,
+                exp: "歐大解析：Theta 代表時間價值的衰減。買方每天都要支付這筆「租金」給賣方，這就是時間吸血。"
+            },
+            {
+                q: "關於 Theta 的衰減規律，下列敘述何者更為準確？",
+                options: ["越靠近到期日，衰減越慢", "每天流失的點數都固定", "越靠近到期日，衰減越快", "Theta 不受行情時間影響"],
+                ans: 2,
+                exp: "歐大解析：Theta 衰減是非線性的。瀕臨到期日時，時間價值會呈現「斷崖式」的融冰消失。"
+            },
+            {
+                q: "週末放假兩天不開盤，對歐大持有的「賣方」部位有何幫助？",
+                options: ["沒開盤沒影響", "賺取兩天的時間價值流逝", "損失兩天的手續費", "Delta 會瞬間歸零"],
+                ans: 1,
+                exp: "歐大解析：時間流逝不因放假停止。週一開盤若指數不動，賣方通常能收割週末兩天的 Theta 融冰利潤。"
+            },
+            {
+                q: "哪一種狀態的選擇權 Theta 絕對值最大，代表流失壓力最驚人？",
+                options: ["深度價外", "價平 (ATM)", "深度價內", "都一樣"],
+                ans: 1,
+                exp: "歐大解析：價平選擇權包含的時間價值最高，因此在接近結算時，其流逝的點數絕對值也最為巨大。"
+            },
+            {
+                q: "賣方（莊家）最理想的獲利情境，是標的指數呈現？",
+                options: ["狂噴 2000 點", "死魚盤（橫盤不動）", "劇烈震盪", "單日跳空大跌"],
+                ans: 1,
+                exp: "歐大解析：賣方最愛死魚盤。指數不動，時間價值天天自動轉進你的口袋，這就是「賺租金」。"
+            },
+            // --- Vega 波動率氣球 ---
+            {
+                q: "Vega 衡量的是權利金與哪一個核心變數的關係？",
+                options: ["到期時間", "標的指數點數", "隱含波動率 (IV)", "無風險利率"],
+                ans: 2,
+                exp: "歐大解析：Vega 代表波動率氣球。市場情緒越恐慌，隱含波動率上升，權利金也會隨之膨脹。"
+            },
+            {
+                q: "當市場發生黑天鵝利空，恐慌指數 (VIX) 噴發時，權利金會？",
+                options: ["變便宜", "變貴", "保持不變", "直接消失"],
+                ans: 1,
+                exp: "歐大解析：波動率上升會讓 Vega 發揮作用，不論 Call 或 Put，只要 IV 上升，權利金都會變貴。"
+            },
+            {
+                q: "歐大常提醒的「IV Crush」（波動率縮減）通常會導致？",
+                options: ["權利金大幅萎縮", "權利金翻倍", "標的指數瞬間跌停", "Delta 變成 1.0"],
+                ans: 0,
+                exp: "歐大解析：當不確定因素消失後，IV 會迅速從高點滑落，這時 Vega 會讓權利金急速縮水，即使方向看對，買方也可能賠錢。"
+            },
+            {
+                q: "當歐大預期未來市場會有大事發生，他最適合用哪種策略賺 Vega？",
+                options: ["賣出跨式部位", "買進跨式部位 (Long Straddle)", "持有大量現貨", "保持空手"],
+                ans: 1,
+                exp: "歐大解析：買進跨式（同時買 Call 和 Put）擁有正 Vega，當市場情緒轉趨恐慌、波動率上升時，兩邊權利金都會受惠膨脹。"
+            },
+            {
+                q: "市場避險情緒升溫導致 IV 開始墊高，這代表了什麼意義？",
+                options: ["市場極度樂觀", "權利金隱含成本變貴", "指數即刻結算", "時間價值停止衰減"],
+                ans: 1,
+                exp: "歐大解析：IV 墊高代表避險需求增加。這就像氣球被吹大，買方成本變高，而賣方收取的防守空間也隨之加大。"
+            }
+        ];
+
+        function App() {
+            const [currentQ, setCurrentQ] = useState(0);
+            const [selected, setSelected] = useState(null);
+            const [showExp, setShowExp] = useState(false);
+            const [score, setScore] = useState(0);
+            const [isWrong, setIsWrong] = useState(false);
+            const [quizDone, setQuizDone] = useState(false);
+
+            const handleAnswer = (idx) => {
+                if (showExp) return;
+                setSelected(idx);
+                setShowExp(true);
+                
+                if (idx === quizData[currentQ].ans) {
+                    setScore(prev => prev + 1);
+                    setIsWrong(false);
+                } else {
+                    setIsWrong(true);
+                    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                }
+            };
+
+            const next = () => {
+                if (currentQ < quizData.length - 1) {
+                    setCurrentQ(currentQ + 1);
+                    setSelected(null);
+                    setShowExp(false);
+                    setIsWrong(false);
+                } else {
+                    setQuizDone(true);
+                }
+            };
+
+            const reset = () => {
+                setCurrentIdx(0); // This was a legacy variable in my mind, fixing to currentQ
+                setCurrentQ(0);
+                setSelected(null);
+                setShowExp(false);
+                setScore(0);
+                setIsWrong(false);
+                setQuizDone(false);
+            };
+
+            const q = quizData[currentQ];
+
+            return (
+                <div className="min-h-screen flex items-center justify-center fluid-padding">
+                    <div className="w-full max-w-4xl">
+                        {/* Header */}
+                        <header className="mb-10 transform rotate-[-2deg]">
+                            <div className="bg-[var(--pop-header)] pop-card p-6 relative overflow-hidden">
+                                <div className="absolute top-[-10px] right-[-10px] text-black opacity-10">
+                                    <IconLightning />
+                                </div>
+                                <h1 className="fluid-title font-[900] italic uppercase tracking-tighter leading-none text-black drop-shadow-md">
+                                    歐大選擇權教室
+                                </h1>
+                                <div className="flex gap-2 mt-3">
+                                    <span className="bg-black text-[#7FFF00] px-4 py-1 font-black text-sm border-2 border-white skew-x-[-10deg]">
+                                        希臘字母戰鬥營
+                                    </span>
+                                    <span className="bg-[#00D1FF] text-black px-4 py-1 font-black text-sm border-2 border-black skew-x-[-10deg]">
+                                        必考 20 題
+                                    </span>
+                                </div>
+                            </div>
+                        </header>
+
+                        {!quizDone ? (
+                            <main className={isWrong ? 'animate-shake' : ''}>
+                                {/* Question Card */}
+                                <div className={`pop-card fluid-padding mb-8 transition-all duration-300 ${isWrong ? 'bg-[var(--pop-red)]' : 'bg-[var(--pop-card)]'}`}>
+                                    <div className="flex justify-between items-center mb-8">
+                                        <div className="flex items-center gap-2">
+                                            <div className="bg-black text-white p-2 border-2 border-white rotate-[5deg] shadow-sm">
+                                                <IconLightning />
+                                            </div>
+                                            <span className={`font-[900] text-sm md:text-lg uppercase tracking-widest ${isWrong ? 'text-white' : 'bg-black text-white px-3'}`}>
+                                                QUESTION {currentQ + 1}
+                                            </span>
+                                        </div>
+                                        <div className={`font-[900] text-2xl md:text-3xl ${isWrong ? 'text-white' : 'text-black'}`}>
+                                            {currentQ + 1} / {quizData.length}
+                                        </div>
+                                    </div>
+
+                                    <h2 className={`fluid-question font-[900] leading-tight mb-12 ${isWrong ? 'text-white' : 'text-black'}`}>
+                                        {q.q}
+                                    </h2>
+
+                                    <div className="grid grid-cols-1 gap-6">
+                                        {q.options.map((opt, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleAnswer(idx)}
+                                                disabled={showExp}
+                                                className={`
+                                                    btn-option-pill text-left p-5 md:p-7 font-[900] text-lg md:text-2xl flex items-center gap-6
+                                                    ${showExp 
+                                                        ? (idx === q.ans 
+                                                            ? 'bg-[#39FF14] text-black scale-[1.03] z-10' 
+                                                            : (selected === idx ? 'bg-black text-white border-white' : 'bg-gray-200 text-gray-500 border-gray-400 opacity-50'))
+                                                        : 'bg-[var(--pop-btn)] text-black hover:bg-[#00D1FF] hover:translate-x-2'
+                                                    }
+                                                `}
+                                            >
+                                                <span className="shrink-0 w-12 h-12 border-4 border-black bg-white flex items-center justify-center text-black font-[900] italic rounded-full shadow-inner">
+                                                    {String.fromCharCode(65 + idx)}
+                                                </span>
+                                                {opt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Ou Da Analysis */}
+                                {showExp && (
+                                    <div className="pop-card bg-[var(--pop-purple)] fluid-padding animate-in fade-in slide-in-from-bottom-6 duration-500 mb-28 relative transform rotate-[1deg]">
+                                        <div className="absolute -top-6 left-12 bg-black text-[#7FFF00] px-6 py-1 font-[900] italic skew-x-[-15deg] border-4 border-white shadow-lg text-xl">
+                                            歐大點評：
+                                        </div>
+                                        <div className="flex flex-col md:flex-row items-center md:items-start gap-10">
+                                            <div className="shrink-0 bg-white border-4 border-black p-5 rotate-[-5deg] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                                                {selected === q.ans ? <IconCorrect className="text-[#39FF14]" /> : <IconWrong className="text-[var(--pop-red)]" />}
+                                            </div>
+                                            <div className="flex-1 text-center md:text-left text-white">
+                                                <p className="text-xl md:text-3xl font-[900] leading-snug mb-10 drop-shadow-lg">
+                                                    {q.exp}
+                                                </p>
+                                                <button
+                                                    onClick={next}
+                                                    className="w-full md:w-auto bg-black text-[#39FF14] px-14 py-5 font-[900] text-2xl btn-option-pill hover:bg-white hover:text-black uppercase italic tracking-widest shadow-2xl"
+                                                >
+                                                    {currentQ === quizData.length - 1 ? "看總結 RESULT" : "下一題 NEXT"}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </main>
+                        ) : (
+                            /* Success Screen */
+                            <div className="pop-card bg-white fluid-padding text-center rotate-[1deg] mb-24 relative overflow-hidden">
+                                <div className="absolute -top-10 -left-10 w-40 h-40 bg-[var(--pop-header)] rounded-full border-4 border-black opacity-50"></div>
+                                <h2 className="text-5xl md:text-7xl font-[900] mb-10 uppercase italic tracking-tighter text-black">
+                                    特訓達成！
+                                </h2>
+                                <div className="inline-block relative mb-12">
+                                    <div className="absolute inset-0 bg-[#00D1FF] translate-x-4 translate-y-4 border-4 border-black rounded-full"></div>
+                                    <div className="relative bg-white border-8 border-black px-16 py-10 text-8xl md:text-[12rem] font-[900] text-[var(--pop-red)] rounded-full leading-none flex items-baseline gap-2">
+                                        {Math.round((score / quizData.length) * 100)}<span className="text-4xl md:text-6xl text-black">%</span>
+                                    </div>
+                                </div>
+                                <p className="text-2xl md:text-4xl font-[900] mb-12 leading-tight text-black">
+                                    你在這場希臘字母挑戰中答對了 {score} 題！
+                                    <br />
+                                    <span className="bg-[var(--pop-bg)] border-4 border-black px-8 py-2 mt-8 inline-block shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] rotate-[-2deg] uppercase">
+                                        {score === 20 ? "🚀 傳奇！你已具備莊家之神格！" : (score >= 15 ? "🔥 強大！你對致富工具瞭若指掌！" : "🧘 再接再厲！細讀歐大的交易心法！")}
+                                    </span>
+                                </p>
+                                <button
+                                    onClick={reset}
+                                    className="flex items-center gap-5 mx-auto bg-black text-white px-16 py-7 font-[900] text-3xl btn-option-pill hover:bg-[var(--pop-header)] hover:text-black transition-all shadow-2xl active:scale-95"
+                                >
+                                    重新挑戰 RETRY
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Progress Bar Footer */}
+                        {!quizDone && (
+                            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-xl z-50">
+                                <div className="flex items-center gap-6">
+                                    <div className="flex-1 bg-white border-4 border-black h-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden rounded-full">
+                                        <div 
+                                            className="h-full bg-[var(--pop-red)] transition-all duration-700 border-r-4 border-black" 
+                                            style={{ width: `${(currentQ / quizData.length) * 100}%` }}
+                                        ></div>
+                                    </div>
+                                    <div className="bg-black text-[#39FF14] px-7 py-3 font-[900] border-4 border-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-2xl rounded-xl">
+                                        {score}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

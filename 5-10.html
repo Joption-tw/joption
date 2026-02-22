@@ -8,23 +8,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --ghibli-bg: #f0f9ff; /* 極淺藍 */
-            --ghibli-night: #1e3a8a; /* 深藍 */
-            --ghibli-accent: #3b82f6; /* 亮藍 */
-            --ghibli-profit: #dbeafe; /* 獲利區淺藍 */
+            --iron-bg: #f8fafc; /* 淺石板色 */
+            --iron-dark: #334155; /* 深石板藍 */
+            --iron-accent: #6366f1; /* 靛藍色 */
+            --iron-profit: #e0e7ff; /* 獲利區淺色 */
         }
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background: linear-gradient(180deg, var(--ghibli-bg) 0%, #ffffff 100%);
+            background: linear-gradient(180deg, var(--iron-bg) 0%, #ffffff 100%);
             color: #334155;
             scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent;
         }
         .ghibli-card {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
-            border: 2px solid #dbeafe; 
+            border: 2px solid #e2e8f0; 
             border-radius: 24px;
-            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
         .chart-line {
             stroke-dasharray: 2000;
@@ -35,179 +36,233 @@
             to { stroke-dashoffset: 0; }
         }
         input[type="range"] {
-            accent-color: var(--ghibli-accent);
+            accent-color: var(--iron-accent);
+            height: 8px;
+            border-radius: 4px;
+        }
+        /* 優化手機端滑塊觸控區域 */
+        input[type="range"]::-webkit-slider-thumb {
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* 平滑捲動位移補償 */
+        section {
+            scroll-margin-top: 5rem;
         }
     </style>
 </head>
 <body class="min-h-screen">
 
     <!-- Navigation -->
-    <nav class="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-blue-100">
-        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+    <nav class="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-2">
-                <img src="ip標籤.jpg" alt="Logo" class="w-10 h-10 rounded-full object-cover border-2 border-blue-100" onerror="this.src='https://via.placeholder.com/40?text=JP'">
+                <img src="ip標籤.jpg" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-slate-100" onerror="this.src='https://via.placeholder.com/40?text=JP'">
                 <div class="flex items-center">
-                    <span class="text-xl font-bold tracking-tighter text-slate-800">JOPTION</span>
-                    <div class="h-6 w-[1px] bg-slate-300 mx-3"></div>
-                    <span class="text-lg font-medium text-slate-600">歐大選擇權教室</span>
+                    <span class="text-lg sm:text-xl font-bold tracking-tighter text-slate-800">JOPTION</span>
+                    <div class="h-5 sm:h-6 w-[1px] bg-slate-300 mx-2 sm:mx-3"></div>
+                    <span class="text-sm sm:text-lg font-medium text-slate-600 truncate max-w-[120px] sm:max-w-none">歐大選擇權教室</span>
                 </div>
             </div>
-            <div class="hidden md:flex space-x-8 text-slate-600 font-medium">
-                <a href="#definition" class="hover:text-blue-600">組合定義</a>
-                <a href="#strategy" class="hover:text-blue-600">策略優勢</a>
-                <a href="#interactive" class="hover:text-blue-600">蝴蝶模擬</a>
+            <div class="hidden md:flex space-x-6 lg:space-x-8 text-slate-600 font-medium">
+                <a href="#definition" class="hover:text-indigo-600 transition-colors">策略定義</a>
+                <a href="#strategy" class="hover:text-indigo-600 transition-colors">策略優勢</a>
+                <a href="#interactive" class="hover:text-indigo-600 transition-colors">鐵蝴蝶模擬</a>
+            </div>
+            <!-- 行動端簡單提醒或小按鈕 -->
+            <div class="md:hidden text-indigo-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <header class="relative py-16 px-4 text-center overflow-hidden">
+    <header class="relative py-12 md:py-20 px-4 text-center overflow-hidden">
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-20">
-            <div class="absolute top-10 left-10 w-32 h-32 bg-blue-200 rounded-full blur-3xl"></div>
-            <div class="absolute bottom-10 right-10 w-48 h-48 bg-cyan-200 rounded-full blur-3xl"></div>
+            <div class="absolute top-10 left-10 w-32 h-32 bg-indigo-200 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-10 right-10 w-48 h-48 bg-slate-300 rounded-full blur-3xl"></div>
         </div>
-        <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight">精準停留的藝術：蝴蝶價差</h1>
-        <p class="text-lg text-slate-600 max-w-2xl mx-auto">在 Joption 教室，學會如何利用對稱的結構，在市場靜止於目標點位時，獲得最高效率的報酬。</p>
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold text-slate-800 mb-6 leading-tight px-2">
+                橫盤收租的鋼鐵意志<br class="hidden sm:block"><span class="text-indigo-600">鐵蝴蝶價差</span>
+            </h1>
+            <p class="text-base md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed px-4">
+                在 Joption 教室，學會結合 Call 與 Put 的優勢，在預期的狹幅區間內榨取最高的時間價值。
+            </p>
+        </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-4 space-y-12 pb-24">
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 md:space-y-16 pb-24">
         
         <!-- Section 1: Definition -->
-        <section id="definition" class="ghibli-card p-8 md:p-12 border-l-8 border-l-blue-500">
-            <div class="flex flex-col md:flex-row items-center gap-8">
+        <section id="definition" class="ghibli-card p-6 md:p-12 border-l-4 md:border-l-8 border-l-indigo-500">
+            <div class="flex flex-col lg:flex-row items-start lg:items-center gap-8 md:gap-12">
                 <div class="flex-1">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
-                        <span class="bg-blue-100 text-blue-600 p-2 rounded-lg mr-3">
+                    <h2 class="text-xl md:text-3xl font-bold text-slate-800 mb-6 flex items-center">
+                        <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg mr-3">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
                         </span>
-                        什麼是蝴蝶價差 (Butterfly Spread)？
+                        什麼是鐵蝴蝶價差？
                     </h2>
-                    <div class="space-y-4 text-slate-600 leading-relaxed">
+                    <div class="space-y-4 text-slate-600 leading-relaxed text-sm md:text-base">
                         <p>
-                            <strong>蝴蝶價差</strong>是一種結合了「牛市價差」與「熊市價差」的對稱策略。它由三個履約價組成：買入一個低位（左翼）、賣出兩個中位（主體）、買入一個高位（右翼）。這是一個看「行情不動」的中性策略。
+                            <strong>鐵蝴蝶價差 (Iron Butterfly)</strong> 是一種進階的中性策略。它結合了賣出平值跨式（ATM Straddle）與買入價外寬跨式（OTM Strangle）作為保護。
                         </p>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-                            <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-50">
-                                <div class="text-blue-500 font-bold text-sm">最大獲利</div>
-                                <div class="text-slate-800 font-medium">剛好落在中間履約價</div>
+                        <p class="hidden sm:block">
+                            與傳統蝴蝶不同，它使用了兩種不同類型的選擇權，通常能帶來一筆<strong>淨權利金收入</strong>，在行情波動極小時表現最佳。
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                                <div class="text-indigo-500 font-bold text-xs mb-1 uppercase tracking-wider">獲利高峰</div>
+                                <div class="text-slate-800 font-semibold text-sm md:text-base">結算於中間履約價</div>
                             </div>
-                            <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-50">
-                                <div class="text-blue-500 font-bold text-sm">最大風險</div>
-                                <div class="text-slate-800 font-medium">極低的淨權利金支出</div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                                <div class="text-indigo-500 font-bold text-xs mb-1 uppercase tracking-wider">風險鎖定</div>
+                                <div class="text-slate-800 font-semibold text-sm md:text-base">翅膀保護免於大賠</div>
                             </div>
-                            <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-50">
-                                <div class="text-blue-500 font-bold text-sm">策略槓桿</div>
-                                <div class="text-slate-800 font-medium">低成本博取高倍數</div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                                <div class="text-indigo-500 font-bold text-xs mb-1 uppercase tracking-wider">現金流</div>
+                                <div class="text-slate-800 font-semibold text-sm md:text-base">進場即收取權利金</div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="w-full md:w-1/3 bg-blue-50 p-6 rounded-2xl border-2 border-blue-100 italic text-blue-700/70">
-                    "在 選擇權 的視野裡，蝴蝶價差就像是在森林中靜靜飛舞的蝴蝶。它不需要大風大浪，只需要行情溫柔地停留在預測的中心。"
+                <div class="w-full lg:w-1/3 bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100 italic text-indigo-700/70 text-sm md:text-base">
+                    "在 JOPTION 的策略庫中，鐵蝴蝶就像是設下了穩固的捕蠅草，等待行情在精準的範圍內停歇，將時間價值轉化為利潤。"
                 </div>
             </div>
         </section>
 
         <!-- Section 3: Interactive Simulator -->
-        <section id="interactive" class="ghibli-card p-8 md:p-12 overflow-hidden">
-            <div class="flex justify-between items-start mb-10">
+        <section id="interactive" class="ghibli-card p-6 md:p-12 overflow-hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8 md:mb-12">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-800 mb-2">蝴蝶價差動態模擬</h2>
-                    <p class="text-slate-500">調整翅膀寬度與中心點，觀察對稱的「V型獲利頂峰」。</p>
+                    <h2 class="text-xl md:text-3xl font-bold text-slate-800 mb-2">鐵蝴蝶動態模擬</h2>
+                    <p class="text-slate-500 text-sm md:text-base">調整參數，觀察權利金收入與損益變化。</p>
                 </div>
-                <span class="bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Butterfly</span>
+                <span class="bg-indigo-100 text-indigo-600 px-4 py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest self-start sm:self-center">Iron Butterfly</span>
             </div>
 
-            <div class="grid lg:grid-cols-3 gap-12 items-center">
+            <div class="grid lg:grid-cols-12 gap-10 lg:gap-16 items-start">
                 <!-- Controls -->
-                <div class="space-y-6">
-                    <div>
-                        <div class="flex justify-between mb-1">
-                            <label class="text-[10px] font-bold text-slate-700">主體履約價 (Middle/Body)</label>
-                            <span class="text-blue-600 font-mono text-xs" id="val-mid">30000</span>
+                <div class="lg:col-span-5 space-y-8">
+                    <div class="space-y-6">
+                        <div class="group">
+                            <div class="flex justify-between mb-2">
+                                <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">中間履約價 (ATM Body)</label>
+                                <span class="text-indigo-600 font-mono text-sm font-bold" id="val-mid">30000</span>
+                            </div>
+                            <input type="range" id="mid-strike" min="28500" max="31500" step="100" value="30000" class="w-full cursor-pointer">
                         </div>
-                        <input type="range" id="mid-strike" min="28500" max="31500" step="100" value="30000" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                    <div>
-                        <div class="flex justify-between mb-1">
-                            <label class="text-[10px] font-bold text-slate-500">翅膀間距 (Wing Width)</label>
-                            <span class="text-blue-600 font-mono text-xs" id="val-width">200</span>
+                        <div class="group">
+                            <div class="flex justify-between mb-2">
+                                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">翅膀保護寬度 (Wing Width)</label>
+                                <span class="text-indigo-600 font-mono text-sm font-bold" id="val-width">200</span>
+                            </div>
+                            <input type="range" id="wing-width" min="50" max="500" step="50" value="200" class="w-full cursor-pointer">
                         </div>
-                        <input type="range" id="wing-width" min="50" max="500" step="50" value="200" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                    <div>
-                        <div class="flex justify-between mb-1">
-                            <label class="text-[10px] font-bold text-slate-500">淨權利金成本</label>
-                            <span class="text-blue-600 font-mono text-xs" id="val-cost">30</span>
+                        <div class="group">
+                            <div class="flex justify-between mb-2">
+                                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">淨權利金收入 (Net Credit)</label>
+                                <span class="text-indigo-600 font-mono text-sm font-bold" id="val-credit">120</span>
+                            </div>
+                            <input type="range" id="net-credit" min="20" max="250" step="10" value="120" class="w-full cursor-pointer">
                         </div>
-                        <input type="range" id="net-cost" min="5" max="100" step="5" value="30" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
                     </div>
                     
-                    <div class="p-6 rounded-2xl bg-gradient-to-br from-white to-blue-50 border border-blue-100 shadow-sm">
-                        <div class="text-xs text-slate-400 mb-1">結算股價: <span id="val-current">30000</span></div>
-                        <input type="range" id="current-price" min="28000" max="32000" step="50" value="30000" class="w-full h-2 mb-4 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                        <div class="text-xs text-slate-400 mb-1 uppercase tracking-tighter font-bold">預估損益</div>
-                        <div class="text-3xl font-black text-blue-500" id="profit-result">+170</div>
+                    <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 shadow-sm space-y-4">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-slate-500 uppercase font-bold tracking-tighter">當前模擬結算價</span>
+                                <span class="text-sm font-mono text-slate-700" id="val-current">30000</span>
+                            </div>
+                            <input type="range" id="current-price" min="28000" max="32000" step="50" value="30000" class="w-full h-2 bg-indigo-200 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                        <div class="pt-2 border-t border-slate-200">
+                            <div class="text-[10px] text-slate-400 mb-1 uppercase font-bold">預估結算損益 (P/L)</div>
+                            <div class="text-4xl font-black text-indigo-500 tracking-tighter" id="profit-result">+120</div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Visualization -->
-                <div class="lg:col-span-2 relative h-80 bg-white rounded-3xl border-2 border-blue-50 shadow-inner flex items-center justify-center p-4">
-                    <svg id="chart" viewBox="0 0 500 250" class="w-full h-full">
+                <div class="lg:col-span-7 relative bg-white rounded-3xl border border-slate-100 shadow-inner p-4 md:p-6 min-h-[300px] flex flex-col items-center justify-center">
+                    <svg id="chart" viewBox="0 0 500 250" class="w-full h-auto drop-shadow-sm">
                         <defs>
                             <linearGradient id="profitGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="#dbeafe" stop-opacity="0.9" />
-                                <stop offset="100%" stop-color="#dbeafe" stop-opacity="0" />
+                                <stop offset="0%" stop-color="#818cf8" stop-opacity="0.4" />
+                                <stop offset="100%" stop-color="#818cf8" stop-opacity="0" />
                             </linearGradient>
                         </defs>
                         <!-- Grid Lines -->
-                        <line x1="0" y1="125" x2="500" y2="125" stroke="#f1f5f9" stroke-width="1" />
+                        <line x1="0" y1="125" x2="500" y2="125" stroke="#e2e8f0" stroke-width="1" />
                         
                         <!-- Profit Area -->
                         <path id="profit-area" d="" fill="url(#profitGradient)" />
                         
                         <!-- Payoff Line -->
-                        <path id="payoff-path" d="" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round" class="chart-line" />
+                        <path id="payoff-path" d="" fill="none" stroke="#4f46e5" stroke-width="4" stroke-linecap="round" class="chart-line" />
                         
                         <!-- Marker -->
-                        <circle id="marker" cx="0" cy="0" r="8" fill="#2563eb" stroke="white" stroke-width="3" />
+                        <circle id="marker" cx="0" cy="0" r="8" fill="#4f46e5" stroke="white" stroke-width="3" />
                         
-                        <!-- Labels -->
-                        <text x="210" y="30" font-size="12" font-weight="bold" fill="#2563eb">獲利頂峰</text>
-                        <text x="10" y="235" font-size="11" fill="#94a3b8">成本止損</text>
-                        <text x="440" y="235" font-size="11" fill="#94a3b8">成本止損</text>
+                        <!-- Labels - Hidden on small mobile to avoid clutter -->
+                        <g class="hidden sm:block">
+                            <text x="210" y="30" font-size="12" font-weight="bold" fill="#4f46e5">最大收租點</text>
+                            <text x="10" y="235" font-size="11" fill="#94a3b8">下跌風險</text>
+                            <text x="420" y="235" font-size="11" fill="#94a3b8">上漲風險</text>
+                        </g>
                     </svg>
+                    <!-- Mobile Labels (Simple) -->
+                    <div class="sm:hidden w-full flex justify-between mt-4 px-2">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">下跌端</span>
+                        <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">模擬圖表</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">上漲端</span>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Section 4: Strategies -->
-        <div class="grid md:grid-cols-2 gap-6">
-            <div class="bg-white/60 p-6 rounded-2xl border border-blue-50">
-                <h4 class="font-bold text-blue-800 mb-2">💡 蝴蝶的低成本優勢</h4>
-                <p class="text-sm text-slate-600 leading-relaxed">蝴蝶價差最大的特色是「極高的盈虧比」。因為賣出的兩口平值選擇權收取了大量權利金，抵銷了買入翅膀的成本，所以即便預測失敗，損失也非常有限。</p>
+        <div id="strategy" class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white/80 p-6 md:p-8 rounded-3xl border border-indigo-50 shadow-sm transition-all hover:shadow-md">
+                <h4 class="text-lg font-bold text-indigo-800 mb-3 flex items-center">
+                    <span class="mr-2">💡</span> 鐵蝴蝶與一般蝴蝶的差異
+                </h4>
+                <p class="text-sm md:text-base text-slate-600 leading-relaxed">
+                    一般蝴蝶通常是淨支出（Debit），博取高倍數回報；而鐵蝴蝶則是淨收入（Credit），本質上是為了賺取權利金。它的最大風險是「翅膀寬度減去收取的權利金」，在隱含波動率 (IV) 較高時進場對鐵蝴蝶更為有利。
+                </p>
             </div>
-            <div class="bg-white/60 p-6 rounded-2xl border border-blue-50">
-                <h4 class="font-bold text-blue-800 mb-2">🎯 最佳進場時機</h4>
-                <p class="text-sm text-slate-600 leading-relaxed">當預期市場即將結算在某個特定點位附近，或是預期隱含波動率 (IV) 將大幅下降時，蝴蝶策略能發揮最強的效力。在 Joption 教室，我們視之為「狙擊手般的精準布局」。</p>
+            <div class="bg-white/80 p-6 md:p-8 rounded-3xl border border-indigo-50 shadow-sm transition-all hover:shadow-md">
+                <h4 class="text-lg font-bold text-indigo-800 mb-3 flex items-center">
+                    <span class="mr-2">🎯</span> 實戰應用指南
+                </h4>
+                <p class="text-sm md:text-base text-slate-600 leading-relaxed">
+                    鐵蝴蝶適合在預期行情進入「盤整期」時操作。由於進場即收錢，這給了交易者更多的心理防守空間。如果行情大幅震盪，翅膀的買權與賣權能有效限縮最大損失，是新手轉進階必學的風險控管策略。
+                </p>
             </div>
         </div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="bg-[#fcfcfc] border-t border-gray-100 pt-12 pb-10 px-4">
+    <footer class="bg-white border-t border-slate-100 pt-16 pb-12 px-4 mt-12">
         <div class="max-w-6xl mx-auto flex flex-col items-center">
-            <div class="flex items-center space-x-3 mb-4">
-                <img src="ip標籤.jpg" alt="Logo" class="w-10 h-10 rounded-full object-cover shadow-sm" onerror="this.src='https://via.placeholder.com/40?text=JP'">
-                <div class="flex items-center text-lg font-bold tracking-wider">
-                    <span class="text-gray-500 uppercase">JOPTION</span>
-                    <span class="text-gray-400 mx-3 font-light">|</span>
-                    <span class="text-gray-500 font-medium">歐大選擇權教室</span>
+            <div class="flex items-center space-x-3 mb-6">
+                <img src="ip標籤.jpg" alt="Logo" class="w-10 h-10 rounded-full object-cover shadow-sm grayscale hover:grayscale-0 transition-all" onerror="this.src='https://via.placeholder.com/40?text=JP'">
+                <div class="flex flex-col sm:flex-row sm:items-center text-lg font-bold tracking-wider">
+                    <span class="text-slate-500 uppercase tracking-tighter">JOPTION</span>
+                    <span class="hidden sm:inline text-slate-200 mx-3 font-light">|</span>
+                    <span class="text-slate-400 font-medium text-sm sm:text-lg">歐大選擇權教室</span>
                 </div>
             </div>
-            <div class="text-[13px] text-gray-400 text-center font-normal tracking-normal">
-                © 2026 Joption Academy - 金融教育僅供參考，投資有風險，操作需謹慎。
+            <div class="max-w-md text-center">
+                <p class="text-[12px] text-slate-400 leading-loose">
+                    © 2026 Joption Academy. 本網頁僅供教學展示與模擬練習使用，內容不構成任何形式的投資建議。金融市場投資具有風險，操作前請務必獨立思考與評估。
+                </p>
             </div>
         </div>
     </footer>
@@ -215,12 +270,12 @@
     <script>
         const midInput = document.getElementById('mid-strike');
         const widthInput = document.getElementById('wing-width');
-        const costInput = document.getElementById('net-cost');
+        const creditInput = document.getElementById('net-credit');
         const currentInput = document.getElementById('current-price');
         
         const valMid = document.getElementById('val-mid');
         const valWidth = document.getElementById('val-width');
-        const valCost = document.getElementById('val-cost');
+        const valCredit = document.getElementById('val-credit');
         const valCurrent = document.getElementById('val-current');
         const profitResult = document.getElementById('profit-result');
         
@@ -231,23 +286,29 @@
         function updateSimulation() {
             const mid = parseInt(midInput.value);
             const width = parseInt(widthInput.value);
-            const cost = parseInt(costInput.value);
+            const credit = parseInt(creditInput.value);
             const current = parseInt(currentInput.value);
 
-            const low = mid - width;
-            const high = mid + width;
+            const lowWing = mid - width;
+            const highWing = mid + width;
 
             valMid.innerText = mid.toLocaleString();
             valWidth.innerText = width.toLocaleString();
-            valCost.innerText = cost.toLocaleString();
+            valCredit.innerText = credit.toLocaleString();
             valCurrent.innerText = current.toLocaleString();
 
-            // Butterfly Profit Calculation
-            // Profit = Max(0, current-low) - 2*Max(0, current-mid) + Max(0, current-high) - cost
-            let profit = Math.max(0, current - low) - 2 * Math.max(0, current - mid) + Math.max(0, current - high) - cost;
+            // Short Iron Butterfly Calculation
+            let intrinsicLoss = 0;
+            if (current < mid) {
+                intrinsicLoss = Math.min(mid - current, mid - lowWing);
+            } else if (current > mid) {
+                intrinsicLoss = Math.min(current - mid, highWing - mid);
+            }
+            
+            let profit = credit - intrinsicLoss;
 
             profitResult.innerText = profit > 0 ? `+${profit.toLocaleString()}` : profit.toLocaleString();
-            profitResult.className = `text-3xl font-black ${profit > 0 ? 'text-blue-500' : (profit < 0 ? 'text-red-400' : 'text-slate-800')}`;
+            profitResult.className = `text-3xl md:text-4xl font-black ${profit > 0 ? 'text-indigo-500' : (profit < 0 ? 'text-rose-500' : 'text-slate-800')}`;
 
             const minX = 28000;
             const maxX = 32000;
@@ -256,20 +317,20 @@
             const scaleX = chartWidth / (maxX - minX);
             const scaleY = 0.5; 
 
-            const lowX = (low - minX) * scaleX;
+            const lowX = (lowWing - minX) * scaleX;
             const midX = (mid - minX) * scaleX;
-            const highX = (high - minX) * scaleX;
+            const highX = (highWing - minX) * scaleX;
 
-            const baseLossY = zeroY + (cost * scaleY);
-            const peakProfitY = zeroY - ((width - cost) * scaleY);
+            const maxLossY = zeroY + ((width - credit) * scaleY);
+            const peakProfitY = zeroY - (credit * scaleY);
 
             // Payoff Line
-            let d = `M 0 ${baseLossY} L ${lowX} ${baseLossY} L ${midX} ${peakProfitY} L ${highX} ${baseLossY} L 500 ${baseLossY}`;
+            let d = `M 0 ${maxLossY} L ${lowX} ${maxLossY} L ${midX} ${peakProfitY} L ${highX} ${maxLossY} L 500 ${maxLossY}`;
             payoffPath.setAttribute('d', d);
 
             // Profit Area (where profit > 0)
-            const beLow = low + cost;
-            const beHigh = high - cost;
+            const beLow = mid - credit;
+            const beHigh = mid + credit;
             const beLowX = (beLow - minX) * scaleX;
             const beHighX = (beHigh - minX) * scaleX;
 
@@ -285,10 +346,11 @@
             marker.setAttribute('cy', zeroY - (profit * scaleY));
         }
 
-        [midInput, widthInput, costInput, currentInput].forEach(input => {
+        [midInput, widthInput, creditInput, currentInput].forEach(input => {
             input.addEventListener('input', updateSimulation);
         });
 
+        // 初始化模擬
         window.onload = updateSimulation;
     </script>
 

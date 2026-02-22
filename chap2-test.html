@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歐大選擇權教室 - 20題全攻略</title>
+    <!-- React & ReactDOM CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-image: radial-gradient(#000000 1.2px, transparent 0);
+            background-size: 20px 20px;
+            background-attachment: fixed;
+            background-color: #00D1FF;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        .animate-shake { animation: shake 0.2s ease-in-out infinite; }
+        
+        .pop-card {
+            box-shadow: 12px 12px 0px 0px rgba(0,0,0,1);
+            border: 4px solid #000;
+        }
+
+        .btn-pop {
+            box-shadow: 6px 6px 0px 0px rgba(0,0,0,1);
+            border: 3px solid #000;
+            transition: all 0.1s;
+        }
+        .btn-pop:active {
+            transform: translate(3px, 3px);
+            box-shadow: 3px 3px 0px 0px rgba(0,0,0,1);
+        }
+
+        .fluid-text-title { font-size: clamp(1.8rem, 5vw, 3.5rem); }
+        .fluid-text-q { font-size: clamp(1.2rem, 3vw, 1.8rem); }
+        .fluid-spacing { padding: clamp(1rem, 4vw, 2.5rem); }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // SVG Icons defined as components to avoid dependency issues
+        const IconBook = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>;
+        const IconZap = ({ size = 24 }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>;
+        const IconCheck = () => <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>;
+        const IconAlert = () => <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>;
+        const IconRefresh = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path><path d="M16 16h5v5"></path></svg>;
+
+        const questions = [
+            {
+                title: "履約價與權利金",
+                question: "台指選 30,000 點時，歐大支付 80 點買入 30,100 的 Call，若不計交易成本，這 80 點相當於台幣多少錢？",
+                options: ["4,000 元", "1,600 元", "8,000 元", "40,000 元"],
+                answer: 0,
+                explanation: "台指選擇權一點價值 50 元。80 點 × 50 元 = 4,000 元。這是買方的權利金成本。"
+            },
+            {
+                title: "履約價與權利金",
+                question: "當現貨為 30,000 點，30,200 的 Call 權利金為 150 點，此時它的「內涵價值」為多少點？",
+                options: ["150 點", "200 點", "0 點", "50 點"],
+                answer: 2,
+                explanation: "因為現價(30,000)低於履約價(30,200)，該 Call 處於價外，內涵價值為 0。目前的權利金完全由時間價值組成。"
+            },
+            {
+                title: "履約價與權利金",
+                question: "台指選合約規格中，履約價間隔通常隨指數高低調整，目前 30,000 點附近的週選擇權間隔通常是？",
+                options: ["10 點", "25 點", "50 點", "100 點"],
+                answer: 2, // 修改為 50 點
+                explanation: "為了增加交易靈活性，目前台指週選擇權在指數高檔時，近價位區間的履約價間隔通常設定為 50 點。"
+            },
+            {
+                title: "履約價與權利金",
+                question: "歐大買入 29,800 的 Put。若指數在 30,000 點，此 Put 具有內涵價值嗎？",
+                options: ["有，200 點", "有，100 點", "沒有，內涵價值為 0", "不一定"],
+                answer: 2,
+                explanation: "Put 是「賣出的權利」。當現價(30,000)高於履約價(29,800)，賣在高處才有利，現在賣更低沒意義，故為價外，內涵價值為 0。"
+            },
+            {
+                title: "價內外三態",
+                question: "目前台指 30,000 點，歐大持有的「30,000 Call」被稱為什麼狀態？",
+                options: ["ITM (價內)", "ATM (價平)", "OTM (價外)", "UTM (超價外)"],
+                answer: 1,
+                explanation: "當履約價等於或最接近現貨價格時，稱為 ATM (At-the-money) 價平。"
+            },
+            {
+                title: "價內外三態",
+                question: "台指 30,000 點，29,700 的 Call 屬於哪種狀態？",
+                options: ["ITM (價內)", "ATM (價平)", "OTM (價外)", "深度價外"],
+                answer: 0,
+                explanation: "對 Call 而言，履約價(29,700)低於現價(30,000)即為價內 (In-the-money)，因為它已經具有 300 點的內涵價值。"
+            },
+            {
+                title: "價內外三態",
+                question: "若台指跌至 29,500 點，歐大之前買的 30,000 Call 會變成什麼？",
+                options: ["越趨價內", "越趨價外", "保持價平", "無法判斷"],
+                answer: 1,
+                explanation: "當行情下跌，低於 Call 的履約價時，Call 會往價外 (Out-of-the-money) 移動。"
+            },
+            {
+                title: "價內外三態",
+                question: "30,000 點時，30,500 的 Put 是屬於？",
+                options: ["ITM (價內)", "ATM (價平)", "OTM (價外)", "不知道"],
+                answer: 0,
+                explanation: "Put 是看跌。履約價(30,500)高於現價(30,000)，代表你可以用 30,500 賣出(現在市價僅 30,000)，故為價內。"
+            },
+            {
+                title: "結算與到期",
+                question: "選擇權的「融冰效應」是指哪一項價值會隨著時間流逝而縮減？",
+                options: ["內涵價值", "保證金", "時間價值", "標的點數"],
+                answer: 2,
+                explanation: "選擇權合約有到期日。越接近到期，獲利的機率與彈性越小，時間價值 (Time Value) 會像冰塊一樣融化至歸零。"
+            },
+            {
+                title: "結算與到期",
+                question: "歐大常說「買方怕盤整」，主要是因為什麼效應？",
+                options: ["Delta 變動", "Vega 變動", "Theta (時間流逝)", "Gamma 變動"],
+                answer: 2,
+                explanation: "Theta 代表時間流逝的成本。盤整時指數沒動，但時間天天過，買方會不斷損失時間價值。"
+            },
+            {
+                title: "結算與到期",
+                question: "台指選擇權採用何種結算方式？",
+                options: ["實物交割（交割股票）", "現金結算", "強制轉倉", "手動平倉"],
+                answer: 1,
+                explanation: "台指選擇權在到期日直接以「現金」結算差價，不需要真的去買賣指數成份股。"
+            },
+            {
+                title: "結算與到期",
+                question: "在到期日當天，哪一種狀態的選擇權權利金會徹底歸零？",
+                options: ["價內 ITM", "價平 ATM", "價外 OTM", "所有狀態都會歸零"],
+                answer: 2,
+                explanation: "價外選擇權 (OTM) 在到期時因為沒有履行價值（內涵價值為0），所以權利金會完全歸零。"
+            },
+            {
+                title: "保證金與風險",
+                question: "歐大今天想要「賣出」一個 Call (Sell Call)，他必須在帳戶準備什麼？",
+                options: ["僅需權利金", "僅需手續費", "履約價全額", "保證金 (Margin)"],
+                answer: 3,
+                explanation: "賣方有履行的義務，風險較大，因此期交所要求賣方必須預留「保證金」以確保違約時能賠得起。"
+            },
+            {
+                title: "保證金與風險",
+                question: "當歐大的賣方部位保證金低於「維持保證金」時，會發生什麼事？",
+                options: ["自動獲利", "收到追繳通知 (Margin Call)", "帳戶被封鎖", "不影響"],
+                answer: 1,
+                explanation: "低於維持保證金會收到追繳通知。若未在期限內補足或自行平倉，可能會面臨期貨商強制沖銷（斷頭）。"
+            },
+            {
+                title: "保證金與風險",
+                question: "買方 (Buyer) 是否會遇到保證金追繳的情況？",
+                options: ["會", "不會", "行情劇烈時會", "保證金不足時會"],
+                answer: 1,
+                explanation: "買方支付權利金後即享有權利，最大損失就是權利金，因此沒有保證金追繳的問題。"
+            },
+            {
+                title: "保證金與風險",
+                question: "哪一種策略被稱為「風險無限，獲利有限」？",
+                options: ["Buy Call", "Buy Put", "Sell Put", "牛市價差"],
+                answer: 2,
+                explanation: "單純的賣方 (Naked Seller) 獲利上限是收到的權利金，但行情大反轉時損失可能極大，且需面對保證金壓力。"
+            },
+            {
+                title: "結算日大揭密",
+                question: "台指選擇權在結算當天，結算價格是如何計算的？",
+                options: ["最後一筆成交價", "當天最高價", "13:00~13:30 標的指數簡單平均價", "開盤價"],
+                answer: 2,
+                explanation: "最後交易日 13:00 至 13:30 標的指數之簡單算術平均價為結算價。這是為了防止大戶在最後一秒刻意操縱。"
+            },
+            {
+                title: "結算日大揭密",
+                question: "結算日當天 13:30 之後，未平倉的部位會如何？",
+                options: ["自動作廢", "自動參與現金結算", "轉入下一個交易日", "變成期貨部位"],
+                answer: 1,
+                explanation: "未平倉部位會依據公告的「最後結算價」自動進行現金損益結算。"
+            },
+            {
+                title: "結算日大揭密",
+                question: "為什麼結算日 13:00 之後行情常有劇烈波動？",
+                options: ["因為大戶在算平均價", "因為大家都想收工", "因為保證金減半", "不一定，看歐大心情"],
+                answer: 0,
+                explanation: "13:00~13:30 是結算價計算時間，法人與大戶會在此時進行最後的避險或套利操作，導致震盪加劇。"
+            },
+            {
+                title: "結算日大揭密",
+                question: "歐大建議：若不想參與結算日最後 30 分鐘的震盪，最好怎麼做？",
+                options: ["全押", "提早平倉或轉倉", "關掉電腦", "改做股票"],
+                answer: 1,
+                explanation: "為了避開 13:00~13:30 的不可預測性，穩健的投資者會選擇在當天上午或前一日就處理好部位。"
+            }
+        ];
+
+        function App() {
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [selectedOption, setSelectedOption] = useState(null);
+            const [showExplanation, setShowExplanation] = useState(false);
+            const [score, setScore] = useState(0);
+            const [isWrong, setIsWrong] = useState(false);
+            const [quizComplete, setQuizComplete] = useState(false);
+
+            const handleAnswer = (index) => {
+                if (showExplanation) return;
+                
+                setSelectedOption(index);
+                setShowExplanation(true);
+
+                if (index === questions[currentQuestion].answer) {
+                    setScore(score + 1);
+                    setIsWrong(false);
+                } else {
+                    setIsWrong(true);
+                    if (navigator.vibrate) {
+                        navigator.vibrate([200, 100, 200]);
+                    }
+                }
+            };
+
+            const nextQuestion = () => {
+                if (currentQuestion < questions.length - 1) {
+                    setCurrentQuestion(currentQuestion + 1);
+                    setSelectedOption(null);
+                    setShowExplanation(false);
+                    setIsWrong(false);
+                } else {
+                    setQuizComplete(true);
+                }
+            };
+
+            const resetQuiz = () => {
+                setCurrentQuestion(0);
+                setSelectedOption(null);
+                setShowExplanation(false);
+                setScore(0);
+                setIsWrong(false);
+                setQuizComplete(false);
+            };
+
+            return (
+                <div className="min-h-screen p-4 md:p-10 selection:bg-yellow-300">
+                    <div className="max-w-4xl mx-auto">
+                        {/* Header */}
+                        <header className="mb-10 bg-[#FFD700] pop-card p-6 rotate-[-1deg] relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-2 opacity-20">
+                                <IconZap size={80} />
+                            </div>
+                            <h1 className="fluid-text-title font-black italic tracking-tighter uppercase text-center md:text-left">
+                                歐大選擇權教室
+                            </h1>
+                            <div className="flex gap-2 mt-2">
+                                <span className="bg-black text-white px-3 py-1 font-bold text-sm uppercase">20題 全攻略</span>
+                            </div>
+                        </header>
+
+                        {!quizComplete ? (
+                            <div className={isWrong ? 'animate-shake' : ''}>
+                                {/* Question Card */}
+                                <div className={`pop-card fluid-spacing mb-8 transition-colors duration-300 ${isWrong ? 'bg-red-500' : 'bg-white'}`}>
+                                    <div className="flex justify-between items-center mb-6">
+                                        <div className="flex items-center gap-2">
+                                            <div className="bg-yellow-400 border-2 border-black p-1">
+                                                <IconBook />
+                                            </div>
+                                            <span className="font-black text-sm md:text-base uppercase tracking-widest bg-black text-white px-2">
+                                                {questions[currentQuestion].title}
+                                            </span>
+                                        </div>
+                                        <div className="font-black text-xl">
+                                            {currentQuestion + 1} / {questions.length}
+                                        </div>
+                                    </div>
+                                    
+                                    <h2 className={`fluid-text-q font-black leading-tight mb-8 ${isWrong ? 'text-white' : 'text-black'}`}>
+                                        {questions[currentQuestion].question}
+                                    </h2>
+
+                                    <div className="grid grid-cols-1 gap-4">
+                                        {questions[currentQuestion].options.map((option, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleAnswer(idx)}
+                                                disabled={showExplanation}
+                                                className={`
+                                                    btn-pop text-left p-4 md:p-6 font-bold text-base md:text-xl flex items-center gap-4
+                                                    ${showExplanation 
+                                                        ? (idx === questions[currentQuestion].answer 
+                                                            ? 'bg-green-400 text-black scale-102 z-10 border-green-700' 
+                                                            : (selectedOption === idx ? 'bg-black text-white opacity-90' : 'bg-gray-100 text-gray-400 border-gray-300'))
+                                                        : 'bg-white text-black hover:bg-cyan-200'
+                                                    }
+                                                `}
+                                            >
+                                                <span className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 border-4 border-black bg-yellow-400 flex items-center justify-center text-black font-black italic">
+                                                    {String.fromCharCode(65 + idx)}
+                                                </span>
+                                                {option}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Explanation Section */}
+                                {showExplanation && (
+                                    <div className="pop-card bg-[#FF5733] fluid-spacing animate-in fade-in slide-in-from-bottom-6 duration-500 mb-20 relative">
+                                        <div className="absolute -top-6 left-10 bg-black text-white px-4 py-1 font-black skew-x-[-10deg] border-2 border-white">
+                                            歐大說：
+                                        </div>
+                                        <div className="flex flex-col md:flex-row items-center md:items-start gap-6 text-white">
+                                            <div className="shrink-0 bg-white border-4 border-black p-3 rotate-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                                {selectedOption === questions[currentQuestion].answer ? (
+                                                    <IconCheck />
+                                                ) : (
+                                                    <IconAlert />
+                                                )}
+                                            </div>
+                                            <div className="flex-1 text-center md:text-left">
+                                                <p className="text-lg md:text-2xl font-black leading-snug mb-6 drop-shadow-sm">
+                                                    {questions[currentQuestion].explanation}
+                                                </p>
+                                                <button
+                                                    onClick={nextQuestion}
+                                                    className="w-full md:w-auto bg-black text-white px-12 py-4 font-black text-xl btn-pop hover:bg-yellow-300 hover:text-black uppercase italic tracking-widest"
+                                                >
+                                                    {currentQuestion === questions.length - 1 ? "看總分 ⮕" : "下一題 NEXT"}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            /* Result Screen */
+                            <div className="pop-card bg-white p-10 text-center rotate-[1deg] mb-20 border-8">
+                                <h2 className="text-4xl md:text-6xl font-black mb-6 uppercase italic">測驗達成！</h2>
+                                <div className="inline-block relative mb-8">
+                                    <div className="absolute inset-0 bg-yellow-400 translate-x-2 translate-y-2 border-4 border-black"></div>
+                                    <div className="relative bg-white border-4 border-black px-10 py-6 text-7xl md:text-9xl font-black text-red-500">
+                                        {Math.round((score / questions.length) * 100)}<span className="text-3xl">%</span>
+                                    </div>
+                                </div>
+                                <p className="text-2xl md:text-3xl font-black mb-10 leading-tight">
+                                    歐大評價：
+                                    <br />
+                                    <span className="bg-cyan-300 border-2 border-black px-4 mt-2 inline-block shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                        {score === 20 ? "🚀 完美！你是未來的歐大！" : (score >= 15 ? "🔥 強大！實力非常堅實！" : "🧘 再練練，機率在等你！")}
+                                    </span>
+                                </p>
+                                <button
+                                    onClick={resetQuiz}
+                                    className="flex items-center gap-3 mx-auto bg-yellow-400 text-black px-12 py-5 font-black text-2xl btn-pop hover:bg-cyan-300"
+                                >
+                                    <IconRefresh /> 再次挑戰
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Floating Progress */}
+                        {!quizComplete && (
+                            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 px-4 w-full max-w-md">
+                                <div className="flex-1 bg-white border-4 border-black h-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                                    <div 
+                                        className="h-full bg-[#00D1FF] transition-all duration-500 border-r-4 border-black" 
+                                        style={{ width: `${(currentQuestion / questions.length) * 100}%` }}
+                                    ></div>
+                                </div>
+                                <div className="bg-black text-white px-4 py-1 font-black border-2 border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                    SCORE: {score}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
