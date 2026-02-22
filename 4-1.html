@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BOOM! Delta 方向敏感度圖解 | 歐大選擇權教室</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,12 +11,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* 極速普普風專屬色調 */
         :root {
             --c-bg: #FAF9F6;
-            --c-call: #3B82F6; /* 正 Delta 藍 */
-            --c-put: #EF4444;  /* 負 Delta 紅 */
-            --c-accent: #FDE047; /* 亮黃 */
+            --c-call: #3B82F6; 
+            --c-put: #EF4444;  
+            --c-accent: #FDE047; 
             --c-dark: #0F172A;
             --c-halftone: #CBD5E1;
         }
@@ -25,8 +24,9 @@
             font-family: 'Noto Sans TC', sans-serif;
             background-color: var(--c-bg);
             color: var(--c-dark);
-            background-image: radial-gradient(var(--c-halftone) 2px, transparent 2px);
-            background-size: 32px 32px;
+            background-image: radial-gradient(var(--c-halftone) 1px, transparent 1px);
+            background-size: 24px 24px;
+            overflow-x: hidden;
         }
 
         .font-comic {
@@ -34,31 +34,45 @@
             letter-spacing: 0.05em;
         }
 
-        /* 普普風卡通框線與深度陰影 */
+        /* 普普風卡通框線與深度陰影 - 行動端微調 */
         .pop-card {
-            border: 5px solid var(--c-dark);
-            border-radius: 1.5rem;
+            border: 4px solid var(--c-dark);
+            border-radius: 1rem;
             background-color: white;
-            box-shadow: 12px 12px 0px var(--c-dark);
+            box-shadow: 6px 6px 0px var(--c-dark);
             transition: all 0.2s ease;
         }
 
-        .pop-card:hover {
-            transform: translate(-3px, -3px);
-            box-shadow: 15px 15px 0px var(--c-dark);
+        @media (min-width: 768px) {
+            .pop-card {
+                border-width: 5px;
+                border-radius: 1.5rem;
+                box-shadow: 12px 12px 0px var(--c-dark);
+            }
+        }
+
+        .pop-card:active {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0px var(--c-dark);
         }
 
         /* 膠囊容器 */
         .capsule-container {
             background: white;
-            border: 4px solid var(--c-dark);
+            border: 3px solid var(--c-dark);
             border-radius: 9999px;
-            box-shadow: 0 8px 0 var(--c-dark);
+            box-shadow: 0 4px 0 var(--c-dark);
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
-            max-width: 900px;
+        }
+
+        @media (min-width: 768px) {
+            .capsule-container {
+                border-width: 4px;
+                box-shadow: 0 8px 0 var(--c-dark);
+            }
         }
 
         /* 儀表板動畫 */
@@ -67,171 +81,177 @@
             transform-origin: 100px 100px;
         }
 
-        /* 拉桿樣式 */
+        /* 拉桿樣式優化 - 觸控友善 */
         input[type=range] {
             -webkit-appearance: none;
             width: 100%;
             background: transparent;
+            cursor: pointer;
         }
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
-            height: 20px;
+            height: 16px;
             background: var(--c-dark);
             border-radius: 10px;
             border: 2px solid white;
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 44px;
-            width: 44px;
-            border-radius: 12px;
+            height: 40px;
+            width: 40px;
+            border-radius: 10px;
             background: var(--c-accent);
-            cursor: pointer;
             margin-top: -14px;
-            border: 4px solid var(--c-dark);
-            box-shadow: 0 5px 0 var(--c-dark);
+            border: 3px solid var(--c-dark);
+            box-shadow: 0 4px 0 var(--c-dark);
         }
 
         .mode-btn.active {
             background-color: var(--c-dark);
             color: white;
-            transform: scale(1.05);
+            transform: scale(1.02);
         }
 
-        /* 曲線圖填充動畫 */
         #curveArea {
             transition: d 0.5s ease;
         }
 
-        @media (max-width: 640px) {
-            .pop-card { border-width: 4px; box-shadow: 8px 8px 0px var(--c-dark); }
+        /* 防止文字選取 */
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center p-4 sm:p-8">
+<body class="min-h-screen flex flex-col items-center p-3 sm:p-8">
 
     <!-- 頁首 -->
-    <header class="w-full flex justify-center mb-12">
-        <div class="capsule-container px-6 py-3 flex-row gap-4">
-            <div class="w-14 h-14 rounded-xl border-4 border-[var(--c-dark)] overflow-hidden bg-white shrink-0">
+    <header class="w-full flex justify-center mb-8 sm:mb-12">
+        <div class="capsule-container px-4 py-2 sm:px-6 sm:py-3 max-w-2xl flex-row gap-3 sm:gap-4">
+            <div class="w-10 h-10 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl border-2 sm:border-4 border-[var(--c-dark)] overflow-hidden bg-white shrink-0">
                 <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/3B82F6/FFFFFF?text=Logo&font=Bangers'">
             </div>
             <div class="flex flex-col">
-                <h1 class="text-2xl sm:text-3xl font-black text-[var(--c-dark)] leading-none tracking-tight">歐大選擇權教室</h1>
-                <p class="text-xs font-black text-[var(--c-call)] tracking-[0.2em] uppercase mt-1 font-comic">GREEKS MASTERCLASS</p>
+                <h1 class="text-lg sm:text-2xl md:text-3xl font-black text-[var(--c-dark)] leading-none tracking-tight">歐大選擇權教室</h1>
+                <p class="text-[8px] sm:text-xs font-black text-[var(--c-call)] tracking-[0.15em] uppercase mt-0.5 sm:mt-1 font-comic">GREEKS MASTERCLASS</p>
             </div>
         </div>
     </header>
 
-    <main class="w-full max-w-6xl flex flex-col gap-12">
+    <main class="w-full max-w-5xl flex flex-col gap-8 sm:gap-16">
         
-        <!-- 大標題 -->
-        <div class="text-center">
-            <div class="inline-block bg-[var(--c-accent)] px-8 py-5 pop-card transform rotate-1 relative">
-                <div class="absolute -top-8 -left-8 text-6xl md:text-8xl transform -rotate-12">⚡</div>
-                <h2 class="text-4xl sm:text-6xl md:text-7xl font-black text-[var(--c-dark)] tracking-wide font-comic uppercase">
+        <!-- 大標題區 -->
+        <div class="text-center px-2">
+            <div class="inline-block bg-[var(--c-accent)] px-6 py-4 sm:px-10 sm:py-6 pop-card transform -rotate-1 relative">
+                <div class="absolute -top-6 -left-6 sm:-top-10 sm:-left-10 text-5xl sm:text-8xl transform -rotate-12 no-select">⚡</div>
+                <h2 class="text-4xl sm:text-7xl font-black text-[var(--c-dark)] tracking-wider font-comic uppercase">
                     Delta
                 </h2>
-                <div class="mt-2 text-xl md:text-3xl font-black text-white bg-[var(--c-call)] px-5 py-2 inline-block rounded-xl border-4 border-black shadow-[4px_4px_0_#000]">
+                <div class="mt-2 text-base sm:text-2xl font-black text-white bg-[var(--c-call)] px-4 py-1.5 sm:px-6 sm:py-2 inline-block rounded-lg sm:rounded-xl border-2 sm:border-4 border-black shadow-[3px_3px_0_#000]">
                     方向敏感度：獲利的油門
                 </div>
             </div>
         </div>
 
         <!-- Delta 核心觀念區 -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
-            <div class="pop-card p-8 flex flex-col justify-center relative overflow-hidden">
-                <div class="absolute -bottom-6 -right-6 text-9xl opacity-5 font-black">Δ</div>
-                <h3 class="text-2xl md:text-3xl font-black mb-4 flex items-center gap-2">
-                    <span class="bg-[var(--c-dark)] text-white w-10 h-10 rounded-full flex items-center justify-center font-comic">?</span>
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 w-full">
+            <div class="pop-card p-6 sm:p-8 flex flex-col justify-center relative overflow-hidden">
+                <div class="absolute -bottom-6 -right-6 text-8xl sm:text-9xl opacity-5 font-black no-select">Δ</div>
+                <h3 class="text-xl sm:text-2xl font-black mb-4 flex items-center gap-2">
+                    <span class="bg-[var(--c-dark)] text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-comic">?</span>
                     Delta 是什麼？
                 </h3>
-                <p class="text-lg font-bold text-gray-700 leading-relaxed">
+                <p class="text-base sm:text-lg font-bold text-gray-700 leading-relaxed">
                     它是衡量<strong class="text-[var(--c-dark)] underline decoration-4 decoration-[var(--c-accent)]">方向敏感度</strong>的指標。<br>
-                    標的（大盤）每變動 <strong class="text-[var(--c-call)] text-2xl">1 點</strong>，選擇權價格大約會跟著變動多少點。
+                    標的（大盤）每變動 <strong class="text-[var(--c-call)] text-xl sm:text-2xl font-comic">1 點</strong>，選擇權價格跟著變動的點數。
                 </p>
-                <div class="mt-6 p-4 bg-gray-50 rounded-xl border-4 border-dashed border-gray-200">
-                    <p class="font-comic text-xl text-center">Δ = 選擇權價變 / 標的價變</p>
+                <div class="mt-6 p-3 sm:p-4 bg-gray-50 rounded-xl border-2 sm:border-4 border-dashed border-gray-200">
+                    <p class="font-comic text-lg sm:text-xl text-center">$\Delta = \frac{\text{選擇權價變}}{\text{標的價變}}$</p>
                 </div>
             </div>
 
-            <div class="pop-card p-8 bg-[var(--c-dark)] text-white flex flex-col justify-center">
-                <h3 class="text-2xl font-black mb-6 text-[var(--c-accent)] uppercase font-comic tracking-widest">Range & Direction</h3>
-                <div class="grid grid-cols-2 gap-6">
-                    <div class="border-2 border-white/20 p-4 rounded-xl">
-                        <div class="text-xs font-black text-gray-400 mb-1">買權 CALL</div>
-                        <div class="text-3xl font-black text-[var(--c-call)] font-comic">0 ~ +1</div>
-                        <p class="text-[10px] mt-2 font-bold text-gray-300">大盤漲 ➔ 選擇權漲 (正向)</p>
+            <div class="pop-card p-6 sm:p-8 bg-[var(--c-dark)] text-white flex flex-col justify-center">
+                <h3 class="text-lg sm:text-xl font-black mb-6 text-[var(--c-accent)] uppercase font-comic tracking-widest">Range & Direction</h3>
+                <div class="grid grid-cols-2 gap-4 sm:gap-6">
+                    <div class="border-2 border-white/10 p-3 sm:p-4 rounded-xl bg-white/5">
+                        <div class="text-[10px] sm:text-xs font-black text-gray-400 mb-1 uppercase">買權 CALL</div>
+                        <div class="text-2xl sm:text-3xl font-black text-[var(--c-call)] font-comic">0 ~ +1</div>
+                        <p class="text-[9px] sm:text-[10px] mt-1 font-bold text-gray-400 leading-tight">正向變動</p>
                     </div>
-                    <div class="border-2 border-white/20 p-4 rounded-xl">
-                        <div class="text-xs font-black text-gray-400 mb-1">賣權 PUT</div>
-                        <div class="text-3xl font-black text-[var(--c-put)] font-comic">0 ~ -1</div>
-                        <p class="text-[10px] mt-2 font-bold text-gray-300">大盤漲 ➔ 選擇權跌 (反向)</p>
+                    <div class="border-2 border-white/10 p-3 sm:p-4 rounded-xl bg-white/5">
+                        <div class="text-[10px] sm:text-xs font-black text-gray-400 mb-1 uppercase">賣權 PUT</div>
+                        <div class="text-2xl sm:text-3xl font-black text-[var(--c-put)] font-comic">0 ~ -1</div>
+                        <p class="text-[9px] sm:text-[10px] mt-1 font-bold text-gray-400 leading-tight">反向變動</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- ★ 核心互動：Delta 速度模擬儀 ★ -->
-        <section class="flex flex-col items-center mt-6">
-            <h3 class="text-2xl md:text-4xl font-black mb-8 text-[var(--c-dark)] tracking-wide text-center bg-white px-8 py-3 pop-card inline-block border-dashed">
-                🕹️ Delta 速度模擬儀 (台指 30,000)
+        <section class="flex flex-col items-center">
+            <h3 class="text-lg sm:text-3xl font-black mb-6 text-[var(--c-dark)] tracking-wide text-center bg-white px-6 py-2 sm:px-8 sm:py-3 pop-card inline-block border-dashed">
+                🕹️ Delta 速度模擬儀
             </h3>
             
-            <div class="w-full pop-card bg-[#1E293B] p-6 md:p-12 relative overflow-hidden">
-                <div class="absolute inset-0 opacity-10" style="background: repeating-linear-gradient(90deg, transparent, transparent 40px, #fff 40px, #fff 41px);"></div>
+            <div class="w-full pop-card bg-[#1E293B] p-5 sm:p-10 relative overflow-hidden">
+                <div class="absolute inset-0 opacity-5 pointer-events-none" style="background: repeating-linear-gradient(90deg, transparent, transparent 40px, #fff 40px, #fff 41px);"></div>
                 
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
-                    <div class="lg:col-span-5 flex flex-col items-center">
-                        <div class="relative w-64 h-64 bg-white border-[6px] border-[var(--c-dark)] rounded-full shadow-[0_15px_0_#000] flex items-center justify-center">
-                            <svg viewBox="0 0 200 200" class="w-full h-full">
-                                <path d="M 40 140 A 75 75 0 1 1 160 140" fill="none" stroke="#E2E8F0" stroke-width="20" stroke-linecap="round"/>
+                <div class="flex flex-col lg:grid lg:grid-cols-12 gap-8 sm:gap-12 items-center relative z-10">
+                    <!-- 儀表板 -->
+                    <div class="lg:col-span-5 w-full flex flex-col items-center">
+                        <div class="relative w-56 h-56 sm:w-64 sm:h-64 bg-white border-[4px] sm:border-[6px] border-[var(--c-dark)] rounded-full shadow-[0_8px_0_#000] sm:shadow-[0_15px_0_#000] flex items-center justify-center">
+                            <svg viewBox="0 0 200 200" class="w-full h-full p-2">
+                                <path d="M 40 140 A 75 75 0 1 1 160 140" fill="none" stroke="#F1F5F9" stroke-width="20" stroke-linecap="round"/>
                                 <path id="gaugePath" d="M 40 140 A 75 75 0 0 1 100 25" fill="none" stroke="var(--c-call)" stroke-width="20" stroke-linecap="round"/>
                                 <g id="gaugeNeedle" class="needle" style="transform: rotate(0deg);">
                                     <path d="M 100 100 L 100 35" stroke="var(--c-dark)" stroke-width="6" stroke-linecap="round"/>
                                     <circle cx="100" cy="100" r="10" fill="var(--c-dark)"/>
                                 </g>
-                                <text x="40" y="160" text-anchor="middle" font-weight="900" font-size="12">0</text>
-                                <text x="100" y="20" text-anchor="middle" font-weight="900" font-size="12">0.5</text>
-                                <text x="160" y="160" text-anchor="middle" font-weight="900" font-size="12">1.0</text>
+                                <text x="40" y="160" text-anchor="middle" font-weight="900" font-size="10" class="fill-gray-400">0</text>
+                                <text x="100" y="20" text-anchor="middle" font-weight="900" font-size="10" class="fill-gray-400">0.5</text>
+                                <text x="160" y="160" text-anchor="middle" font-weight="900" font-size="10" class="fill-gray-400">1.0</text>
                             </svg>
-                            <div class="absolute bottom-10 flex flex-col items-center">
-                                <span class="text-[10px] font-black text-gray-400 uppercase">Delta Value</span>
-                                <span id="deltaNum" class="text-4xl font-black font-comic text-[var(--c-dark)]">0.50</span>
+                            <div class="absolute bottom-8 sm:bottom-10 flex flex-col items-center">
+                                <span class="text-[9px] sm:text-[10px] font-black text-gray-400 uppercase tracking-widest">Current Delta</span>
+                                <span id="deltaNum" class="text-3xl sm:text-4xl font-black font-comic text-[var(--c-dark)]">0.50</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="lg:col-span-7 flex flex-col gap-8">
-                        <div class="flex flex-wrap gap-3">
-                            <button onclick="setContract('otm')" id="btn-otm" class="mode-btn flex-1 py-3 border-4 border-black rounded-xl font-black text-sm bg-gray-100 transition-all">🎈 遠價外</button>
-                            <button onclick="setContract('atm')" id="btn-atm" class="mode-btn active flex-1 py-3 border-4 border-black rounded-xl font-black text-sm bg-gray-100 transition-all">🔥 價平附近</button>
-                            <button onclick="setContract('itm')" id="btn-itm" class="mode-btn flex-1 py-3 border-4 border-black rounded-xl font-black text-sm bg-gray-100 transition-all">💎 深價內</button>
+                    <!-- 控制與數據 -->
+                    <div class="lg:col-span-7 w-full flex flex-col gap-6 sm:gap-8">
+                        <!-- 切換按鈕 -->
+                        <div class="flex gap-2 sm:gap-3">
+                            <button onclick="setContract('otm')" id="btn-otm" class="mode-btn flex-1 py-3 border-2 sm:border-4 border-black rounded-lg sm:rounded-xl font-black text-xs sm:text-sm bg-gray-100 transition-all">🎈 價外</button>
+                            <button onclick="setContract('atm')" id="btn-atm" class="mode-btn active flex-1 py-3 border-2 sm:border-4 border-black rounded-lg sm:rounded-xl font-black text-xs sm:text-sm bg-gray-100 transition-all">🔥 價平</button>
+                            <button onclick="setContract('itm')" id="btn-itm" class="mode-btn flex-1 py-3 border-2 sm:border-4 border-black rounded-lg sm:rounded-xl font-black text-xs sm:text-sm bg-gray-100 transition-all">💎 價內</button>
                         </div>
 
-                        <div class="bg-white/95 p-6 rounded-2xl border-4 border-black shadow-[4px_4px_0_var(--c-call)]">
-                            <div class="flex justify-between items-end mb-4">
-                                <span class="text-gray-500 font-black text-xs uppercase tracking-widest">模擬台指大盤跳動</span>
+                        <!-- 拉桿區 -->
+                        <div class="bg-white p-5 sm:p-6 rounded-2xl border-2 sm:border-4 border-black shadow-[4px_4px_0_var(--c-call)]">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-gray-400 font-black text-[10px] uppercase tracking-widest">台指期大盤模擬</span>
                                 <div class="flex items-baseline gap-1">
-                                    <span id="indexVal" class="text-4xl font-black text-[var(--c-call)] font-comic">30,000</span>
-                                    <span class="text-sm font-bold text-gray-400">點</span>
+                                    <span id="indexVal" class="text-2xl sm:text-4xl font-black text-[var(--c-call)] font-comic">30,000</span>
+                                    <span class="text-[10px] font-bold text-gray-400">PTS</span>
                                 </div>
                             </div>
                             <input type="range" id="indexSlider" min="29500" max="30500" step="10" value="30000">
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class="bg-[var(--c-dark)] p-5 rounded-2xl border-b-4 border-[var(--c-accent)]">
-                                <span class="text-gray-500 text-[10px] font-black uppercase">價格敏感度</span>
-                                <p id="sensitivityText" class="text-white font-bold text-sm mt-2">
-                                    大盤漲 100 點 ➔ <br><span class="text-[var(--c-accent)] text-2xl font-comic">漲 50.0 點</span>
+                        <!-- 數據卡片 -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            <div class="bg-[#2D3748] p-4 sm:p-5 rounded-xl border-b-4 border-[var(--c-accent)]">
+                                <span class="text-gray-500 text-[10px] font-black uppercase">價格連動性</span>
+                                <p id="sensitivityText" class="text-white font-bold text-sm sm:text-base mt-2">
+                                    漲 100 點 ➔ <br><span class="text-[var(--c-accent)] text-xl sm:text-2xl font-comic">漲 50.0 點</span>
                                 </p>
                             </div>
-                            <div class="bg-[var(--c-dark)] p-5 rounded-2xl border-b-4 border-[var(--c-secondary)]">
-                                <span class="text-gray-500 text-[10px] font-black uppercase">估計獲勝機率</span>
-                                <div class="flex items-center gap-4 mt-2">
-                                    <div id="probNum" class="text-4xl font-black text-[var(--c-secondary)] font-comic">50%</div>
-                                    <p class="text-[10px] text-gray-400 font-bold leading-tight">到期變成<br>價內的機率</p>
+                            <div class="bg-[#2D3748] p-4 sm:p-5 rounded-xl border-b-4 border-blue-400">
+                                <span class="text-gray-500 text-[10px] font-black uppercase">估計勝率</span>
+                                <div class="flex items-center gap-3 mt-2">
+                                    <div id="probNum" class="text-3xl sm:text-4xl font-black text-blue-400 font-comic">50%</div>
+                                    <p class="text-[9px] sm:text-[10px] text-gray-400 font-bold leading-tight uppercase">In-the-money<br>Probability</p>
                                 </div>
                             </div>
                         </div>
@@ -240,121 +260,91 @@
             </div>
         </section>
 
-        <!-- ★ 追加功能：Delta 敏感度變動曲線 (仿 image_77dcad.png) ★ -->
+        <!-- ★ 互動體驗：Delta 曲線圖 ★ -->
         <section class="flex flex-col items-center">
-            <div class="w-full pop-card bg-[#E0F2F1] p-6 md:p-10 relative">
-                <div class="flex items-center gap-3 mb-8">
-                    <span class="text-3xl">🎮</span>
-                    <h3 class="text-2xl md:text-3xl font-black text-[var(--c-dark)]">互動體驗：調整看看</h3>
+            <div class="w-full pop-card bg-[#E0F2F1] p-5 sm:p-10 relative overflow-hidden">
+                <div class="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+                    <span class="text-2xl sm:text-3xl">📊</span>
+                    <h3 class="text-xl sm:text-3xl font-black text-[var(--c-dark)]">Delta 敏感度動態曲線</h3>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- 左側控制區 -->
-                    <div class="flex flex-col gap-6">
-                        <div class="bg-white p-6 rounded-2xl border-4 border-black shadow-[6px_6px_0_#000]">
-                            <span class="text-xs font-black text-gray-400 uppercase block mb-4">1. 選擇類型</span>
-                            <div class="flex gap-4">
-                                <button onclick="setCurveType('call')" id="curve-call" class="curve-mode-btn flex-1 py-3 border-4 border-black rounded-xl font-black text-sm bg-white transition-all active border-blue-500 text-blue-500">CALL</button>
-                                <button onclick="setCurveType('put')" id="curve-put" class="curve-mode-btn flex-1 py-3 border-4 border-black rounded-xl font-black text-sm bg-white transition-all">PUT</button>
+                <div class="flex flex-col lg:grid lg:grid-cols-3 gap-6 sm:gap-8">
+                    <!-- 控制區 -->
+                    <div class="flex flex-col gap-4 sm:gap-6 order-2 lg:order-1">
+                        <div class="bg-white p-4 sm:p-6 rounded-2xl border-2 sm:border-4 border-black shadow-[4px_4px_0_#000]">
+                            <span class="text-[10px] font-black text-gray-400 uppercase block mb-3">類型選擇</span>
+                            <div class="flex gap-2">
+                                <button onclick="setCurveType('call')" id="curve-call" class="curve-mode-btn flex-1 py-2 sm:py-3 border-2 sm:border-4 border-black rounded-lg sm:rounded-xl font-black text-xs sm:text-sm bg-white transition-all active border-blue-500 text-blue-500">CALL</button>
+                                <button onclick="setCurveType('put')" id="curve-put" class="curve-mode-btn flex-1 py-2 sm:py-3 border-2 sm:border-4 border-black rounded-lg sm:rounded-xl font-black text-xs sm:text-sm bg-white transition-all">PUT</button>
                             </div>
                         </div>
 
-                        <div class="bg-white p-6 rounded-2xl border-4 border-black shadow-[6px_6px_0_#000]">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="text-xs font-black text-gray-400 uppercase">2. 標的價格</span>
-                                <span id="curvePriceVal" class="text-3xl font-black text-orange-500 font-comic">30000</span>
+                        <div class="bg-white p-4 sm:p-6 rounded-2xl border-2 sm:border-4 border-black shadow-[4px_4px_0_#000]">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-[10px] font-black text-gray-400 uppercase">標的價格</span>
+                                <span id="curvePriceVal" class="text-xl sm:text-3xl font-black text-orange-500 font-comic">30000</span>
                             </div>
                             <input type="range" id="curveSlider" min="29000" max="31000" step="20" value="30000">
                         </div>
 
-                        <div class="bg-[var(--c-accent)] p-6 rounded-full border-4 border-black aspect-square flex flex-col items-center justify-center shadow-[8px_8px_0_#000]">
-                            <span class="text-[10px] font-black text-black/60 uppercase">當前 DELTA</span>
-                            <div id="curveDeltaDisplay" class="text-4xl md:text-5xl font-black font-comic">0.50</div>
+                        <div class="bg-[var(--c-accent)] p-4 sm:p-6 rounded-xl sm:rounded-full border-2 sm:border-4 border-black flex flex-row sm:flex-col items-center justify-between sm:justify-center shadow-[4px_4px_0_#000]">
+                            <span class="text-[10px] font-black text-black/60 uppercase">即時 Delta</span>
+                            <div id="curveDeltaDisplay" class="text-3xl sm:text-5xl font-black font-comic">0.50</div>
                         </div>
                     </div>
 
-                    <!-- 右側曲線圖區 -->
-                    <div class="lg:col-span-2 bg-white rounded-3xl border-4 border-black p-6 relative h-[400px] overflow-hidden">
-                        <div class="absolute top-4 left-6 text-gray-400 font-black text-[10px] tracking-widest uppercase">Delta 敏感度變動曲線</div>
-                        
-                        <svg viewBox="0 0 500 300" class="w-full h-full overflow-visible">
-                            <!-- X, Y 軸 -->
+                    <!-- 曲線圖 -->
+                    <div class="lg:col-span-2 bg-white rounded-2xl sm:rounded-3xl border-2 sm:border-4 border-black p-4 sm:p-6 relative h-[250px] sm:h-[400px] order-1 lg:order-2">
+                        <svg viewBox="0 0 500 300" class="w-full h-full overflow-visible" preserveAspectRatio="none">
                             <line x1="40" y1="20" x2="40" y2="280" stroke="#000" stroke-width="2"/>
                             <line x1="40" y1="150" x2="480" y2="150" stroke="#E2E8F0" stroke-width="2" stroke-dasharray="4 4"/>
                             <line x1="40" y1="280" x2="480" y2="280" stroke="#000" stroke-width="2"/>
-
-                            <!-- 座標刻度 -->
                             <text x="35" y="30" text-anchor="end" font-size="12" font-weight="900">1</text>
                             <text x="35" y="155" text-anchor="end" font-size="12" font-weight="900">0</text>
                             <text x="35" y="280" text-anchor="end" font-size="12" font-weight="900">-1</text>
-
-                            <!-- 動態填充與曲線 -->
                             <path id="curveArea" d="" fill="rgba(59, 130, 246, 0.2)" />
-                            <path id="curveLine" d="" fill="none" stroke="var(--c-call)" stroke-width="5" stroke-linecap="round"/>
-
-                            <!-- 當前位置掃描線 -->
-                            <line id="scanLine" x1="0" y1="30" x2="0" y2="280" stroke="#EF4444" stroke-width="3" stroke-dasharray="4 2"/>
+                            <path id="curveLine" d="" fill="none" stroke="var(--c-call)" stroke-width="6" stroke-linecap="round"/>
+                            <line id="scanLine" x1="0" y1="30" x2="0" y2="280" stroke="#EF4444" stroke-width="2" stroke-dasharray="4 2"/>
                             <circle id="scanDot" cx="0" cy="0" r="8" fill="#EF4444" stroke="#000" stroke-width="2"/>
                         </svg>
-
-                        <!-- X軸標籤 -->
-                        <div class="absolute bottom-2 left-0 w-full flex justify-between px-12 text-[10px] font-black text-gray-400">
-                            <span>29,000 (價外)</span>
-                            <span>30,000 (價平)</span>
-                            <span>31,000 (價內)</span>
+                        <div class="absolute bottom-2 left-0 w-full flex justify-between px-6 sm:px-12 text-[8px] sm:text-[10px] font-black text-gray-400 uppercase pointer-events-none">
+                            <span>OTM (價外)</span>
+                            <span>ATM (價平)</span>
+                            <span>ITM (價內)</span>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Delta 三大特性 -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="pop-card p-8 bg-white">
-                <div class="text-4xl mb-4">📈</div>
-                <h3 class="text-xl font-black mb-3">價格敏感度</h3>
-                <p class="text-sm font-bold text-gray-600 leading-relaxed">Delta 就是你的「連動比例」。Delta 0.6 代表大盤每漲 1 點，選擇權大約會漲 0.6 點。</p>
-            </div>
-            <div class="pop-card p-8 bg-white">
-                <div class="text-4xl mb-4">🎯</div>
-                <h3 class="text-xl font-black mb-3">勝率機率論</h3>
-                <p class="text-sm font-bold text-gray-600 leading-relaxed">實戰中常把 Delta 當成「變成價內的機率」。Delta 0.3 的合約，代表市場認為有 30% 的機率會贏。</p>
-            </div>
-            <div class="pop-card p-8 bg-white">
-                <div class="text-4xl mb-4">🚜</div>
-                <h3 class="text-xl font-black mb-3">倉位曝險量</h3>
-                <p class="text-sm font-bold text-gray-600 leading-relaxed">Delta 1.0 的合約，波動跟期貨一模一樣！你的風險與獲利空間就越接近標的資產。</p>
-            </div>
-        </section>
-
-        <!-- 表格 -->
+        <!-- 總結表格 -->
         <section class="w-full">
-            <h3 class="text-2xl md:text-3xl font-black mb-8 text-center font-comic uppercase tracking-widest">📊 Delta Quick Cheat Sheet</h3>
-            <div class="pop-card p-0 overflow-hidden shadow-blue-500/20">
+            <h3 class="text-xl sm:text-3xl font-black mb-6 sm:mb-8 text-center font-comic uppercase tracking-widest">📊 Quick Cheat Sheet</h3>
+            <div class="pop-card p-0 overflow-hidden">
                 <div class="w-full overflow-x-auto">
-                    <table class="w-full text-center border-collapse">
+                    <table class="w-full text-center border-collapse min-w-[500px]">
                         <thead>
                             <tr class="bg-[var(--c-dark)] text-white">
-                                <th class="py-6 px-6 font-black text-lg">合約位置</th>
-                                <th class="py-6 px-6 font-black text-lg border-x border-gray-700">CALL Delta</th>
-                                <th class="py-6 px-6 font-black text-lg">實戰特徵</th>
+                                <th class="py-4 px-4 font-black text-sm sm:text-lg">合約位置</th>
+                                <th class="py-4 px-4 font-black text-sm sm:text-lg border-x border-gray-700">CALL Delta</th>
+                                <th class="py-4 px-4 font-black text-sm sm:text-lg">實戰特徵</th>
                             </tr>
                         </thead>
-                        <tbody class="font-bold text-sm md:text-base divide-y-4 divide-gray-100">
+                        <tbody class="font-bold text-xs sm:text-base divide-y-2 divide-gray-100">
                             <tr>
-                                <td class="py-6 px-6 bg-gray-50 text-blue-600 italic">深價內 ITM</td>
-                                <td class="py-6 px-6 text-2xl font-comic">0.8 ~ 1.0</td>
-                                <td class="py-6 px-6 text-gray-600">🏃 非常接近期貨，勝率極高。</td>
+                                <td class="py-4 px-4 bg-gray-50 text-blue-600">深價內 ITM</td>
+                                <td class="py-4 px-4 text-xl sm:text-2xl font-comic">0.8 ~ 1.0</td>
+                                <td class="py-4 px-4 text-gray-500 text-left">🏃 趨近標的期貨，勝率極高。</td>
                             </tr>
-                            <tr class="bg-blue-50/30">
-                                <td class="py-6 px-6 font-black italic">價平 ATM</td>
-                                <td class="py-6 px-6 text-2xl font-comic text-[var(--c-call)]">約 0.5</td>
-                                <td class="py-6 px-6 text-[var(--c-dark)]">⚖️ 平衡型，彈性最大。</td>
+                            <tr class="bg-blue-50/50">
+                                <td class="py-4 px-4 font-black">價平 ATM</td>
+                                <td class="py-4 px-4 text-xl sm:text-2xl font-comic text-[var(--c-call)]">約 0.5</td>
+                                <td class="py-4 px-4 text-[var(--c-dark)] text-left">⚖️ 平衡型，槓桿與勝率中庸。</td>
                             </tr>
                             <tr>
-                                <td class="py-6 px-6 bg-gray-50 text-gray-500 italic">深價外 OTM</td>
-                                <td class="py-6 px-6 text-2xl font-comic">0.0 ~ 0.2</td>
-                                <td class="py-6 px-6 text-gray-500">🐢 變動極慢，拚爆發力。</td>
+                                <td class="py-4 px-4 bg-gray-50 text-gray-500">深價外 OTM</td>
+                                <td class="py-4 px-4 text-xl sm:text-2xl font-comic">0.0 ~ 0.2</td>
+                                <td class="py-4 px-4 text-gray-400 text-left">🐢 變動慢，低勝率高報酬。</td>
                             </tr>
                         </tbody>
                     </table>
@@ -365,20 +355,23 @@
     </main>
 
     <!-- 頁尾 -->
-    <footer class="w-full flex justify-center mt-20 pb-12 px-4">
-        <div class="capsule-container px-8 py-4 flex-col gap-2">
-            <div class="flex items-center gap-4">
-                <span class="text-2xl font-black text-[var(--c-dark)] font-comic tracking-widest uppercase">JOPTION</span>
-                <div class="w-1 h-8 bg-gray-300"></div>
-                <span class="text-lg font-bold text-gray-600">歐大選擇權教室</span>
+    <footer class="w-full flex justify-center mt-12 sm:mt-20 pb-10">
+        <div class="capsule-container px-6 py-4 max-w-xl flex-col gap-1">
+            <div class="flex items-center gap-3">
+                <span class="text-xl font-black text-[var(--c-dark)] font-comic tracking-widest">JOPTION</span>
+                <div class="w-0.5 h-6 bg-gray-200"></div>
+                <span class="text-sm font-bold text-gray-500">歐大選擇權教室</span>
             </div>
-            <p class="text-[10px] text-gray-400 font-black italic tracking-wider">© 2026 金融教育僅供參考。Delta 為動態指標。</p>
+            <p class="text-[9px] text-gray-400 font-black italic tracking-wider">© 2026 金融教育僅供參考。Delta 為動態指標。</p>
         </div>
     </footer>
 
     <script>
-        // --- 原有模擬器邏輯 ---
+        // --- 核心變數 ---
         let currentMode = 'atm';
+        let curveType = 'call';
+
+        // --- DOM 元素 ---
         const indexSlider = document.getElementById('indexSlider');
         const indexDisplay = document.getElementById('indexVal');
         const deltaDisplay = document.getElementById('deltaNum');
@@ -386,29 +379,6 @@
         const probNum = document.getElementById('probNum');
         const sensitivityText = document.getElementById('sensitivityText');
 
-        function setContract(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active', 'bg-[var(--c-dark)]', 'text-white'));
-            const activeBtn = document.getElementById(`btn-${mode}`);
-            activeBtn.classList.add('active', 'bg-[var(--c-dark)]', 'text-white');
-            update();
-        }
-
-        function update() {
-            const currentIdx = parseInt(indexSlider.value);
-            indexDisplay.innerText = currentIdx.toLocaleString();
-            let strike = 30000;
-            if(currentMode === 'otm') strike += 500;
-            if(currentMode === 'itm') strike -= 500;
-            let delta = 1 / (1 + Math.exp(-(currentIdx - strike) / 150));
-            deltaDisplay.innerText = delta.toFixed(2);
-            probNum.innerText = Math.round(delta * 100) + '%';
-            needle.style.transform = `rotate(${-90 + (delta * 180)}deg)`;
-            sensitivityText.innerHTML = `大盤漲 100 點 ➔ <br><span class="text-[var(--c-accent)] text-2xl font-comic">漲 ${(delta * 100).toFixed(1)} 點</span>`;
-        }
-
-        // --- 追加曲線圖邏輯 ---
-        let curveType = 'call';
         const curveSlider = document.getElementById('curveSlider');
         const curvePriceVal = document.getElementById('curvePriceVal');
         const curveDeltaDisplay = document.getElementById('curveDeltaDisplay');
@@ -416,6 +386,29 @@
         const curveArea = document.getElementById('curveArea');
         const scanLine = document.getElementById('scanLine');
         const scanDot = document.getElementById('scanDot');
+
+        // --- 邏輯函數 ---
+        function setContract(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active', 'bg-[var(--c-dark)]', 'text-white'));
+            document.getElementById(`btn-${mode}`).classList.add('active', 'bg-[var(--c-dark)]', 'text-white');
+            updateSimulator();
+        }
+
+        function updateSimulator() {
+            const currentIdx = parseInt(indexSlider.value);
+            indexDisplay.innerText = currentIdx.toLocaleString();
+            
+            let strike = 30000;
+            if(currentMode === 'otm') strike += 300;
+            if(currentMode === 'itm') strike -= 300;
+            
+            let delta = 1 / (1 + Math.exp(-(currentIdx - strike) / 120));
+            deltaDisplay.innerText = delta.toFixed(2);
+            probNum.innerText = Math.round(delta * 100) + '%';
+            needle.style.transform = `rotate(${-90 + (delta * 180)}deg)`;
+            sensitivityText.innerHTML = `漲 100 點 ➔ <br><span class="text-[var(--c-accent)] text-xl sm:text-2xl font-comic">漲 ${(delta * 100).toFixed(1)} 點</span>`;
+        }
 
         function setCurveType(type) {
             curveType = type;
@@ -432,16 +425,13 @@
             
             const strike = 30000;
             const points = [];
-            const svgWidth = 440; // 480 - 40
-            const svgHeight = 260; // 280 - 20
+            const svgWidth = 440; 
             const centerY = 150;
 
-            // 繪製整條曲線
             for (let x = 0; x <= svgWidth; x++) {
                 const p = 29000 + (x / svgWidth) * 2000;
-                let d = 1 / (1 + Math.exp(-(p - strike) / 250));
+                let d = 1 / (1 + Math.exp(-(p - strike) / 200));
                 if (curveType === 'put') d = d - 1;
-                
                 const y = centerY - (d * 125); 
                 points.push(`${x + 40},${y}`);
             }
@@ -450,16 +440,13 @@
             curveLine.setAttribute('d', pathData);
             curveLine.setAttribute('stroke', curveType === 'call' ? 'var(--c-call)' : 'var(--c-put)');
             
-            // 填充區域
             const areaPath = pathData + ` L ${480},150 L 40,150 Z`;
             curveArea.setAttribute('d', areaPath);
             curveArea.setAttribute('fill', curveType === 'call' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)');
 
-            // 更新掃描點
             const currentX = 40 + ((price - 29000) / 2000) * svgWidth;
-            let currentDelta = 1 / (1 + Math.exp(-(price - strike) / 250));
+            let currentDelta = 1 / (1 + Math.exp(-(price - strike) / 200));
             if (curveType === 'put') currentDelta = currentDelta - 1;
-            
             const currentY = centerY - (currentDelta * 125);
             
             scanLine.setAttribute('x1', currentX);
@@ -467,15 +454,19 @@
             scanDot.setAttribute('cx', currentX);
             scanDot.setAttribute('cy', currentY);
             
-            curveDeltaDisplay.innerText = currentDelta.toFixed(2);
+            curveDeltaDisplay.innerText = Math.abs(currentDelta).toFixed(2);
             curveDeltaDisplay.style.color = curveType === 'call' ? 'var(--c-call)' : 'var(--c-put)';
         }
 
-        indexSlider.addEventListener('input', update);
+        // --- 事件監聽 ---
+        indexSlider.addEventListener('input', updateSimulator);
         curveSlider.addEventListener('input', updateCurve);
-        
-        setContract('atm');
-        setCurveType('call');
+
+        // --- 初始化 ---
+        window.onload = () => {
+            setContract('atm');
+            setCurveType('call');
+        };
     </script>
 </body>
 </html>
