@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BOOM! 履約價與權利金 | 歐大選擇權教室 JOPTION</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,23 +11,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* 全新色系：電馭普普風 (Cyber Pop) */
         :root {
-            --c-bg: #E0FBFC; /* 亮青白背景 */
-            --c-primary: #EF476F; /* 桃紅色 */
-            --c-secondary: #118AB2; /* 電馭藍 */
-            --c-accent: #FFD166; /* 亮黃色 */
-            --c-success: #06D6A0; /* 翡翠綠 */
-            --c-dark: #073B4C; /* 極深藍黑邊框 */
+            --c-bg: #E0FBFC; 
+            --c-primary: #EF476F; 
+            --c-secondary: #118AB2; 
+            --c-accent: #FFD166; 
+            --c-success: #06D6A0; 
+            --c-dark: #073B4C; 
         }
 
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background-color: var(--c-bg);
             color: var(--c-dark);
-            /* 普普風大型圓點背景 */
             background-image: radial-gradient(#CBD5E1 2px, transparent 2px);
             background-size: 30px 30px;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .font-comic {
@@ -35,7 +34,6 @@
             letter-spacing: 0.05em;
         }
 
-        /* 普普風卡通邊框與陰影 */
         .pop-border {
             border: 4px solid var(--c-dark);
             border-radius: 1rem;
@@ -46,59 +44,47 @@
             transition: all 0.2s ease;
         }
 
-        .pop-shadow:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 8px 8px 0px var(--c-dark);
+        .pop-shadow:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--c-dark);
         }
 
         .pop-shadow-accent {
             box-shadow: 6px 6px 0px var(--c-accent);
         }
 
-        /* 膠囊型容器 */
         .capsule-container {
             background: white;
             border: 4px solid var(--c-dark);
             border-radius: 9999px;
-            box-shadow: 0 8px 0 var(--c-dark);
+            box-shadow: 0 6px 0 var(--c-dark);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             width: 100%;
-            max-width: 900px;
         }
 
-        .header-capsule { padding: 0.6rem 2.5rem; }
-        .footer-capsule { padding: 1.5rem 2rem; margin-bottom: 2rem; }
-
-        /* 互動拉桿樣式 */
+        /* 互動拉桿樣式 - 優化觸控體驗 */
         input[type=range] {
             -webkit-appearance: none;
             width: 100%;
             background: transparent;
         }
-        input[type=range]:focus {
-            outline: none;
-        }
+        input[type=range]:focus { outline: none; }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 44px;
-            width: 44px;
+            height: 48px; /* 增加高度便於觸控 */
+            width: 48px;
             border-radius: 50%;
             background: var(--c-primary);
             cursor: pointer;
             margin-top: -16px;
             border: 4px solid var(--c-dark);
             box-shadow: 0 4px 0 var(--c-dark);
-            transition: transform 0.1s;
-        }
-        input[type=range]::-webkit-slider-thumb:active {
-            transform: scale(1.15);
         }
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
-            height: 16px;
+            height: 20px;
             cursor: pointer;
             background: var(--c-accent);
             border-radius: 10px;
@@ -108,125 +94,100 @@
         /* 價格標籤形狀 */
         .price-tag {
             clip-path: polygon(10% 0, 100% 0, 100% 100%, 10% 100%, 0 50%);
-            padding-left: 2rem;
+            padding-left: 1.5rem;
+        }
+
+        /* 文字陰影 */
+        .text-pop {
+            text-shadow: 2px 2px 0 var(--c-dark);
         }
 
         @media (max-width: 640px) {
-            .capsule-container { border-radius: 1.5rem; padding: 1rem; }
-            .header-capsule { padding: 0.5rem 1rem; }
+            .capsule-container { border-radius: 1.5rem; padding: 0.75rem; border-width: 3px; }
             .pop-border { border-width: 3px; }
-            .price-tag { clip-path: none; padding-left: 1rem; border-radius: 0.5rem; }
+            .price-tag { clip-path: none; padding-left: 0.5rem; border-radius: 0.5rem; }
+            input[type=range]::-webkit-slider-thumb { height: 40px; width: 40px; margin-top: -12px; }
+            input[type=range]::-webkit-slider-runnable-track { height: 16px; }
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center p-3 sm:p-4 md:p-8 overflow-x-hidden w-full">
+<body class="min-h-screen flex flex-col items-center p-4 md:p-8 w-full max-w-[100vw] overflow-x-hidden">
 
-    <!-- 頁首：標頭設計 -->
-    <header class="w-full flex justify-center mb-10 md:mb-16 relative z-10 px-2">
-        <div class="capsule-container header-capsule flex-row w-full max-w-3xl">
-            <div class="flex items-center justify-center gap-3 md:gap-6 w-full">
-                <!-- Logo -->
-                <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl border-2 border-[var(--c-dark)] overflow-hidden shadow-sm shrink-0 bg-white">
-                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/118AB2/FFFFFF?text=Logo&font=Bangers'">
-                </div>
-                <!-- 文字 -->
-                <div class="flex flex-col justify-center">
-                    <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-[var(--c-dark)] leading-none mb-1 tracking-wide">
-                        歐大選擇權教室
-                    </h1>
-                    <p class="text-[10px] sm:text-xs md:text-sm font-black text-[var(--c-secondary)] tracking-[0.1em] sm:tracking-[0.2em] uppercase leading-none mt-1 font-comic">
-                        JOPTION ACADEMY
-                    </p>
-                </div>
+    <!-- 頁首 -->
+    <header class="w-full flex justify-center mb-10 md:mb-16">
+        <div class="capsule-container py-3 px-6 max-w-2xl flex-row gap-4">
+            <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl border-2 border-[var(--c-dark)] overflow-hidden bg-white shrink-0">
+                <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/118AB2/FFFFFF?text=J&font=Bangers'">
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-xl md:text-3xl font-black text-[var(--c-dark)] leading-tight">歐大選擇權教室</h1>
+                <p class="text-[10px] md:text-sm font-black text-[var(--c-secondary)] tracking-widest font-comic uppercase">JOPTION ACADEMY</p>
             </div>
         </div>
     </header>
 
-    <!-- 主要內容區 -->
-    <main class="w-full max-w-5xl flex-grow flex flex-col gap-10 md:gap-16">
+    <main class="w-full max-w-5xl flex flex-col gap-12 md:gap-20">
         
-        <!-- 大標題區 -->
+        <!-- 大標題 -->
         <div class="text-center px-2">
-            <div class="inline-block bg-[var(--c-accent)] px-6 sm:px-10 py-4 sm:py-5 pop-border pop-shadow transform -rotate-1 relative max-w-full">
-                <div class="absolute -top-6 -right-6 md:-top-8 md:-right-8 text-5xl md:text-7xl transform rotate-12 drop-shadow-md">🏷️</div>
-                <h2 class="text-3xl sm:text-4xl md:text-6xl font-black text-[var(--c-dark)] tracking-wide font-comic">
-                    履約價 vs 權利金
-                </h2>
-                <div class="mt-2 text-lg md:text-2xl font-bold text-[var(--c-primary)] bg-[var(--c-dark)] text-white px-4 py-1 inline-block rounded-lg transform rotate-2">
+            <div class="inline-block bg-[var(--c-accent)] px-6 md:px-12 py-5 pop-border pop-shadow transform -rotate-1 relative">
+                <div class="absolute -top-6 -right-6 md:-top-10 md:-right-10 text-5xl md:text-7xl transform rotate-12">🏷️</div>
+                <h2 class="text-3xl md:text-6xl font-black text-[var(--c-dark)] font-comic">履約價 vs 權利金</h2>
+                <div class="mt-3 text-sm md:text-2xl font-bold bg-[var(--c-dark)] text-white px-4 py-1 inline-block rounded-lg transform rotate-2">
                     破解選擇權的價格密碼
                 </div>
             </div>
         </div>
 
-        <!-- 核心名詞定義 -->
-        <section class="px-2 md:px-0 grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
-            
-            <!-- 履約價卡片 -->
-            <div class="bg-white pop-border pop-shadow p-6 md:p-8 relative flex flex-col h-full">
-                <div class="absolute -top-5 -left-5 bg-[var(--c-secondary)] text-white w-12 h-12 rounded-full border-4 border-[var(--c-dark)] flex items-center justify-center font-black text-2xl z-10">1</div>
-                <h3 class="text-2xl md:text-3xl font-black mb-4 text-[var(--c-secondary)] border-b-4 border-[var(--c-dark)] pb-2 inline-block">
-                    🎯 履約價 (Strike Price)
-                </h3>
-                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-4">
-                    就像預售屋合約上的<strong class="text-[var(--c-dark)] bg-yellow-200 px-1">「約定價格」</strong>。<br>
-                    它規定了未來你有權利在哪個價位買進或賣出。
+        <!-- 名詞定義：手機端改為單欄，電腦端雙欄 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 px-2 md:px-0">
+            <!-- 履約價 -->
+            <div class="bg-white pop-border pop-shadow p-6 md:p-8 flex flex-col h-full border-b-[8px] border-r-[8px]">
+                <h3 class="text-2xl md:text-3xl font-black mb-4 text-[var(--c-secondary)] border-b-4 border-[var(--c-dark)] pb-2 inline-block">🎯 履約價</h3>
+                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-6">
+                    就像合約上的<span class="bg-yellow-200 px-1 underline decoration-2">約定價格</span>。<br>規定了未來你可以買賣的點位。
                 </p>
-                <div class="mt-auto bg-gray-100 p-4 border-2 border-[var(--c-dark)] rounded-lg">
-                    <span class="font-black text-[var(--c-dark)]">📌 台指選實務：</span><br>
-                    <span class="text-sm font-bold text-gray-600">台指選的履約價就像梯子，每隔一段距離就有一個。在 30,000 點附近，通常是<strong class="text-blue-600">每 200 點一個間距</strong> (例如: 29800, 30000, 30200)。</span>
+                <div class="mt-auto bg-gray-50 p-4 border-2 border-[var(--c-dark)] rounded-xl italic text-sm text-gray-600 font-bold">
+                    📌 實務：台指選通常每 100 或 200 點設一個履約價階梯。
                 </div>
             </div>
 
-            <!-- 權利金卡片 -->
-            <div class="bg-white pop-border pop-shadow p-6 md:p-8 relative flex flex-col h-full">
-                <div class="absolute -top-5 -left-5 bg-[var(--c-primary)] text-white w-12 h-12 rounded-full border-4 border-[var(--c-dark)] flex items-center justify-center font-black text-2xl z-10">2</div>
-                <h3 class="text-2xl md:text-3xl font-black mb-4 text-[var(--c-primary)] border-b-4 border-[var(--c-dark)] pb-2 inline-block">
-                    💰 權利金 (Premium)
-                </h3>
-                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-4">
-                    就是選擇權的<strong class="text-[var(--c-dark)] bg-pink-200 px-1">「售價 (保費/訂金)」</strong>。<br>
-                    買方支付這筆錢來獲得權利，賣方收取這筆錢來承擔風險。
+            <!-- 權利金 -->
+            <div class="bg-white pop-border pop-shadow p-6 md:p-8 flex flex-col h-full border-b-[8px] border-r-[8px]">
+                <h3 class="text-2xl md:text-3xl font-black mb-4 text-[var(--c-primary)] border-b-4 border-[var(--c-dark)] pb-2 inline-block">💰 權利金</h3>
+                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-6">
+                    就是這張契約的<span class="bg-pink-200 px-1 underline decoration-2">市場售價</span>。<br>也是買方支付的「門票」或「保費」。
                 </p>
-                <div class="mt-auto bg-gray-100 p-4 border-2 border-[var(--c-dark)] rounded-lg relative overflow-hidden">
-                    <div class="absolute top-0 right-0 bg-[var(--c-accent)] text-[var(--c-dark)] font-black text-xs px-2 py-1 rounded-bl-lg border-b-2 border-l-2 border-[var(--c-dark)]">超重要</div>
-                    <span class="font-black text-[var(--c-dark)]">📌 台指選實務：</span><br>
-                    <span class="text-base font-black text-[var(--c-primary)]">大台指選擇權：1 點 = $50 元新台幣</span><br>
-                    <span class="text-sm font-bold text-gray-600">例如報價顯示 100 點，實際成本就是 100 × 50 = <strong class="text-[var(--c-dark)]">5,000 元</strong>。</span>
+                <div class="mt-auto bg-[var(--c-dark)] p-4 rounded-xl text-white">
+                    <p class="text-xs font-black text-[var(--c-accent)] mb-1 uppercase tracking-widest">Calculated in NTD</p>
+                    <p class="text-lg font-black">1 點 = NT$ 50 元</p>
                 </div>
             </div>
-
         </section>
 
-        <!-- ★ 新增：快速總結表 ★ -->
-        <section class="px-2 md:px-0 flex flex-col items-center mt-8 w-full">
-            <h3 class="text-2xl md:text-4xl font-black mb-6 text-[var(--c-dark)] tracking-wide text-center font-comic">
-                📌 快速總結
-            </h3>
-            <div class="w-full pop-border pop-shadow-accent bg-white p-4 md:p-8 relative">
-                <div class="w-full overflow-x-auto">
-                    <table class="w-full text-left min-w-[600px] border-collapse">
+        <!-- 快速總結表 -->
+        <section class="flex flex-col items-center">
+            <h3 class="text-2xl md:text-4xl font-black mb-6 text-[var(--c-dark)] font-comic">📌 QUICK SUMMARY</h3>
+            <div class="w-full overflow-x-auto pb-4 px-2">
+                <div class="min-w-[600px] bg-white pop-border pop-shadow-accent">
+                    <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-[var(--c-dark)] text-white">
-                                <th class="py-4 px-6 font-black text-lg border-b-4 border-[var(--c-dark)] rounded-tl-xl">項目</th>
-                                <th class="py-4 px-6 font-black text-lg text-[var(--c-secondary)] border-b-4 border-[var(--c-dark)]">履約價 (Strike)</th>
-                                <th class="py-4 px-6 font-black text-lg text-[var(--c-primary)] border-b-4 border-[var(--c-dark)] rounded-tr-xl">權利金 (Premium)</th>
+                                <th class="p-4 font-black">比較項目</th>
+                                <th class="p-4 font-black text-[var(--c-secondary)]">履約價 (Strike)</th>
+                                <th class="p-4 font-black text-[var(--c-primary)]">權利金 (Premium)</th>
                             </tr>
                         </thead>
-                        <tbody class="text-gray-800 font-bold divide-y-4 divide-gray-100">
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="py-5 px-6 font-black text-gray-600">性質</td>
-                                <td class="py-5 px-6">契約中固定的買賣價格</td>
-                                <td class="py-5 px-6">契約在市場上的交易價格 (變動)</td>
+                        <tbody class="text-gray-800 font-bold divide-y-2 divide-gray-100">
+                            <tr>
+                                <td class="p-4 bg-gray-50">決定權</td>
+                                <td class="p-4">期交所固定好供選擇</td>
+                                <td class="p-4">市場交易即時跳動</td>
                             </tr>
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="py-5 px-6 font-black text-gray-600">由誰決定</td>
-                                <td class="py-5 px-6">交易所預先設定好</td>
-                                <td class="py-5 px-6">市場買賣雙方供需決定</td>
-                            </tr>
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="py-5 px-6 font-black text-gray-600">對損益影響</td>
-                                <td class="py-5 px-6">決定是否獲利的「<strong class="text-[var(--c-secondary)]">起跑線</strong>」</td>
-                                <td class="py-5 px-6">決定交易的「<strong class="text-[var(--c-primary)]">初始成本</strong>」</td>
+                            <tr>
+                                <td class="p-4 bg-gray-50">角色</td>
+                                <td class="p-4">獲利的「起跑線」</td>
+                                <td class="p-4">交易的「門票成本」</td>
                             </tr>
                         </tbody>
                     </table>
@@ -234,261 +195,135 @@
             </div>
         </section>
 
-        <!-- T字報價表 & 價內外關係 -->
-        <section class="px-2 md:px-0 flex flex-col items-center mt-12">
-            <h3 class="text-2xl md:text-4xl font-black mb-6 text-[var(--c-dark)] tracking-wide text-center">
-                📊 報價表的秘密：當前台指期 30,000 點
-            </h3>
-            
-            <p class="text-center text-lg font-bold text-gray-700 mb-8 max-w-3xl">
-                履約價與當前大盤的關係，決定了這個選擇權是<span class="text-[var(--c-primary)]">價內</span>、<span class="text-[var(--c-accent)]">價平</span>還是<span class="text-[var(--c-success)]">價外</span>。我們以「買權 (Call)」為例來看看：
-            </p>
-
-            <div class="w-full pop-border pop-shadow bg-[#1E293B] p-4 md:p-8 rounded-2xl overflow-hidden relative">
-                <!-- T字報價表 Header -->
-                <div class="grid grid-cols-3 text-center border-b-4 border-[#334155] pb-4 mb-4">
-                    <div class="text-[var(--c-primary)] font-black text-xl md:text-2xl tracking-widest">買權 CALL<br><span class="text-sm text-gray-400">看漲</span></div>
-                    <div class="text-[var(--c-accent)] font-black text-xl md:text-2xl tracking-widest bg-[#334155] rounded-xl py-1 border-2 border-[var(--c-dark)] shadow-sm">履約價</div>
-                    <div class="text-[var(--c-success)] font-black text-xl md:text-2xl tracking-widest opacity-50">賣權 PUT<br><span class="text-sm text-gray-400">看跌</span></div>
-                </div>
-
-                <!-- 行列資料 (以目前 30000 點為例) -->
-                <div class="flex flex-col gap-3">
-                    
-                    <!-- 29800 價內 -->
-                    <div class="grid grid-cols-3 text-center items-center bg-[#334155]/50 rounded-xl p-3 border border-[#475569] hover:bg-[#334155] transition-colors relative">
-                        <div class="absolute -left-2 top-1/2 transform -translate-y-1/2 hidden md:block">
-                            <span class="bg-[var(--c-primary)] text-white text-xs font-black px-2 py-1 rounded border border-[var(--c-dark)] shadow-[2px_2px_0_#000]">價內 ITM</span>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-white font-black text-xl md:text-2xl">280 <span class="text-sm text-gray-400">點</span></span>
-                            <span class="text-[var(--c-accent)] text-xs font-bold">$14,000 元</span>
-                        </div>
-                        <div class="text-white font-black text-2xl md:text-3xl tracking-wider">29800</div>
-                        <div class="text-gray-500 font-bold text-sm">...</div>
-                    </div>
-
-                    <!-- 30000 價平 -->
-                    <div class="grid grid-cols-3 text-center items-center bg-[var(--c-accent)] rounded-xl p-3 border-4 border-[var(--c-dark)] shadow-[4px_4px_0_#000] transform scale-105 z-10 relative">
-                        <div class="absolute -left-3 top-1/2 transform -translate-y-1/2">
-                            <span class="bg-[var(--c-dark)] text-[var(--c-accent)] text-xs font-black px-2 py-1 rounded border border-[var(--c-dark)]">價平 ATM</span>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-[var(--c-dark)] font-black text-2xl md:text-3xl">120 <span class="text-sm">點</span></span>
-                            <span class="text-[var(--c-primary)] text-sm font-black">$6,000 元</span>
-                        </div>
-                        <div class="text-[var(--c-dark)] font-black text-3xl md:text-4xl tracking-wider relative">
-                            30000
-                            <span class="absolute -right-4 -top-6 text-2xl animate-bounce">👈 大盤在這</span>
-                        </div>
-                        <div class="text-gray-600 font-bold text-sm">...</div>
-                    </div>
-
-                    <!-- 30200 價外 -->
-                    <div class="grid grid-cols-3 text-center items-center bg-[#334155]/50 rounded-xl p-3 border border-[#475569] hover:bg-[#334155] transition-colors relative">
-                        <div class="absolute -left-2 top-1/2 transform -translate-y-1/2 hidden md:block">
-                            <span class="bg-[var(--c-success)] text-[var(--c-dark)] text-xs font-black px-2 py-1 rounded border border-[var(--c-dark)] shadow-[2px_2px_0_#000]">價外 OTM</span>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-white font-black text-xl md:text-2xl">45 <span class="text-sm text-gray-400">點</span></span>
-                            <span class="text-[var(--c-accent)] text-xs font-bold">$2,250 元</span>
-                        </div>
-                        <div class="text-white font-black text-2xl md:text-3xl tracking-wider">30200</div>
-                        <div class="text-gray-500 font-bold text-sm">...</div>
-                    </div>
-
-                </div>
-
-                <!-- 圖例解說 -->
-                <div class="mt-6 flex flex-col md:flex-row gap-4 justify-between text-sm">
-                    <div class="bg-[var(--c-primary)]/20 border border-[var(--c-primary)] p-3 rounded-lg text-white flex-1">
-                        <strong class="text-[var(--c-primary)]">價內 (In-The-Money)：</strong><br>
-                        履約價 < 大盤。具有真實價值，權利金最貴。
-                    </div>
-                    <div class="bg-[var(--c-accent)]/20 border border-[var(--c-accent)] p-3 rounded-lg text-white flex-1">
-                        <strong class="text-[var(--c-accent)]">價平 (At-The-Money)：</strong><br>
-                        履約價 ≈ 大盤。多空交戰最激烈的地方。
-                    </div>
-                    <div class="bg-[var(--c-success)]/20 border border-[var(--c-success)] p-3 rounded-lg text-white flex-1">
-                        <strong class="text-[var(--c-success)]">價外 (Out-Of-The-Money)：</strong><br>
-                        履約價 > 大盤。只剩下時間價值，像買樂透很便宜。
-                    </div>
-                </div>
+        <!-- 互動計算機區塊 -->
+        <section class="flex flex-col items-center mt-10">
+            <div class="bg-[var(--c-dark)] text-white px-8 py-3 rounded-t-2xl font-black text-xl md:text-2xl pop-shadow-accent">
+                🕹️ 動態價格模擬器
             </div>
-        </section>
+            
+            <div class="bg-white pop-border pop-shadow p-6 md:p-10 w-full flex flex-col items-center border-t-8">
+                <p class="text-center text-lg font-bold text-gray-700 mb-8">
+                    假設您看好大盤，買入 <span class="text-[var(--c-primary)] font-black underline">30,000 點的買權 (Call)</span>
+                </p>
 
-        <!-- ★ 互動亮點：動態權利金拆解計算機 ★ -->
-        <section class="px-2 md:px-0 flex flex-col items-center mt-8">
-            <h3 class="text-2xl md:text-4xl font-black mb-8 text-[var(--c-dark)] tracking-wide relative inline-block text-center w-full">
-                <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-5xl md:text-7xl opacity-20 whitespace-nowrap font-comic" style="z-index:-1;">SIMULATOR</span>
-                🕹️ 動態權利金計算機
-            </h3>
-
-            <p class="text-center text-lg font-bold text-gray-700 mb-6 max-w-2xl">
-                鎖定目標：<strong class="bg-[var(--c-dark)] text-white px-3 py-1 rounded text-xl">買進 30000 買權 (Call)</strong><br>
-                滑動下方大盤拉桿，看看這檔合約的狀態與價格會如何變化！
-            </p>
-
-            <div class="bg-white pop-border pop-shadow p-6 md:p-10 w-full flex flex-col items-center relative">
-                
-                <!-- 拉桿控制區 -->
-                <div class="w-full max-w-3xl mb-10 bg-gray-50 p-6 rounded-2xl border-2 border-gray-200">
-                    <div class="flex justify-between items-end mb-4">
-                        <span class="text-lg font-black text-gray-600">目前台指期大盤：</span>
-                        <span class="text-4xl md:text-5xl font-black text-[var(--c-secondary)]" id="currentIndexDisplay">30000</span>
-                    </div>
-                    <input type="range" id="indexSlider" min="29600" max="30400" step="10" value="30000">
-                    <div class="flex justify-between mt-3 text-xs md:text-sm font-black text-gray-400">
-                        <span>29600 (大跌)</span>
-                        <span>30000 (平盤)</span>
-                        <span>30400 (大漲)</span>
-                    </div>
-                </div>
-
-                <!-- 計算結果面板 -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
-                    
-                    <!-- 狀態框 -->
-                    <div class="flex flex-col items-center justify-center p-6 border-4 border-[var(--c-dark)] rounded-2xl bg-gray-100 relative">
-                        <span class="absolute -top-4 bg-white border-2 border-[var(--c-dark)] px-3 py-1 font-black text-sm rounded-full">合約狀態</span>
-                        <div id="optionState" class="text-3xl md:text-4xl font-black text-yellow-500 my-2 text-shadow-sm transition-colors">
-                            價平 (ATM)
+                <!-- 拉桿區 -->
+                <div class="w-full max-w-2xl mb-12 bg-gray-50 p-6 md:p-8 rounded-3xl border-4 border-dashed border-gray-300">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-2">
+                        <span class="text-lg font-black text-gray-500">目前台指期大盤：</span>
+                        <div class="bg-white px-6 py-2 rounded-full border-4 border-[var(--c-dark)] shadow-[4px_4px_0_#073B4C]">
+                            <span class="text-4xl md:text-5xl font-black text-[var(--c-secondary)]" id="currentIndexDisplay">30,000</span>
                         </div>
                     </div>
+                    <input type="range" id="indexSlider" min="29600" max="30400" step="20" value="30000" class="my-4">
+                    <div class="flex justify-between text-xs font-black text-gray-400">
+                        <span>📉 29600 (跌)</span>
+                        <span>平盤</span>
+                        <span>📈 30400 (漲)</span>
+                    </div>
+                </div>
 
-                    <!-- 價值拆解框 (內含 + 時間) -->
-                    <div class="flex flex-col items-center justify-center p-4 border-4 border-[var(--c-dark)] rounded-2xl bg-[#F8FAFC] relative md:col-span-2">
-                        <span class="absolute -top-4 bg-white border-2 border-[var(--c-dark)] px-3 py-1 font-black text-sm rounded-full">權利金 = 內含價值 + 時間價值</span>
-                        
-                        <div class="flex w-full justify-around items-center mt-4">
-                            <!-- 內含價值 -->
-                            <div class="text-center">
-                                <div class="text-sm font-bold text-gray-500 mb-1">內含價值</div>
-                                <div id="intrinsicValue" class="text-2xl md:text-3xl font-black text-[var(--c-primary)]">0 點</div>
-                                <div class="text-[10px] text-gray-400">大盤 > 履約價才有</div>
-                            </div>
-                            <div class="text-2xl font-black text-gray-300">+</div>
-                            <!-- 時間價值 -->
-                            <div class="text-center">
-                                <div class="text-sm font-bold text-gray-500 mb-1">時間價值</div>
-                                <div id="timeValue" class="text-2xl md:text-3xl font-black text-[var(--c-success)]">150 點</div>
-                                <div class="text-[10px] text-gray-400">價平時最高</div>
-                            </div>
-                            <div class="text-2xl font-black text-gray-300">=</div>
-                            <!-- 總點數 -->
-                            <div class="text-center">
-                                <div class="text-sm font-bold text-[var(--c-dark)] mb-1">總權利金報價</div>
-                                <div id="totalPremium" class="text-3xl md:text-4xl font-black text-[var(--c-dark)]">150 點</div>
-                            </div>
+                <!-- 結果卡片：手機端垂直排列 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+                    <!-- 狀態 -->
+                    <div class="flex flex-col items-center justify-center p-6 border-4 border-[var(--c-dark)] rounded-2xl bg-gray-100">
+                        <span class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">合約狀態</span>
+                        <div id="optionState" class="text-3xl font-black text-[var(--c-accent)] text-pop transition-all">價平 (ATM)</div>
+                    </div>
+
+                    <!-- 點數拆解 -->
+                    <div class="md:col-span-2 flex flex-col md:flex-row items-center justify-around p-6 border-4 border-[var(--c-dark)] rounded-2xl bg-white gap-6">
+                        <div class="text-center">
+                            <span class="text-xs font-black text-gray-400">內含價值</span>
+                            <div id="intrinsicValue" class="text-3xl font-black text-[var(--c-primary)]">0</div>
+                        </div>
+                        <div class="text-4xl font-black text-gray-200 hidden md:block">+</div>
+                        <div class="text-center">
+                            <span class="text-xs font-black text-gray-400">時間價值</span>
+                            <div id="timeValue" class="text-3xl font-black text-[var(--c-success)]">150</div>
+                        </div>
+                        <div class="text-4xl font-black text-gray-200 hidden md:block">=</div>
+                        <div class="text-center bg-[var(--c-accent)] px-4 py-2 rounded-xl border-2 border-[var(--c-dark)]">
+                            <span class="text-xs font-black text-[var(--c-dark)]">總報價點數</span>
+                            <div id="totalPremium" class="text-4xl font-black text-[var(--c-dark)]">150</div>
                         </div>
                     </div>
-
                 </div>
 
-                <!-- 最終台幣成本 -->
-                <div class="mt-8 bg-[var(--c-primary)] border-4 border-[var(--c-dark)] p-4 rounded-xl w-full max-w-md text-center flex flex-col items-center justify-center shadow-[6px_6px_0_#073B4C] transform hover:scale-105 transition-transform">
-                    <span class="text-white font-bold text-sm uppercase tracking-widest mb-1">實際台幣成本 (點數 × $50)</span>
-                    <div id="ntdCost" class="text-4xl md:text-5xl font-black text-[var(--c-accent)] drop-shadow-[2px_2px_0_#000] tracking-wider">
-                        $7,500
+                <!-- 最終成本 -->
+                <div class="mt-10 w-full max-w-md">
+                    <div class="bg-[var(--c-primary)] border-4 border-[var(--c-dark)] p-6 rounded-2xl text-center shadow-[8px_8px_0_#073B4C] transform hover:rotate-1 transition-transform">
+                        <p class="text-white font-black text-sm mb-1">實際台幣投資金額</p>
+                        <div id="ntdCost" class="text-5xl md:text-6xl font-black text-[var(--c-accent)] drop-shadow-[3px_3px_0_#000]">
+                            $7,500
+                        </div>
+                        <p class="text-[var(--c-dark)] font-bold text-xs mt-2 opacity-80">( 總點數 × $50 元 )</p>
                     </div>
                 </div>
-
-                <!-- 將備註說明移動到這裡 -->
-                <div class="mt-6 w-full text-center">
-                    <p class="text-xs text-gray-400 font-bold tracking-wider">
-                        * 註：模擬器數值為教學示意，實際選擇權定價受波動率與剩餘天數等 B-S 模型影響
-                    </p>
-                </div>
-
             </div>
         </section>
 
     </main>
 
     <!-- 頁尾 -->
-    <footer class="w-full flex justify-center mt-16 pb-10 relative z-10 px-2">
-        <div class="capsule-container footer-capsule text-center">
-            <div class="flex flex-wrap items-center justify-center gap-2 md:gap-4 mb-3">
-                <div class="w-8 h-8 md:w-12 md:h-12 rounded-full border-2 border-gray-200 overflow-hidden shadow-sm shrink-0 bg-white">
-                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/EF476F/FFFFFF?text=Logo&font=Bangers'">
-                </div>
-                <div class="flex items-center flex-wrap justify-center">
-                    <span class="text-lg md:text-2xl font-black tracking-tight text-[var(--c-dark)] font-comic">JOPTION</span>
-                    <span class="mx-2 md:mx-4 text-gray-300 font-light text-xl hidden sm:inline">|</span>
-                    <span class="text-base md:text-xl font-bold text-[var(--c-dark)] w-full sm:w-auto mt-1 sm:mt-0">歐大選擇權教室</span>
-                </div>
+    <footer class="w-full flex justify-center mt-20 pb-10">
+        <div class="capsule-container max-w-lg py-6 px-4 flex-col text-center">
+            <div class="flex items-center gap-3 mb-2">
+                <img src="IP標籤.jpg" class="w-8 h-8 rounded-full border border-gray-300" alt="Icon" onerror="this.style.display='none'">
+                <span class="text-xl font-black font-comic">JOPTION ACADEMY</span>
             </div>
-            <div class="text-center w-full mt-2">
-                <p class="text-[10px] md:text-sm text-gray-500 font-bold tracking-tight">
-                    © 2026 Joption Academy - 金融教育僅供參考，投資有風險，操作需謹慎。
-                </p>
-            </div>
+            <p class="text-[10px] md:text-xs text-gray-500 font-bold">
+                © 2026 Joption Academy. 投資必有風險，教學內容僅供教育參考。
+            </p>
         </div>
     </footer>
 
-    <!-- 互動邏輯腳本 -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const indexSlider = document.getElementById('indexSlider');
-            const currentIndexDisplay = document.getElementById('currentIndexDisplay');
-            const stateDisplay = document.getElementById('optionState');
-            const intrinsicDisplay = document.getElementById('intrinsicValue');
-            const timeValueDisplay = document.getElementById('timeValue');
-            const premiumDisplay = document.getElementById('totalPremium');
-            const ntdCostDisplay = document.getElementById('ntdCost');
-            
-            // 目標履約價：30000 Call
-            const targetStrike = 30000;
-            // 價平時的最高時間價值 (教學示意用)
-            const maxTimeValue = 150; 
-            // 點數乘數
-            const multiplier = 50;
+            const slider = document.getElementById('indexSlider');
+            const display = document.getElementById('currentIndexDisplay');
+            const state = document.getElementById('optionState');
+            const intrinsic = document.getElementById('intrinsicValue');
+            const time = document.getElementById('timeValue');
+            const total = document.getElementById('totalPremium');
+            const ntd = document.getElementById('ntdCost');
 
-            function updateCalculator() {
-                const currentIndex = parseInt(indexSlider.value);
-                
-                // 1. 更新大盤顯示
-                currentIndexDisplay.innerText = currentIndex.toLocaleString();
-                
-                // 2. 判斷價內外狀態
-                if (currentIndex > targetStrike) {
-                    stateDisplay.innerText = "價內 (ITM)";
-                    stateDisplay.className = "text-3xl md:text-4xl font-black my-2 transition-colors text-[var(--c-primary)] drop-shadow-sm";
-                } else if (currentIndex === targetStrike) {
-                    stateDisplay.innerText = "價平 (ATM)";
-                    stateDisplay.className = "text-3xl md:text-4xl font-black my-2 transition-colors text-[var(--c-accent)] drop-shadow-sm";
+            const strike = 30000;
+            const maxTime = 150; 
+
+            function update() {
+                const val = parseInt(slider.value);
+                display.innerText = val.toLocaleString();
+
+                // 狀態判斷
+                if (val > strike) {
+                    state.innerText = "價內 (ITM)";
+                    state.style.color = "var(--c-primary)";
+                } else if (val === strike) {
+                    state.innerText = "價平 (ATM)";
+                    state.style.color = "var(--c-accent)";
                 } else {
-                    stateDisplay.innerText = "價外 (OTM)";
-                    stateDisplay.className = "text-3xl md:text-4xl font-black my-2 transition-colors text-[var(--c-success)] drop-shadow-sm";
+                    state.innerText = "價外 (OTM)";
+                    state.style.color = "var(--c-success)";
                 }
 
-                // 3. 計算內含價值 (Call = 股價 - 履約價，若小於0則為0)
-                const intrinsic = Math.max(0, currentIndex - targetStrike);
-                
-                // 4. 計算時間價值 (簡單模擬：越靠近履約價時間價值越高，越遠越低)
-                // 這裡用簡單的線性遞減模型，每偏離 1 點時間價值少 0.3 點，最低不小於 5 點 (極端價外還是有微小價值)
-                const distance = Math.abs(currentIndex - targetStrike);
-                let timeValue = Math.round(maxTimeValue - (distance * 0.35));
-                if (timeValue < 5) timeValue = 5; 
+                // 計算內含價值
+                const iv = Math.max(0, val - strike);
+                intrinsic.innerText = iv;
 
-                // 5. 總權利金與真實成本
-                const totalPremium = intrinsic + timeValue;
-                const totalNtd = totalPremium * multiplier;
+                // 計算時間價值 (簡易線性模擬)
+                const dist = Math.abs(val - strike);
+                let tv = Math.round(maxTime - (dist * 0.4));
+                if (tv < 5) tv = 5;
+                time.innerText = tv;
 
-                // 6. 更新 UI 數字
-                intrinsicDisplay.innerText = `${intrinsic} 點`;
-                timeValueDisplay.innerText = `${timeValue} 點`;
-                premiumDisplay.innerText = `${totalPremium} 點`;
-                
-                // 加入千分位逗號
-                ntdCostDisplay.innerText = `$${totalNtd.toLocaleString()}`;
+                // 總計
+                const tp = iv + tv;
+                total.innerText = tp;
+                ntd.innerText = `$${(tp * 50).toLocaleString()}`;
             }
 
-            // 綁定拉桿滑動事件
-            indexSlider.addEventListener('input', updateCalculator);
-            
-            // 初始執行一次
-            updateCalculator();
+            slider.addEventListener('input', update);
+            update();
         });
     </script>
 </body>

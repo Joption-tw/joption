@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BOOM! 結算機制與到期效應 | 歐大選擇權教室</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,37 +11,32 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* 街機普普風專屬 CSS 變數 */
         :root {
-            --c-bg: #F3E8FF; /* 淺紫背景 */
-            --c-primary: #A855F7; /* 螢光紫 */
-            --c-secondary: #10B981; /* 薄荷綠 */
-            --c-accent: #F97316; /* 亮橘色 (警告/倒數) */
-            --c-danger: #EF4444; /* 鮮紅色 */
-            --c-dark: #0F172A; /* 極深藍黑 */
-            --c-text: #0F172A;
+            --c-bg: #F3E8FF; 
+            --c-primary: #A855F7; 
+            --c-secondary: #10B981; 
+            --c-accent: #F97316; 
+            --c-danger: #EF4444; 
+            --c-dark: #0F172A; 
         }
 
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background-color: var(--c-bg);
-            color: var(--c-text);
-            /* 普普風大型十字網點背景 */
+            color: var(--c-dark);
             background-image: 
                 linear-gradient(var(--c-primary) 1px, transparent 1px),
                 linear-gradient(90deg, var(--c-primary) 1px, transparent 1px);
             background-size: 40px 40px;
-            background-position: center center;
-            /* 讓網點半透明 */
-            background-color: var(--c-bg);
+            background-attachment: fixed;
+            -webkit-tap-highlight-color: transparent;
         }
         
-        /* 覆蓋一層半透明底色讓網格不那麼刺眼 */
         body::before {
             content: '';
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(243, 232, 255, 0.85);
+            background: rgba(243, 232, 255, 0.9);
             z-index: -1;
         }
 
@@ -50,42 +45,28 @@
             letter-spacing: 0.05em;
         }
 
-        /* 普普風卡通邊框與陰影 */
         .pop-card {
             border: 4px solid var(--c-dark);
             border-radius: 1rem;
             background-color: white;
             box-shadow: 8px 8px 0px var(--c-dark);
-            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .pop-card:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 10px 10px 0px var(--c-dark);
-        }
-
-        /* 特殊陰影色 */
         .shadow-purple { box-shadow: 8px 8px 0px var(--c-primary); }
         .shadow-orange { box-shadow: 8px 8px 0px var(--c-accent); }
 
-        /* 膠囊型容器 (Header/Footer) */
         .capsule-container {
             background: white;
             border: 4px solid var(--c-dark);
             border-radius: 9999px;
-            box-shadow: 0 8px 0 var(--c-dark);
+            box-shadow: 0 6px 0 var(--c-dark);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             width: 100%;
-            max-width: 900px;
         }
 
-        .header-capsule { padding: 0.6rem 2.5rem; }
-        .footer-capsule { padding: 1.5rem 2rem; margin-bottom: 2rem; }
-
-        /* 互動拉桿樣式 (正常由左向右流逝時間) */
+        /* 互動拉桿樣式 */
         input[type=range] {
             -webkit-appearance: none;
             width: 100%;
@@ -102,18 +83,14 @@
             margin-top: -16px;
             border: 4px solid var(--c-dark);
             box-shadow: 0 4px 0 var(--c-dark);
-            transition: transform 0.1s;
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23111" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>');
             background-size: 60%;
             background-position: center;
             background-repeat: no-repeat;
         }
-        input[type=range]::-webkit-slider-thumb:active {
-            transform: scale(1.1);
-        }
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
-            height: 16px;
+            height: 18px;
             cursor: pointer;
             background: #E2E8F0;
             border-radius: 10px;
@@ -121,346 +98,233 @@
         }
 
         @media (max-width: 640px) {
-            .capsule-container { border-radius: 1.5rem; padding: 1rem; }
-            .header-capsule { padding: 0.5rem 1rem; }
+            .capsule-container { border-radius: 1.5rem; padding: 0.75rem; border-width: 3px; }
             .pop-card { border-width: 3px; box-shadow: 6px 6px 0px var(--c-dark); }
-            input[type=range]::-webkit-slider-thumb { height: 40px; width: 40px; margin-top: -14px;}
+            input[type=range]::-webkit-slider-thumb { height: 40px; width: 40px; margin-top: -12px; }
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center p-3 sm:p-4 md:p-8 overflow-x-hidden w-full relative z-0">
+<body class="min-h-screen flex flex-col items-center p-4 md:p-8 w-full max-w-[100vw] overflow-x-hidden">
 
-    <!-- 頁首：標頭設計 -->
-    <header class="w-full flex justify-center mb-10 md:mb-16 relative z-10 px-2">
-        <div class="capsule-container header-capsule flex-row w-full max-w-3xl">
-            <div class="flex items-center justify-center gap-3 md:gap-6 w-full">
-                <!-- Logo -->
-                <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl border-2 border-[var(--c-dark)] overflow-hidden shadow-sm shrink-0 bg-white">
-                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/A855F7/FFFFFF?text=Logo&font=Bangers'">
-                </div>
-                <!-- 文字 -->
-                <div class="flex flex-col justify-center">
-                    <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-[var(--c-dark)] leading-none mb-1 tracking-wide">
-                        歐大選擇權教室
-                    </h1>
-                    <p class="text-[10px] sm:text-xs md:text-sm font-black text-[var(--c-primary)] tracking-[0.1em] sm:tracking-[0.2em] uppercase leading-none mt-1 font-comic">
-                        JOPTION ACADEMY
-                    </p>
-                </div>
+    <!-- 頁首 -->
+    <header class="w-full flex justify-center mb-10 md:mb-16">
+        <div class="capsule-container py-3 px-6 max-w-2xl flex-row gap-4">
+            <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl border-2 border-[var(--c-dark)] overflow-hidden bg-white shrink-0">
+                <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/A855F7/FFFFFF?text=J&font=Bangers'">
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-xl md:text-3xl font-black text-[var(--c-dark)] leading-tight">歐大選擇權教室</h1>
+                <p class="text-[10px] md:text-sm font-black text-[var(--c-primary)] tracking-widest font-comic uppercase">JOPTION ACADEMY</p>
             </div>
         </div>
     </header>
 
-    <!-- 主要內容區 -->
-    <main class="w-full max-w-5xl flex-grow flex flex-col gap-10 md:gap-16">
+    <main class="w-full max-w-5xl flex flex-col gap-12 md:gap-20">
         
-        <!-- 大標題區 -->
+        <!-- 大標題 -->
         <div class="text-center px-2">
-            <div class="inline-block bg-[var(--c-secondary)] px-6 sm:px-12 py-4 sm:py-6 pop-card transform rotate-1 relative max-w-full z-10">
-                <div class="absolute -top-6 -right-6 md:-top-8 md:-right-8 text-5xl md:text-7xl transform rotate-12 drop-shadow-md">⏳</div>
-                <h2 class="text-3xl sm:text-4xl md:text-6xl font-black text-[var(--c-dark)] tracking-wide font-comic uppercase">
-                    結算與到期效應
-                </h2>
-                <div class="mt-2 text-lg md:text-2xl font-black text-white bg-[var(--c-primary)] px-4 py-1 inline-block rounded-lg transform -rotate-2 border-2 border-[var(--c-dark)] shadow-[4px_4px_0_#0F172A]">
+            <div class="inline-block bg-[var(--c-secondary)] px-6 md:px-12 py-5 pop-card transform rotate-1 relative">
+                <div class="absolute -top-6 -right-6 md:-top-10 md:-right-10 text-5xl md:text-7xl transform rotate-12 drop-shadow-md">⏳</div>
+                <h2 class="text-3xl md:text-6xl font-black text-[var(--c-dark)] font-comic">結算與到期效應</h2>
+                <div class="mt-3 text-sm md:text-2xl font-bold bg-[var(--c-primary)] text-white px-4 py-1 inline-block rounded-lg transform -rotate-2 border-2 border-[var(--c-dark)] shadow-[4px_4px_0_#0F172A]">
                     時間是把殺豬刀 (Theta Decay)
                 </div>
             </div>
         </div>
 
-        <!-- 觀念比喻：結算機制與時間價值 -->
-        <section class="px-2 md:px-0 grid grid-cols-1 md:grid-cols-2 gap-8 w-full relative z-10">
-            
-            <!-- 結算機制卡片 -->
-            <div class="bg-white pop-card p-6 md:p-8 relative flex flex-col h-full shadow-purple">
-                <div class="absolute -top-5 -left-5 bg-[var(--c-primary)] text-white w-12 h-12 rounded-full border-4 border-[var(--c-dark)] flex items-center justify-center font-black text-2xl z-10">1</div>
-                <h3 class="text-2xl md:text-3xl font-black mb-4 text-[var(--c-primary)] border-b-4 border-[var(--c-dark)] pb-2 inline-block">
-                    🏁 什麼是結算？
-                </h3>
-                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-4">
-                    選擇權是有<strong class="text-[var(--c-dark)] bg-purple-200 px-1">「保存期限」</strong>的契約。時間一到，這場賽局就會強制結束、清算籌碼。
+        <!-- 核心觀念 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 px-2 md:px-0">
+            <!-- 結算機制 -->
+            <div class="bg-white pop-card p-6 md:p-8 flex flex-col h-full shadow-purple border-b-[8px] border-r-[8px]">
+                <h3 class="text-2xl md:text-3xl font-black mb-4 text-[var(--c-primary)] border-b-4 border-[var(--c-dark)] pb-2 inline-block">🏁 結算機制</h3>
+                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-6">
+                    選擇權是有<span class="bg-purple-100 px-1 underline decoration-2 decoration-purple-500">保存期限</span>的。<br>時間一到，這場賽局就會強制結束清算。
                 </p>
-                <div class="mt-auto bg-purple-50 p-4 border-2 border-[var(--c-dark)] rounded-lg">
-                    <span class="font-black text-[var(--c-dark)]">📌 台指選實務：</span><br>
-                    <span class="text-sm font-bold text-gray-700">台指選擇權採<strong class="text-[var(--c-primary)] text-base">現金結算</strong>。通常在<strong class="underline decoration-2 decoration-purple-500">每個月的第三個星期三（月選）</strong>或<strong class="underline decoration-2 decoration-purple-500">每週三（週選）</strong>的下午 1:30 進行結算。過了這時間，沒價值的合約直接歸零！</span>
+                <div class="mt-auto bg-purple-50 p-4 border-2 border-[var(--c-dark)] rounded-xl text-sm font-bold text-gray-700">
+                    📌 實務：台指選在每週三或每月第三個週三進行結算。過了下午 1:30，沒價值的合約直接歸零！
                 </div>
             </div>
 
-            <!-- 時間的無情卡片 -->
-            <div class="bg-white pop-card p-6 md:p-8 relative flex flex-col h-full shadow-orange">
-                <div class="absolute -top-5 -left-5 bg-[var(--c-accent)] text-white w-12 h-12 rounded-full border-4 border-[var(--c-dark)] flex items-center justify-center font-black text-2xl z-10">2</div>
-                <h3 class="text-2xl md:text-3xl font-black mb-4 text-[var(--c-accent)] border-b-4 border-[var(--c-dark)] pb-2 inline-block">
-                    🧊 到期效應 (Theta)
-                </h3>
-                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-4">
-                    買選擇權就像買一顆<strong class="text-[var(--c-dark)] bg-orange-200 px-1">「正在融化的冰塊」</strong>。<br>
-                    就算大盤指數一動也不動，你的權利金也會因為「時間流逝」而天天扣血。
+            <!-- 時間衰退 -->
+            <div class="bg-white pop-card p-6 md:p-8 flex flex-col h-full shadow-orange border-b-[8px] border-r-[8px]">
+                <h3 class="text-2xl md:text-3xl font-black mb-4 text-[var(--c-accent)] border-b-4 border-[var(--c-dark)] pb-2 inline-block">🧊 到期效應</h3>
+                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-6">
+                    買選擇權就像買一顆<span class="bg-orange-100 px-1 underline decoration-2 decoration-orange-500">正在融化的冰塊</span>。<br>就算行情不動，你的權利金也會天天扣血。
                 </p>
-                <div class="mt-auto bg-orange-50 p-4 border-2 border-[var(--c-dark)] rounded-lg relative overflow-hidden">
-                    <div class="absolute top-0 right-0 bg-[var(--c-danger)] text-white font-black text-xs px-2 py-1 rounded-bl-lg border-b-2 border-l-2 border-[var(--c-dark)]">殘酷真相</div>
-                    <span class="font-black text-[var(--c-dark)]">📌 衰退的速率不是直線：</span><br>
-                    <span class="text-sm font-bold text-gray-700">距離到期日越遠，每天扣的血越少；但當<strong class="text-[var(--c-danger)] text-base">剩下最後幾天時，融化速度會呈現「斷崖式」的崩塌！</strong>這對買方極度不利，卻是賣方的最愛。</span>
+                <div class="mt-auto bg-orange-50 p-4 border-2 border-[var(--c-dark)] rounded-xl text-sm font-bold text-gray-700">
+                    📌 注意：剩餘天數越少，融化速度越快！最後幾天會呈現「斷崖式」崩塌。
                 </div>
             </div>
-
         </section>
 
-        <!-- ★ 超級互動區：動態 Theta 融冰模擬器 ★ -->
-        <section class="px-2 md:px-0 flex flex-col items-center mt-4 relative z-10">
-            <h3 class="text-2xl md:text-4xl font-black mb-4 text-[var(--c-dark)] tracking-wide text-center">
-                🕹️ Theta 融冰模擬器 (14天雙週選)
-            </h3>
-            <p class="text-center text-lg font-bold text-gray-700 mb-8 max-w-3xl">
-                假設目前 <strong class="text-white bg-[var(--c-dark)] px-2 py-1 rounded">台指期大盤正好在 30,000 點</strong>，你關注的是 <strong class="text-white bg-[var(--c-primary)] px-2 py-1 rounded">30,000 價平買權 (ATM Call)</strong>。<br>
-                在指數完全不動的情況下，向右滑動拉桿（時間推進），看看「時間」是如何吃掉這 400 點的權利金！
-            </p>
+        <!-- 互動融冰模擬器 -->
+        <section class="flex flex-col items-center mt-10">
+            <h3 class="text-2xl md:text-4xl font-black mb-6 text-[var(--c-dark)] font-comic">🕹️ THETA MELTING SIMULATOR</h3>
+            
+            <div class="w-full bg-[#1E293B] pop-card p-4 md:p-10 border-t-[12px] border-t-[var(--c-accent)]">
+                <p class="text-center text-white font-bold mb-8 text-sm md:text-lg">
+                    假設大盤在 30,000 點不動，看看 <span class="text-[var(--c-accent)]">30,000 價平買權</span> 隨時間如何衰退：
+                </p>
 
-            <div class="w-full pop-card bg-[#1E293B] p-4 md:p-8 relative pb-10">
-                
-                <!-- 倒數拉桿 (置於頂部) -->
-                <div class="bg-white border-4 border-[var(--c-dark)] rounded-2xl p-5 md:p-8 mb-8 shadow-[4px_4px_0_var(--c-accent)] relative z-20">
-                    <div class="flex justify-between items-end mb-4">
-                        <span class="text-xl md:text-2xl font-black text-[var(--c-dark)]">⏳ 距離結算還剩下：</span>
-                        <div class="flex items-baseline gap-1">
-                            <span id="daysDisplay" class="text-5xl md:text-6xl font-black text-[var(--c-accent)] font-comic">14</span>
-                            <span class="text-xl font-black text-gray-500">天</span>
+                <!-- 拉桿區 -->
+                <div class="bg-white border-4 border-[var(--c-dark)] rounded-3xl p-6 md:p-8 mb-10 shadow-[6px_6px_0_var(--c-accent)]">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                        <span class="text-lg font-black text-gray-600">⏳ 距離結算還剩下：</span>
+                        <div class="flex items-baseline gap-2 bg-[var(--c-dark)] text-white px-6 py-2 rounded-xl">
+                            <span id="daysDisplay" class="text-4xl md:text-6xl font-black text-[var(--c-accent)] font-comic">14</span>
+                            <span class="text-xl font-bold">天</span>
                         </div>
                     </div>
-                    
-                    <div class="px-2 mt-6">
-                        <!-- 由左至右流逝：value=0 表示剛開倉(剩下14天)，value=14 表示結算(剩下0天) -->
-                        <input type="range" id="daysSlider" min="0" max="14" step="1" value="0">
-                    </div>
-                    
-                    <div class="flex justify-between mt-4 text-sm font-black text-gray-400 px-2">
-                        <span class="text-green-600">14天前 (剛開倉)</span>
-                        <span class="text-[var(--c-danger)]">0天 (今日結算)</span>
+                    <input type="range" id="daysSlider" min="0" max="14" step="1" value="0" class="my-4">
+                    <div class="flex justify-between text-xs font-black text-gray-400">
+                        <span class="text-green-600">14天前 (開倉)</span>
+                        <span class="text-[var(--c-danger)]">0天 (結算當日)</span>
                     </div>
                 </div>
 
-                <!-- 下方：圖表與數據面板 -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full items-center">
-                    
-                    <!-- 數據面板 -->
-                    <div class="lg:col-span-1 flex flex-col gap-4">
-                        <div class="bg-[#0F172A] border-2 border-[#334155] rounded-xl p-5 text-center relative overflow-hidden">
-                            <div class="text-gray-400 font-bold text-sm tracking-widest uppercase mb-2">純粹的時間價值 (點數)</div>
-                            <div id="premiumDisplay" class="text-5xl font-black text-[var(--c-secondary)] font-comic">400</div>
-                            <div class="text-gray-500 font-bold text-sm mt-1">點</div>
+                <!-- 數據與圖表 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <!-- 數據板 -->
+                    <div class="flex flex-col gap-6">
+                        <div class="bg-[#0F172A] border-4 border-[#334155] rounded-2xl p-6 text-center">
+                            <p class="text-xs text-gray-500 font-black mb-2 tracking-widest uppercase">當前時間價值 (點數)</p>
+                            <div id="premiumDisplay" class="text-6xl font-black text-[var(--c-secondary)] font-comic">400</div>
                         </div>
-                        
-                        <div class="bg-[#0F172A] border-2 border-[#334155] rounded-xl p-5 text-center">
-                            <div class="text-gray-400 font-bold text-sm tracking-widest uppercase mb-2">真實台幣殘值 (點數 × $50)</div>
-                            <div id="ntdDisplay" class="text-4xl font-black text-white tracking-wider">$20,000</div>
+                        <div class="bg-[#0F172A] border-4 border-[#334155] rounded-2xl p-6 text-center">
+                            <p class="text-xs text-gray-500 font-black mb-2 tracking-widest uppercase">折合台幣殘值</p>
+                            <div id="ntdDisplay" class="text-4xl font-black text-white">$20,000</div>
                         </div>
-
-                        <!-- 狀態解說警示框 -->
-                        <div id="statusAlert" class="border-2 border-[var(--c-secondary)] bg-[var(--c-secondary)]/20 text-[var(--c-secondary)] rounded-xl p-4 mt-2 transition-colors duration-300">
-                            <h4 class="font-black text-lg mb-1 flex items-center gap-2" id="statusTitle">🚶‍♂️ 緩慢融化期</h4>
-                            <p class="text-sm font-bold opacity-90" id="statusDesc">距離結算還有充足時間，每天流失的時間價值非常少，壓力不大。</p>
+                        <div id="statusAlert" class="p-5 rounded-2xl border-4 border-[var(--c-secondary)] bg-[var(--c-secondary)]/10 text-[var(--c-secondary)] transition-all">
+                            <h4 id="statusTitle" class="font-black text-xl mb-1">🚶‍♂️ 緩慢融化期</h4>
+                            <p id="statusDesc" class="text-sm font-bold opacity-80">距離結算還久，Theta 衰退慢，主要是跟大盤拼方向。</p>
                         </div>
                     </div>
 
-                    <!-- SVG 衰退曲線圖 (Theta Curve) -->
-                    <div class="lg:col-span-2 bg-[#0F172A] border-2 border-[#334155] rounded-xl p-4 md:p-6 h-64 relative flex flex-col">
-                        <div class="text-xs font-black text-gray-500 tracking-widest uppercase absolute top-4 right-4 z-10">Theta Decay Curve</div>
-                        <div class="flex-grow relative w-full mt-4">
-                            <!-- 繪製非線性圖表 -->
+                    <!-- 衰退曲線圖 -->
+                    <div class="bg-[#0F172A] border-4 border-[#334155] rounded-2xl p-4 flex flex-col h-[300px]">
+                        <p class="text-[10px] text-gray-500 font-black mb-4 text-right">THETA DECAY CURVE</p>
+                        <div class="flex-grow relative w-full">
                             <svg viewBox="0 0 500 200" class="w-full h-full overflow-visible" preserveAspectRatio="none">
-                                <!-- 網格底線 -->
-                                <line x1="0" y1="180" x2="500" y2="180" stroke="#334155" stroke-width="2"/>
-                                <line x1="0" y1="20" x2="0" y2="180" stroke="#334155" stroke-width="2"/>
-                                
-                                <text x="0" y="10" fill="#64748B" font-size="12" font-weight="bold">400點</text>
-                                <text x="0" y="195" fill="#64748B" font-size="12" font-weight="bold">0點</text>
-                                
-                                <text x="20" y="195" fill="#10B981" font-size="12" font-weight="bold">14天前</text>
-                                <text x="480" y="195" fill="#EF4444" font-size="12" font-weight="bold" text-anchor="end">結算日(0天)</text>
-
-                                <!-- 預先畫好的拋物線軌跡 (從左到右: x=20(14天) 到 x=480(0天) ; y=20(400點) 到 y=180(0點)) -->
                                 <path id="decayPath" d="M 20 20 Q 350 50 480 180" fill="none" stroke="#334155" stroke-width="4" stroke-dasharray="8 8"/>
-                                
-                                <!-- 動態走過的實線軌跡 -->
                                 <path id="activePath" d="M 20 20 Q 150 50 20 180" fill="none" stroke="var(--c-secondary)" stroke-width="6" stroke-linecap="round"/>
-
-                                <!-- 動態定位點 (冰塊/炸彈) -->
                                 <g id="dotIndicator" transform="translate(20, 20)">
-                                    <circle cx="0" cy="0" r="10" fill="var(--c-accent)" stroke="white" stroke-width="3" class="shadow-sm"/>
-                                    <!-- 融化特效圈 -->
-                                    <circle cx="0" cy="0" r="15" fill="var(--c-accent)" opacity="0.3" id="dotPulse"/>
+                                    <circle cx="0" cy="0" r="12" fill="var(--c-accent)" stroke="white" stroke-width="4"/>
+                                    <circle cx="0" cy="0" r="18" fill="var(--c-accent)" opacity="0.3" id="dotPulse"/>
                                 </g>
                             </svg>
                         </div>
+                        <div class="flex justify-between text-[10px] text-gray-600 font-black mt-2">
+                            <span>14天前</span>
+                            <span>結算</span>
+                        </div>
                     </div>
-
                 </div>
             </div>
         </section>
 
-        <!-- 買賣方策略總結 -->
-        <section class="px-2 md:px-0 flex flex-col items-center mt-4 relative z-10">
-            <h3 class="text-2xl md:text-4xl font-black mb-8 text-[var(--c-dark)] tracking-wide text-center font-comic">
-                💡 應對到期效應的終極策略
-            </h3>
-            <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- 給買方 -->
-                <div class="pop-card bg-white p-6 border-l-8 border-l-[var(--c-secondary)]">
-                    <h4 class="text-xl font-black text-[var(--c-dark)] mb-3 flex items-center gap-2">
-                        🏹 給買方 (Buyer) 的忠告
-                    </h4>
-                    <ul class="space-y-3 font-bold text-gray-700 text-sm md:text-base">
-                        <li class="flex items-start gap-2">
-                            <span class="text-[var(--c-secondary)]">✔</span>
-                            盡量不要買「快到期」的合約，因為每天扣血極快，除非你極度看好馬上會大噴發。
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-[var(--c-secondary)]">✔</span>
-                            選擇距離到期日較遠（如次月）的合約，雖然比較貴，但 Theta 扣血速度慢很多，容錯率較高。
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- 給賣方 -->
-                <div class="pop-card bg-white p-6 border-l-8 border-l-[var(--c-primary)]">
-                    <h4 class="text-xl font-black text-[var(--c-dark)] mb-3 flex items-center gap-2">
-                        🏦 給賣方 (Seller) 的絕招
-                    </h4>
-                    <ul class="space-y-3 font-bold text-gray-700 text-sm md:text-base">
-                        <li class="flex items-start gap-2">
-                            <span class="text-[var(--c-primary)]">✔</span>
-                            最喜歡「即將到期」的合約！在最後幾天建倉，享受 Theta 斷崖式崩塌帶來的快速利潤（俗稱收乾）。
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-[var(--c-primary)]">✔</span>
-                            週選（每週三結算）因為壽命極短，權利金衰退極快，是賣方高頻收租的絕佳戰場。
-                        </li>
-                    </ul>
-                </div>
+        <!-- 策略總結 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 px-2 md:px-0">
+            <div class="pop-card bg-white p-6 border-l-[12px] border-l-[var(--c-secondary)]">
+                <h4 class="text-xl font-black text-[var(--c-dark)] mb-4">🏹 給買方 (Buyer)</h4>
+                <ul class="space-y-3 font-bold text-gray-600 text-sm">
+                    <li>• 避開快到期的合約，除非有大行情。</li>
+                    <li>• 越接近結算，勝率必須越高才能補足時間損失。</li>
+                </ul>
+            </div>
+            <div class="pop-card bg-white p-6 border-l-[12px] border-l-[var(--c-primary)]">
+                <h4 class="text-xl font-black text-[var(--c-dark)] mb-4">🏦 給賣方 (Seller)</h4>
+                <ul class="space-y-3 font-bold text-gray-600 text-sm">
+                    <li>• 最喜歡最後 3-5 天，Theta 崩塌最快。</li>
+                    <li>• 享受「收乾」的快感，時間是賣方最好的朋友。</li>
+                </ul>
             </div>
         </section>
 
     </main>
 
     <!-- 頁尾 -->
-    <footer class="w-full flex justify-center mt-16 pb-10 relative z-10 px-2">
-        <div class="capsule-container footer-capsule text-center">
-            <div class="flex flex-wrap items-center justify-center gap-2 md:gap-4 mb-3">
-                <div class="w-8 h-8 md:w-12 md:h-12 rounded-full border-2 border-[var(--c-dark)] overflow-hidden shadow-sm shrink-0 bg-white">
-                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/A855F7/FFFFFF?text=Logo&font=Bangers'">
-                </div>
-                <div class="flex items-center flex-wrap justify-center">
-                    <span class="text-lg md:text-2xl font-black tracking-tight text-[var(--c-dark)] font-comic">JOPTION</span>
-                    <span class="mx-2 md:mx-4 text-gray-300 font-light text-xl hidden sm:inline">|</span>
-                    <span class="text-base md:text-xl font-bold text-[var(--c-dark)] w-full sm:w-auto mt-1 sm:mt-0">歐大選擇權教室</span>
-                </div>
+    <footer class="w-full flex justify-center mt-20 pb-10">
+        <div class="capsule-container max-w-lg py-6 px-4 flex-col text-center">
+            <div class="flex items-center gap-3 mb-2">
+                <img src="IP標籤.jpg" class="w-8 h-8 rounded-full border border-gray-300" alt="Icon" onerror="this.style.display='none'">
+                <span class="text-xl font-black font-comic">JOPTION ACADEMY</span>
             </div>
-            <div class="text-center w-full mt-2">
-                <p class="text-[10px] md:text-sm text-gray-500 font-bold tracking-tight">
-                    © 2026 Joption Academy - 金融教育僅供參考，投資有風險，操作需謹慎。
-                </p>
-            </div>
+            <p class="text-[10px] md:text-xs text-gray-500 font-bold">
+                © 2026 Joption Academy. 投資必有風險，教學內容僅供教育參考。
+            </p>
         </div>
     </footer>
 
-    <!-- 互動邏輯腳本：Theta 融冰計算 -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const daysSlider = document.getElementById('daysSlider');
-            const daysDisplay = document.getElementById('daysDisplay');
-            const premiumDisplay = document.getElementById('premiumDisplay');
-            const ntdDisplay = document.getElementById('ntdDisplay');
-            
-            const dotIndicator = document.getElementById('dotIndicator');
-            const activePath = document.getElementById('activePath');
-            const dotPulse = document.getElementById('dotPulse');
-            
-            const statusAlert = document.getElementById('statusAlert');
-            const statusTitle = document.getElementById('statusTitle');
-            const statusDesc = document.getElementById('statusDesc');
+            const slider = document.getElementById('daysSlider');
+            const daysTxt = document.getElementById('daysDisplay');
+            const premiumTxt = document.getElementById('premiumDisplay');
+            const ntdTxt = document.getElementById('ntdDisplay');
+            const dot = document.getElementById('dotIndicator');
+            const activeLine = document.getElementById('activePath');
+            const alertBox = document.getElementById('statusAlert');
+            const alertTitle = document.getElementById('statusTitle');
+            const alertDesc = document.getElementById('statusDesc');
 
-            // 基礎參數：14天雙週選，最大時間價值 400點, 1點 = $50
             const maxDays = 14;
-            const maxPremium = 400;
-            const multiplier = 50;
-
-            // SVG 座標邊界設定 (時間由左向右流逝)
-            // X: 14天 = 20, 0天 = 480
-            // Y: 400點 = 20, 0點 = 180
+            const maxPoints = 400;
             const startX = 20, endX = 480;
             const topY = 20, bottomY = 180;
 
-            function updateTheta() {
-                // slider.value 範圍 0~14，0代表經過0天(剩14天)，14代表經過14天(剩0天)
-                const elapsedDays = parseInt(daysSlider.value); 
-                const currentDays = maxDays - elapsedDays;
-                
-                daysDisplay.innerText = currentDays;
+            function update() {
+                const elapsed = parseInt(slider.value);
+                const remaining = maxDays - elapsed;
+                daysTxt.innerText = remaining;
 
-                // 核心算式：時間價值衰退呈現非線性，與「剩餘天數的平方根」成正比
-                // Premium = MaxPremium * sqrt(currentDays / maxDays)
-                const ratio = Math.sqrt(currentDays / maxDays);
-                const currentPremium = Math.round(maxPremium * ratio);
-                const currentNtd = currentPremium * multiplier;
+                // 非線性衰退：與剩餘天數平方根成正比
+                const ratio = Math.sqrt(remaining / maxDays);
+                const currentPoints = Math.round(maxPoints * ratio);
+                premiumTxt.innerText = currentPoints;
+                ntdTxt.innerText = `$${(currentPoints * 50).toLocaleString()}`;
 
-                // 更新文字顯示
-                premiumDisplay.innerText = currentPremium;
-                ntdDisplay.innerText = `$${currentNtd.toLocaleString()}`;
+                // 更新圖表
+                const x = startX + (elapsed / maxDays) * (endX - startX);
+                const y = bottomY - (currentPoints / maxPoints) * (bottomY - topY);
+                dot.setAttribute('transform', `translate(${x}, ${y})`);
 
-                // 更新圖表視覺：計算 X, Y 座標
-                const x = startX + (elapsedDays / maxDays) * (endX - startX);
-                const y = bottomY - (currentPremium / maxPremium) * (bottomY - topY);
+                const cX = startX + (x - startX) * 0.8;
+                const cY = topY + (y - topY) * 0.2;
+                activeLine.setAttribute('d', `M ${startX} ${topY} Q ${cX} ${cY} ${x} ${y}`);
 
-                // 移動圓點
-                dotIndicator.setAttribute('transform', `translate(${x}, ${y})`);
-
-                // 動態裁切實線路徑 (從起始點 20,20 畫到目前的座標點 x,y)
-                // 使用動態二次貝茲曲線 (Q) 控制點，讓實線能夠緊貼著原本的虛線軌跡
-                const controlX = startX + (x - startX) * 0.8;
-                const controlY = topY + (y - topY) * 0.2;
-                activePath.setAttribute('d', `M ${startX} ${topY} Q ${controlX} ${controlY} ${x} ${y}`);
-
-                // 更新狀態解說框 (依據剩餘天數)
-                if (currentDays > 7) {
-                    // 安全期 (14 ~ 8天)
-                    statusAlert.className = "border-2 border-[var(--c-secondary)] bg-[var(--c-secondary)]/10 text-[var(--c-secondary)] rounded-xl p-4 mt-2 transition-colors duration-300";
-                    statusTitle.innerHTML = "🚶‍♂️ 緩慢融化期";
-                    statusDesc.innerText = "距離結算還有超過一週，每天流失的時間價值(Theta)非常少，大盤方向決定一切。";
-                    dotPulse.setAttribute('fill', 'var(--c-secondary)');
-                    activePath.setAttribute('stroke', 'var(--c-secondary)');
-                    premiumDisplay.style.color = 'var(--c-secondary)';
-                } else if (currentDays > 3) {
-                    // 加速期 (7 ~ 4天)
-                    statusAlert.className = "border-2 border-[var(--c-accent)] bg-[var(--c-accent)]/10 text-[var(--c-accent)] rounded-xl p-4 mt-2 transition-colors duration-300";
-                    statusTitle.innerHTML = "🏃‍♂️ 加速流失期";
-                    statusDesc.innerText = "注意！時間價值開始以肉眼可見的速度縮水。買方如果方向沒看對，帳面虧損會快速浮現。";
-                    dotPulse.setAttribute('fill', 'var(--c-accent)');
-                    activePath.setAttribute('stroke', 'var(--c-accent)');
-                    premiumDisplay.style.color = 'var(--c-accent)';
+                // 狀態切換
+                if (remaining > 7) {
+                    alertBox.className = "p-5 rounded-2xl border-4 border-[var(--c-secondary)] bg-[var(--c-secondary)]/10 text-[var(--c-secondary)] transition-all";
+                    alertTitle.innerText = "🚶‍♂️ 緩慢融化期";
+                    alertDesc.innerText = "Theta 衰退慢，行情方向決定盈虧。";
+                    premiumTxt.style.color = "var(--c-secondary)";
+                    activeLine.setAttribute('stroke', 'var(--c-secondary)');
+                } else if (remaining > 3) {
+                    alertBox.className = "p-5 rounded-2xl border-4 border-[var(--c-accent)] bg-[var(--c-accent)]/10 text-[var(--c-accent)] transition-all";
+                    alertTitle.innerText = "🏃‍♂️ 加速流失期";
+                    alertDesc.innerText = "注意！即使大盤不動，權利金也會明顯縮水。";
+                    premiumTxt.style.color = "var(--c-accent)";
+                    activeLine.setAttribute('stroke', 'var(--c-accent)');
                 } else {
-                    // 懸崖期 (3 ~ 0天)
-                    statusAlert.className = "border-2 border-[var(--c-danger)] bg-[var(--c-danger)]/10 text-[var(--c-danger)] rounded-xl p-4 mt-2 transition-colors duration-300";
-                    statusTitle.innerHTML = "📉 Theta 斷崖崩塌！";
-                    if (currentDays === 0) {
-                        statusDesc.innerText = "【今日結算】時間價值已經歸零！大盤沒有漲過 30,000 點，這張合約將直接變成廢紙 (0元)。";
-                    } else {
-                        statusDesc.innerText = `只剩最後 ${currentDays} 天！權利金每天都在崩塌，買方時間緊迫，賣方準備開心收乾！`;
-                    }
-                    dotPulse.setAttribute('fill', 'var(--c-danger)');
-                    activePath.setAttribute('stroke', 'var(--c-danger)');
-                    premiumDisplay.style.color = 'var(--c-danger)';
+                    alertBox.className = "p-5 rounded-2xl border-4 border-[var(--c-danger)] bg-[var(--c-danger)]/10 text-[var(--c-danger)] transition-all";
+                    alertTitle.innerText = "📉 斷崖式崩塌！";
+                    alertDesc.innerText = remaining === 0 ? "結算日！點數全部歸零。" : "剩餘時間極短，買方壓力極大！";
+                    premiumTxt.style.color = "var(--c-danger)";
+                    activeLine.setAttribute('stroke', 'var(--c-danger)');
                 }
             }
 
-            // 綁定事件
-            daysSlider.addEventListener('input', updateTheta);
+            slider.addEventListener('input', update);
+            update();
             
-            // 初始執行一次
-            updateTheta();
-            
-            // 讓圓點產生呼吸融化動畫
+            // 呼吸動畫
+            const pulse = document.getElementById('dotPulse');
+            let scale = 1;
             setInterval(() => {
-                dotPulse.style.transform = dotPulse.style.transform === 'scale(1.5)' ? 'scale(1)' : 'scale(1.5)';
-                dotPulse.style.transition = 'transform 0.5s ease';
-                dotPulse.style.opacity = dotPulse.style.transform === 'scale(1.5)' ? '0' : '0.5';
+                scale = scale === 1 ? 1.4 : 1;
+                pulse.style.transform = `scale(${scale})`;
+                pulse.style.transition = "transform 0.8s ease-in-out";
+                pulse.style.opacity = scale === 1 ? 0.3 : 0;
             }, 1000);
         });
     </script>

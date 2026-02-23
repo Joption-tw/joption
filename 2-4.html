@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BOOM! 保證金與權利金 | 歐大選擇權教室</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,22 +11,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* 重裝普普風專屬 CSS 變數 */
         :root {
-            --c-bg: #F1F5F9; /* 淺灰底色 */
-            --c-primary: #EAB308; /* 工業黃 (保證金/金錢) */
-            --c-secondary: #3B82F6; /* 科技藍 (權利金) */
-            --c-danger: #EF4444; /* 警戒紅 (追繳/斷頭) */
+            --c-bg: #F1F5F9; 
+            --c-primary: #EAB308; /* 工業黃 */
+            --c-secondary: #3B82F6; /* 科技藍 */
+            --c-danger: #EF4444; /* 警戒紅 */
             --c-success: #22C55E; /* 安全綠 */
-            --c-dark: #0F172A; /* 極深藍黑 */
-            --c-text: #0F172A;
+            --c-dark: #0F172A; 
         }
 
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background-color: var(--c-bg);
-            color: var(--c-text);
-            /* 普普風大型斜線網點 */
+            color: var(--c-dark);
             background-image: repeating-linear-gradient(
                 45deg,
                 #E2E8F0 0,
@@ -35,6 +32,7 @@
                 transparent 12px
             );
             background-attachment: fixed;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .font-comic {
@@ -42,36 +40,23 @@
             letter-spacing: 0.05em;
         }
 
-        /* 普普風卡通邊框與陰影 */
         .pop-card {
             border: 4px solid var(--c-dark);
             border-radius: 1rem;
             background-color: white;
             box-shadow: 8px 8px 0px var(--c-dark);
-            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .pop-card:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 10px 10px 0px var(--c-dark);
-        }
-
-        /* 膠囊型容器 (Header/Footer) */
         .capsule-container {
             background: white;
             border: 4px solid var(--c-dark);
             border-radius: 9999px;
-            box-shadow: 0 8px 0 var(--c-dark);
+            box-shadow: 0 6px 0 var(--c-dark);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             width: 100%;
-            max-width: 900px;
         }
-
-        .header-capsule { padding: 0.6rem 2.5rem; }
-        .footer-capsule { padding: 1.5rem 2rem; margin-bottom: 2rem; }
 
         /* 互動拉桿樣式 */
         input[type=range] {
@@ -82,26 +67,21 @@
         input[type=range]:focus { outline: none; }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 40px;
-            width: 40px;
+            height: 44px;
+            width: 44px;
             border-radius: 50%;
             background: var(--c-primary);
             cursor: pointer;
-            margin-top: -14px;
+            margin-top: -16px;
             border: 4px solid var(--c-dark);
             box-shadow: 0 4px 0 var(--c-dark);
-            transition: transform 0.1s;
-        }
-        input[type=range]::-webkit-slider-thumb:active {
-            transform: scale(1.15);
         }
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
-            height: 12px;
+            height: 14px;
             cursor: pointer;
             background: var(--c-dark);
             border-radius: 10px;
-            border: 2px solid var(--c-dark);
         }
 
         /* 警報動畫 */
@@ -111,439 +91,302 @@
             100% { background-color: white; }
         }
         .alert-siren {
-            animation: siren 1s infinite;
+            animation: siren 0.8s infinite;
         }
 
         /* 搖晃動畫 (斷頭用) */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
         }
         .shake-dead {
-            animation: shake 0.5s infinite;
+            animation: shake 0.3s infinite;
             background-color: var(--c-danger) !important;
             color: white !important;
         }
 
         @media (max-width: 640px) {
-            .capsule-container { border-radius: 1.5rem; padding: 1rem; }
-            .header-capsule { padding: 0.5rem 1rem; }
+            .capsule-container { border-radius: 1.5rem; padding: 0.75rem; border-width: 3px; }
             .pop-card { border-width: 3px; box-shadow: 6px 6px 0px var(--c-dark); }
-            input[type=range]::-webkit-slider-thumb { height: 32px; width: 32px; margin-top: -12px;}
+            input[type=range]::-webkit-slider-thumb { height: 36px; width: 36px; margin-top: -12px; }
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center p-3 sm:p-4 md:p-8 overflow-x-hidden w-full relative z-0">
+<body class="min-h-screen flex flex-col items-center p-4 md:p-8 w-full max-w-[100vw] overflow-x-hidden">
 
-    <!-- 頁首：標頭設計 -->
-    <header class="w-full flex justify-center mb-10 md:mb-16 relative z-10 px-2">
-        <div class="capsule-container header-capsule flex-row w-full max-w-3xl">
-            <div class="flex items-center justify-center gap-3 md:gap-6 w-full">
-                <!-- Logo -->
-                <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl border-2 border-[var(--c-dark)] overflow-hidden shadow-sm shrink-0 bg-white">
-                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/EAB308/000000?text=Logo&font=Bangers'">
-                </div>
-                <!-- 文字 -->
-                <div class="flex flex-col justify-center">
-                    <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-[var(--c-dark)] leading-none mb-1 tracking-wide">
-                        歐大選擇權教室
-                    </h1>
-                    <p class="text-[10px] sm:text-xs md:text-sm font-black text-gray-600 tracking-[0.1em] sm:tracking-[0.2em] uppercase leading-none mt-1 font-comic">
-                        JOPTION ACADEMY
-                    </p>
-                </div>
+    <!-- 頁首 -->
+    <header class="w-full flex justify-center mb-10 md:mb-16">
+        <div class="capsule-container py-3 px-6 max-w-2xl flex-row gap-4">
+            <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl border-2 border-[var(--c-dark)] overflow-hidden bg-white shrink-0">
+                <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/EAB308/000000?text=J&font=Bangers'">
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-xl md:text-3xl font-black text-[var(--c-dark)] leading-tight">歐大選擇權教室</h1>
+                <p class="text-[10px] md:text-sm font-black text-gray-500 tracking-widest font-comic uppercase">JOPTION ACADEMY</p>
             </div>
         </div>
     </header>
 
-    <!-- 主要內容區 -->
-    <main class="w-full max-w-5xl flex-grow flex flex-col gap-10 md:gap-16">
+    <main class="w-full max-w-5xl flex flex-col gap-12 md:gap-20">
         
-        <!-- 大標題區 -->
+        <!-- 大標題 -->
         <div class="text-center px-2">
-            <div class="inline-block bg-[var(--c-dark)] text-white px-6 sm:px-12 py-4 sm:py-6 pop-card transform rotate-1 relative max-w-full z-10">
-                <div class="absolute -top-6 -left-6 md:-top-8 md:-left-8 text-5xl md:text-7xl transform -rotate-12 drop-shadow-md">💰</div>
-                <h2 class="text-3xl sm:text-4xl md:text-6xl font-black tracking-wide font-comic uppercase">
-                    保證金 VS 權利金
-                </h2>
-                <div class="mt-2 text-lg md:text-2xl font-black text-[var(--c-dark)] bg-[var(--c-primary)] px-4 py-1 inline-block rounded-lg transform -rotate-2 border-2 border-[var(--c-dark)] shadow-[4px_4px_0_#fff]">
+            <div class="inline-block bg-[var(--c-dark)] text-white px-6 md:px-12 py-5 pop-card transform rotate-1 relative">
+                <div class="absolute -top-6 -left-6 md:-top-10 md:-left-10 text-5xl md:text-7xl transform -rotate-12 drop-shadow-md">💰</div>
+                <h2 class="text-3xl md:text-6xl font-black font-comic">MARGIN vs PREMIUM</h2>
+                <div class="mt-3 text-sm md:text-2xl font-bold bg-[var(--c-primary)] text-[var(--c-dark)] px-4 py-1 inline-block rounded-lg transform -rotate-2 border-2 border-[var(--c-dark)] shadow-[4px_4px_0_#fff]">
                     市場的門票與押金
                 </div>
             </div>
         </div>
 
-        <!-- 觀念比喻：門票與押金 -->
-        <section class="px-2 md:px-0 grid grid-cols-1 md:grid-cols-2 gap-8 w-full relative z-10">
-            
-            <!-- 權利金卡片 -->
-            <div class="bg-white pop-card p-6 md:p-8 relative flex flex-col h-full border-l-8 border-l-[var(--c-secondary)]">
-                <div class="flex items-center gap-3 mb-4">
+        <!-- 觀念對比 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 px-2 md:px-0">
+            <!-- 權利金 -->
+            <div class="bg-white pop-card p-6 md:p-8 flex flex-col h-full border-l-[12px] border-l-[var(--c-secondary)]">
+                <div class="flex items-center gap-4 mb-4">
                     <span class="text-4xl">🎟️</span>
-                    <h3 class="text-2xl md:text-3xl font-black text-[var(--c-secondary)]">權利金 (Premium)</h3>
+                    <h3 class="text-2xl md:text-3xl font-black text-[var(--c-secondary)]">權利金</h3>
                 </div>
-                <h4 class="text-lg font-black text-[var(--c-dark)] mb-2 bg-blue-100 inline-block px-2 py-1 rounded">＝ 電影票 / 保險費</h4>
-                <p class="text-base md:text-lg font-bold text-gray-700 leading-relaxed mb-4">
-                    這是選擇權的<strong class="text-[var(--c-secondary)]">「價格」</strong>。<br>
-                    <span class="text-blue-600">買方</span>支付這筆錢，買到一個以小搏大的權利，最多就是把這筆錢賠光。<br>
-                    <span class="text-red-500">賣方</span>則是把這筆錢收進口袋，作為承擔風險的補償。
+                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-6">
+                    等於<span class="bg-blue-100 px-1 underline">電影票 / 保險費</span>。<br>
+                    這是選擇權的「售價」。買方支付它來獲得權利，賣方收下它作為補償。
                 </p>
+                <div class="mt-auto bg-blue-50 p-4 border-2 border-dashed border-[var(--c-secondary)] rounded-xl text-xs font-bold text-blue-700">
+                    買方：支付這筆錢，最多賠光。
+                </div>
             </div>
 
-            <!-- 保證金卡片 -->
-            <div class="bg-white pop-card p-6 md:p-8 relative flex flex-col h-full border-l-8 border-l-[var(--c-primary)]">
-                <div class="flex items-center gap-3 mb-4">
+            <!-- 保證金 -->
+            <div class="bg-white pop-card p-6 md:p-8 flex flex-col h-full border-l-[12px] border-l-[var(--c-primary)]">
+                <div class="flex items-center gap-4 mb-4">
                     <span class="text-4xl">🏦</span>
-                    <h3 class="text-2xl md:text-3xl font-black text-[var(--c-primary)] drop-shadow-[1px_1px_0_#000]">保證金 (Margin)</h3>
+                    <h3 class="text-2xl md:text-3xl font-black text-[var(--c-primary)] drop-shadow-[1px_1px_0_#000]">保證金</h3>
                 </div>
-                <h4 class="text-lg font-black text-[var(--c-dark)] mb-2 bg-yellow-100 inline-block px-2 py-1 rounded">＝ 租房押金 / 財力證明</h4>
-                <p class="text-base md:text-lg font-bold text-gray-700 leading-relaxed mb-4">
-                    這是給<strong class="text-[var(--c-primary)] drop-shadow-[1px_1px_0_#000]">「賣方 (Seller)」</strong>專用的制度。<br>
-                    因為賣方有「必須履約」的義務，為防止賣方賠錢跑路，交易所會先扣留一筆龐大的資金作為押金。只要大盤走勢對賣方不利，這筆押金要求就會<strong class="text-[var(--c-danger)]">暴增</strong>！
+                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-6">
+                    等於<span class="bg-yellow-100 px-1 underline">租房押金 / 財力證明</span>。<br>
+                    這是賣方專屬的制度。為了防止賣方賠錢跑路，交易所會預扣一筆押金。
                 </p>
+                <div class="mt-auto bg-yellow-50 p-4 border-2 border-dashed border-[var(--c-primary)] rounded-xl text-xs font-bold text-yellow-700">
+                    賣方：大盤走勢不利時，押金需求會暴增！
+                </div>
             </div>
-
         </section>
 
-        <!-- ★ 超級互動區：賣方生存模擬器 (含衰退率) ★ -->
-        <section class="px-2 md:px-0 flex flex-col items-center mt-4 relative z-10">
-            <h3 class="text-2xl md:text-4xl font-black mb-4 text-[var(--c-dark)] tracking-wide text-center bg-white px-6 py-2 pop-card inline-block transform -rotate-1">
-                🕹️ 賣方生存模擬器 (追繳/斷頭)
-            </h3>
-            <p class="text-center text-lg font-bold text-gray-700 mb-8 max-w-3xl bg-white/80 p-4 rounded-xl border-2 border-[var(--c-dark)] shadow-sm">
-                你準備了 <strong class="text-[var(--c-dark)] text-xl">10 萬元</strong> 本金，賣出了一口 <strong class="text-[var(--c-danger)] text-xl">30,000 點的買權 (Sell Call)</strong>，並收了 150 點 (<span class="text-[var(--c-success)]">+$7,500</span>) 的權利金。<br>
-                <span class="text-sm">※ 交易所規定的基本原始保證金為 $48,000。讓我們看看大盤暴漲與時間流逝會如何影響你的帳戶！</span>
-            </p>
-
-            <div class="w-full pop-card bg-[#1E293B] p-4 md:p-8 relative pb-10" id="simulatorCard">
-                
-                <!-- 雙拉桿控制區 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 relative z-20">
-                    
-                    <!-- 1. 大盤拉桿 -->
-                    <div class="bg-white border-4 border-[var(--c-dark)] rounded-2xl p-5 shadow-[4px_4px_0_var(--c-danger)]">
-                        <div class="flex justify-between items-end mb-4">
-                            <span class="text-base font-black text-[var(--c-dark)]">📈 1. 模擬大盤走勢：</span>
-                            <div class="flex items-baseline gap-1">
-                                <span id="indexDisplay" class="text-3xl font-black text-[var(--c-danger)] font-comic">30000</span>
-                                <span class="text-sm font-black text-gray-500">點</span>
-                            </div>
-                        </div>
-                        <input type="range" id="indexSlider" min="29500" max="32000" step="50" value="30000">
-                        <div class="flex justify-between mt-2 text-xs font-black text-gray-400">
-                            <span>29500 (安全)</span>
-                            <span class="text-[var(--c-danger)]">32000 (暴漲軋空)</span>
-                        </div>
-                    </div>
-
-                    <!-- 2. 時間拉桿 (衰退率) -->
-                    <div class="bg-white border-4 border-[var(--c-dark)] rounded-2xl p-5 shadow-[4px_4px_0_var(--c-secondary)]">
-                        <div class="flex justify-between items-end mb-4">
-                            <span class="text-base font-black text-[var(--c-dark)]">⏳ 2. 時間衰退 (Theta)：</span>
-                            <div class="flex items-baseline gap-1">
-                                <span class="text-sm font-bold text-gray-500 mr-2">經過了</span>
-                                <span id="daysDisplay" class="text-3xl font-black text-[var(--c-secondary)] font-comic">0</span>
-                                <span class="text-sm font-black text-gray-500">天</span>
-                            </div>
-                        </div>
-                        <!-- 時間由左到右增加 (經過0天 -> 經過14天結算) -->
-                        <input type="range" id="daysSlider" min="0" max="14" step="1" value="0">
-                        <div class="flex justify-between mt-2 text-xs font-black text-gray-400">
-                            <span>0天 (剛開倉)</span>
-                            <span class="text-[var(--c-secondary)]">14天 (結算收乾)</span>
-                        </div>
-                    </div>
-
+        <!-- 賣方生存模擬器 -->
+        <section class="flex flex-col items-center mt-10">
+            <h3 class="text-2xl md:text-4xl font-black mb-6 text-[var(--c-dark)] font-comic">🕹️ SELLER SURVIVAL SIMULATOR</h3>
+            
+            <div class="w-full bg-[#1E293B] pop-card p-4 md:p-10 border-t-[12px] border-t-[var(--c-primary)]">
+                <div class="bg-white/10 p-4 rounded-xl mb-8 text-white font-bold text-sm md:text-base text-center">
+                    本金 10 萬，賣出 30000 點 Call (收 150 點)。<br class="hidden md:block">
+                    觀察大盤暴漲與時間流逝對維持率的衝擊！
                 </div>
 
-                <!-- 帳戶狀態儀表板 -->
-                <div class="bg-[#0F172A] border-4 border-[#334155] rounded-2xl p-6 relative" id="dashboard">
-                    
-                    <!-- 狀態印章 -->
-                    <div id="statusStamp" class="absolute -top-6 -right-2 md:right-4 bg-[var(--c-success)] text-white border-4 border-white font-black text-2xl md:text-4xl px-4 py-2 rounded-xl transform rotate-12 shadow-lg transition-all duration-300">
+                <!-- 雙拉桿控制 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                    <!-- 大盤 -->
+                    <div class="bg-white border-4 border-[var(--c-dark)] rounded-2xl p-5 shadow-[4px_4px_0_var(--c-danger)]">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-sm font-black text-gray-500">📈 大盤走勢：</span>
+                            <span id="indexDisplay" class="text-3xl font-black text-[var(--c-danger)] font-comic">30000</span>
+                        </div>
+                        <input type="range" id="indexSlider" min="29500" max="32000" step="50" value="30000">
+                    </div>
+                    <!-- 時間 -->
+                    <div class="bg-white border-4 border-[var(--c-dark)] rounded-2xl p-5 shadow-[4px_4px_0_var(--c-secondary)]">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-sm font-black text-gray-500">⏳ 經過時間：</span>
+                            <span class="text-3xl font-black text-[var(--c-secondary)] font-comic"><span id="daysDisplay">0</span> 天</span>
+                        </div>
+                        <input type="range" id="daysSlider" min="0" max="14" step="1" value="0">
+                    </div>
+                </div>
+
+                <!-- 儀表板 -->
+                <div id="dashboard" class="bg-[#0F172A] border-4 border-[#334155] rounded-3xl p-6 md:p-10 relative overflow-hidden transition-all duration-300">
+                    <div id="statusStamp" class="absolute top-4 right-4 bg-[var(--c-success)] text-white font-black px-4 py-2 rounded-xl transform rotate-12 border-2 border-white shadow-lg text-xl md:text-3xl z-10">
                         安全 SAFE
                     </div>
 
-                    <h4 class="text-white font-black text-xl mb-6 tracking-widest border-b-2 border-[#334155] pb-2">📊 賣方帳戶即時監控</h4>
-
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
-                        
-                        <!-- 帳戶權益數 -->
-                        <div class="bg-[#1E293B] rounded-xl p-4 text-center border-b-4 border-[var(--c-primary)]">
-                            <div class="text-xs font-bold text-gray-400 mb-1">帳戶總資金 (權益數)</div>
-                            <div id="equityDisplay" class="text-2xl md:text-3xl font-black text-white transition-colors">$107,500</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-0">
+                        <div class="text-center">
+                            <p class="text-[10px] text-gray-500 font-black mb-1">帳戶總資金</p>
+                            <div id="equityDisplay" class="text-3xl font-black text-white">$107,500</div>
                         </div>
-
-                        <!-- 原始保證金 -->
-                        <div class="bg-[#1E293B] rounded-xl p-4 text-center border-b-4 border-gray-500">
-                            <div class="text-xs font-bold text-gray-400 mb-1">規定保證金</div>
-                            <div id="marginDisplay" class="text-xl md:text-2xl font-black text-gray-300">$48,000</div>
+                        <div class="text-center">
+                            <p class="text-[10px] text-gray-500 font-black mb-1">應付保證金</p>
+                            <div id="marginDisplay" class="text-3xl font-black text-gray-400">$48,000</div>
                         </div>
-
-                        <!-- 未實現損益 -->
-                        <div class="bg-[#1E293B] rounded-xl p-4 text-center border-b-4 border-[var(--c-secondary)]">
-                            <div class="text-xs font-bold text-gray-400 mb-1">目前帳面損益</div>
-                            <div id="pnlDisplay" class="text-2xl md:text-3xl font-black text-[var(--c-success)]">+$7,500</div>
+                        <div class="text-center">
+                            <p class="text-[10px] text-gray-500 font-black mb-1">帳面損益</p>
+                            <div id="pnlDisplay" class="text-3xl font-black text-[var(--c-success)]">+$7,500</div>
                         </div>
-
-                        <!-- 保證金維持率 -->
-                        <div class="bg-[#1E293B] rounded-xl p-4 text-center border-b-4 border-[var(--c-success)]" id="ratioBox">
-                            <div class="text-xs font-bold text-gray-400 mb-1">保證金維持率</div>
-                            <div id="ratioDisplay" class="text-3xl md:text-4xl font-black text-[var(--c-success)]">224%</div>
-                        </div>
-
-                    </div>
-
-                    <!-- 進度條 (視覺化維持率) -->
-                    <div class="mt-8">
-                        <div class="flex justify-between text-xs font-bold text-gray-400 mb-1">
-                            <span>💀 斷頭線 (25%)</span>
-                            <span>⚠️ 追繳線 (100%)</span>
-                            <span>安全水位</span>
-                        </div>
-                        <div class="w-full bg-gray-700 h-6 rounded-full overflow-hidden border-2 border-gray-600 relative">
-                            <!-- 警戒線標記 -->
-                            <div class="absolute left-[25%] top-0 bottom-0 w-1 bg-black z-10"></div>
-                            <div class="absolute left-[100%] top-0 bottom-0 w-1 bg-black z-10"></div>
-                            
-                            <!-- 動態填充條 -->
-                            <div id="healthBar" class="h-full bg-[var(--c-success)] transition-all duration-300 w-full" style="width: 100%;"></div>
+                        <div id="ratioBox" class="text-center bg-white/5 rounded-2xl p-4 border-2 border-[var(--c-success)]">
+                            <p class="text-[10px] text-gray-500 font-black mb-1">維持率</p>
+                            <div id="ratioDisplay" class="text-4xl font-black text-[var(--c-success)]">224%</div>
                         </div>
                     </div>
 
-                    <!-- 教學解說框 -->
-                    <div class="mt-6 bg-[#334155] text-gray-200 p-4 rounded-xl text-sm font-bold border-l-4 border-[var(--c-primary)]" id="teachingText">
-                        剛開倉狀態。你收了 $7,500 權利金，維持率高達 224%，此時非常安全，時間是你的朋友。
+                    <!-- 進度條 -->
+                    <div class="mt-10">
+                        <div class="w-full bg-gray-800 h-6 rounded-full border-2 border-gray-700 relative overflow-hidden">
+                            <div class="absolute left-[25%] top-0 bottom-0 w-1 bg-white/20 z-10"></div>
+                            <div class="absolute left-[50%] top-0 bottom-0 w-1 bg-white/20 z-10"></div>
+                            <div id="healthBar" class="h-full bg-[var(--c-success)] transition-all duration-300 w-full"></div>
+                        </div>
+                        <div class="flex justify-between text-[10px] font-black text-gray-500 mt-2 uppercase tracking-widest">
+                            <span>0% 斷頭</span>
+                            <span>100% 追繳線</span>
+                            <span>安全區</span>
+                        </div>
                     </div>
 
+                    <div id="teachingText" class="mt-8 bg-white/10 p-5 rounded-2xl text-sm font-bold text-gray-300 border-l-4 border-[var(--c-primary)]">
+                        帳戶資金充裕。只要大盤不發生暴漲，你就能靠時間流逝穩穩獲利。
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- 總結表：四大名詞釐清 -->
-        <section class="px-2 md:px-0 flex flex-col items-center mt-4">
-            <h3 class="text-2xl md:text-4xl font-black mb-8 text-[var(--c-dark)] tracking-wide text-center font-comic">
-                📚 資金名詞終極釐清
-            </h3>
-            <div class="w-full pop-card p-0 overflow-hidden relative">
-                <div class="w-full overflow-x-auto">
-                    <table class="w-full text-left min-w-[600px] border-collapse">
+        <!-- 名詞釐清表格 -->
+        <section class="flex flex-col items-center">
+            <h3 class="text-2xl md:text-4xl font-black mb-6 text-[var(--c-dark)] font-comic">📚 FUND TERMINOLOGY</h3>
+            <div class="w-full overflow-x-auto px-2">
+                <div class="min-w-[600px] bg-white pop-card p-0 overflow-hidden">
+                    <table class="w-full text-left">
                         <thead>
-                            <tr class="bg-[var(--c-dark)] text-white">
-                                <th class="py-4 px-6 font-black text-lg border-b-4 border-[var(--c-dark)] w-1/4">專有名詞</th>
-                                <th class="py-4 px-6 font-black text-lg border-b-4 border-[var(--c-dark)]">白話文解釋</th>
-                                <th class="py-4 px-6 font-black text-lg border-b-4 border-[var(--c-dark)]">對你的影響</th>
+                            <tr class="bg-[var(--c-dark)] text-white font-black">
+                                <th class="p-4">專有名詞</th>
+                                <th class="p-4">白話解釋</th>
+                                <th class="p-4">影響</th>
                             </tr>
                         </thead>
-                        <tbody class="text-gray-800 font-bold divide-y-4 divide-gray-200">
-                            <tr class="hover:bg-blue-50 transition-colors">
-                                <td class="py-5 px-6">
-                                    <span class="bg-[var(--c-secondary)] text-white px-3 py-1 rounded border-2 border-[var(--c-dark)] font-black">權益數 (Equity)</span>
-                                </td>
-                                <td class="py-5 px-6">你的本金 + 權利金收入 +/- 帳面浮動損益</td>
-                                <td class="py-5 px-6 text-[var(--c-dark)]">這就是你<strong class="text-[var(--c-secondary)]">帳戶裡真正剩下多少錢</strong>。</td>
+                        <tbody class="text-sm md:text-base font-bold divide-y-2">
+                            <tr class="hover:bg-blue-50">
+                                <td class="p-4"><span class="bg-[var(--c-secondary)] text-white px-2 py-1 rounded">權益數</span></td>
+                                <td class="p-4">你的本金 + 賺賠</td>
+                                <td class="p-4">真正剩下的錢</td>
                             </tr>
-                            <tr class="hover:bg-yellow-50 transition-colors">
-                                <td class="py-5 px-6">
-                                    <span class="bg-[var(--c-primary)] text-[var(--c-dark)] px-3 py-1 rounded border-2 border-[var(--c-dark)] font-black">原始保證金</span>
-                                </td>
-                                <td class="py-5 px-6">券商規定下單前必須被「凍結」的押金基本額度</td>
-                                <td class="py-5 px-6 text-[var(--c-dark)]">決定你能賣出幾口。資金太少連一口都賣不出去。</td>
+                            <tr class="hover:bg-yellow-50">
+                                <td class="p-4"><span class="bg-[var(--c-primary)] text-[var(--c-dark)] px-2 py-1 rounded">維持率 < 100%</span></td>
+                                <td class="p-4">跌破規定的押金水位</td>
+                                <td class="p-4 text-[var(--c-danger)]">發出追繳通知！</td>
                             </tr>
-                            <tr class="hover:bg-red-50 transition-colors">
-                                <td class="py-5 px-6">
-                                    <span class="bg-[var(--c-danger)] text-white px-3 py-1 rounded border-2 border-[var(--c-dark)] font-black">維持率低於 100%</span>
-                                </td>
-                                <td class="py-5 px-6">你的「權益數」已經跌破「原始保證金」的水位</td>
-                                <td class="py-5 px-6 text-[var(--c-danger)] font-black">發出「追繳通知 (Margin Call)」，必須立刻補錢！</td>
-                            </tr>
-                            <tr class="hover:bg-gray-100 transition-colors">
-                                <td class="py-5 px-6">
-                                    <span class="bg-gray-800 text-white px-3 py-1 rounded border-2 border-[var(--c-dark)] font-black">維持率低於 25%</span>
-                                </td>
-                                <td class="py-5 px-6">帳戶幾乎賠光，券商為了自保強制介入</td>
-                                <td class="py-5 px-6 text-gray-800 font-black">「斷頭 (Forced Liquidation)」，券商強制幫你平倉認賠。</td>
+                            <tr class="hover:bg-red-50">
+                                <td class="p-4"><span class="bg-[var(--c-dark)] text-white px-2 py-1 rounded">維持率 < 25%</span></td>
+                                <td class="p-4">帳戶幾乎賠光</td>
+                                <td class="p-4 text-[var(--c-danger)]">斷頭 (強制平倉)</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </section>
-
     </main>
 
     <!-- 頁尾 -->
-    <footer class="w-full flex justify-center mt-16 pb-10 relative z-10 px-2">
-        <div class="capsule-container footer-capsule text-center">
-            <div class="flex flex-wrap items-center justify-center gap-2 md:gap-4 mb-3">
-                <div class="w-8 h-8 md:w-12 md:h-12 rounded-full border-2 border-[var(--c-dark)] overflow-hidden shadow-sm shrink-0 bg-white">
-                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/EAB308/000000?text=Logo&font=Bangers'">
-                </div>
-                <div class="flex items-center flex-wrap justify-center">
-                    <span class="text-lg md:text-2xl font-black tracking-tight text-[var(--c-dark)] font-comic">JOPTION</span>
-                    <span class="mx-2 md:mx-4 text-gray-300 font-light text-xl hidden sm:inline">|</span>
-                    <span class="text-base md:text-xl font-bold text-[var(--c-dark)] w-full sm:w-auto mt-1 sm:mt-0">歐大選擇權教室</span>
-                </div>
+    <footer class="w-full flex justify-center mt-20 pb-10">
+        <div class="capsule-container max-w-lg py-6 px-4 flex-col text-center">
+            <div class="flex items-center gap-3 mb-2">
+                <img src="IP標籤.jpg" class="w-8 h-8 rounded-full border border-gray-300" alt="Icon" onerror="this.style.display='none'">
+                <span class="text-xl font-black font-comic">JOPTION ACADEMY</span>
             </div>
-            <div class="text-center w-full mt-2">
-                <p class="text-[10px] md:text-sm text-gray-500 font-bold tracking-tight">
-                    © 2026 Joption Academy - 金融教育僅供參考，投資有風險，操作需謹慎。
-                </p>
-            </div>
+            <p class="text-[10px] md:text-xs text-gray-500 font-bold">
+                © 2026 Joption Academy. 投資必有風險，教學內容僅供教育參考。
+            </p>
         </div>
     </footer>
 
-    <!-- 互動邏輯腳本：保證金與衰退計算 -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const indexSlider = document.getElementById('indexSlider');
             const daysSlider = document.getElementById('daysSlider');
             
-            const indexDisplay = document.getElementById('indexDisplay');
-            const daysDisplay = document.getElementById('daysDisplay');
+            const indexTxt = document.getElementById('indexDisplay');
+            const daysTxt = document.getElementById('daysDisplay');
             
-            const equityDisplay = document.getElementById('equityDisplay');
-            const marginDisplay = document.getElementById('marginDisplay');
-            const pnlDisplay = document.getElementById('pnlDisplay');
-            const ratioDisplay = document.getElementById('ratioDisplay');
+            const equityTxt = document.getElementById('equityDisplay');
+            const marginTxt = document.getElementById('marginDisplay');
+            const pnlTxt = document.getElementById('pnlDisplay');
+            const ratioTxt = document.getElementById('ratioDisplay');
             const healthBar = document.getElementById('healthBar');
             
             const dashboard = document.getElementById('dashboard');
             const ratioBox = document.getElementById('ratioBox');
             const statusStamp = document.getElementById('statusStamp');
-            const teachingText = document.getElementById('teachingText');
+            const teaching = document.getElementById('teachingText');
 
-            // 基礎設定
-            const initialFunds = 100000; // 本金 10萬
-            const strikePrice = 30000;   // 賣出 30000 Call
-            const initialPremiumPts = 150; // 收取 150 點權利金
-            const multiplier = 50;       // 1點 = 50元
-            const baseMargin = 48000;    // 規定原始保證金 48,000
+            const initialFunds = 100000;
+            const strike = 30000;
+            const initialPts = 150;
+            const baseMargin = 48000;
 
-            const maxDays = 14; // 生命週期 14 天
-
-            function updateSimulator() {
-                const currentIndex = parseInt(indexSlider.value);
-                const elapsedDays = parseInt(daysSlider.value); // 0 (剛開倉) 到 14 (結算)
+            function update() {
+                const index = parseInt(indexSlider.value);
+                const elapsed = parseInt(daysSlider.value);
                 
-                // 1. 更新拉桿文字
-                indexDisplay.innerText = currentIndex.toLocaleString();
-                daysDisplay.innerText = elapsedDays;
+                indexTxt.innerText = index.toLocaleString();
+                daysTxt.innerText = elapsed;
 
-                // 2. 計算目前權利金價值 (內含價值 + 時間價值衰退)
-                // 內含價值 (Call被穿價的損失)
-                const intrinsic = Math.max(0, currentIndex - strikePrice);
+                // 賣方邏輯：高賣低買賺錢
+                const intrinsic = Math.max(0, index - strike);
+                const remaining = 14 - elapsed;
+                const timeValue = Math.round(initialPts * Math.sqrt(remaining / 14));
+                const currentPrice = intrinsic + timeValue;
+
+                const pnlNtd = (initialPts - currentPrice) * 50;
+                const equity = initialFunds + (initialPts * 50) + pnlNtd;
                 
-                // 時間價值衰退 (非線性，用剩餘天數平方根模擬)
-                const remainingDays = maxDays - elapsedDays;
-                const timeValueRatio = Math.sqrt(remainingDays / maxDays);
-                // 假設當初的 150 點全是時間價值 (因為是價平)
-                const currentTimeValue = Math.round(initialPremiumPts * timeValueRatio);
-                
-                // 目前市價 (如果你現在要買回平倉的價格)
-                const currentPremiumPrice = intrinsic + currentTimeValue;
-
-                // 3. 計算帳面損益 (賣方：高賣低買賺錢，低賣高買賠錢)
-                // 賺 = (當初賣的價格 - 現在的價格) * 50
-                const pnlPts = initialPremiumPts - currentPremiumPrice;
-                const pnlNtd = pnlPts * multiplier;
-
-                // 4. 計算權益數 (Equity)
-                // Equity = 本金 + 當初收的權利金 + 目前的浮動損益
-                // = 100000 + 7500 + pnlNtd
-                const equity = initialFunds + (initialPremiumPts * multiplier) + pnlNtd;
-
-                // 5. 計算動態保證金需求 (簡化版教學邏輯：大盤漲過履約價時，風險保證金會隨內含價值等比增加)
                 let requiredMargin = baseMargin;
-                if (intrinsic > 0) {
-                    requiredMargin = baseMargin + (intrinsic * multiplier * 0.8); // 稍微加上風險係數
-                }
+                if (intrinsic > 0) requiredMargin = baseMargin + (intrinsic * 40);
 
-                // 6. 計算保證金維持率
                 const ratio = Math.max(0, Math.round((equity / requiredMargin) * 100));
 
-                // 7. 更新 UI 數字
-                equityDisplay.innerText = `$${Math.round(equity).toLocaleString()}`;
-                marginDisplay.innerText = `$${Math.round(requiredMargin).toLocaleString()}`;
-                
-                if (pnlNtd > 0) {
-                    pnlDisplay.innerText = `+$${pnlNtd.toLocaleString()}`;
-                    pnlDisplay.className = "text-2xl md:text-3xl font-black text-[var(--c-success)]";
-                } else if (pnlNtd < 0) {
-                    pnlDisplay.innerText = `-$${Math.abs(pnlNtd).toLocaleString()}`;
-                    pnlDisplay.className = "text-2xl md:text-3xl font-black text-[var(--c-danger)]";
-                } else {
-                    pnlDisplay.innerText = `$0`;
-                    pnlDisplay.className = "text-2xl md:text-3xl font-black text-white";
-                }
+                // UI 更新
+                equityTxt.innerText = `$${Math.round(equity).toLocaleString()}`;
+                marginTxt.innerText = `$${Math.round(requiredMargin).toLocaleString()}`;
+                pnlTxt.innerText = (pnlNtd >= 0 ? '+' : '-') + `$${Math.abs(pnlNtd).toLocaleString()}`;
+                pnlTxt.style.color = pnlNtd >= 0 ? "var(--c-success)" : "var(--c-danger)";
+                ratioTxt.innerText = `${ratio}%`;
 
-                ratioDisplay.innerText = `${ratio}%`;
+                // 顏色與狀態
+                dashboard.className = "bg-[#0F172A] border-4 border-[#334155] rounded-3xl p-6 md:p-10 relative overflow-hidden transition-all duration-300";
+                ratioBox.className = "text-center bg-white/5 rounded-2xl p-4 border-2";
+                statusStamp.className = "absolute top-4 right-4 text-white font-black px-4 py-2 rounded-xl transform rotate-12 border-2 border-white shadow-lg text-xl md:text-3xl z-10";
 
-                // 8. 更新進度條與警告狀態
-                // 進度條視覺化: 100% 畫在條的 50% 位置，200% 畫在滿版
                 let barWidth = (ratio / 200) * 100;
-                if (barWidth > 100) barWidth = 100;
-                healthBar.style.width = `${barWidth}%`;
+                healthBar.style.width = `${Math.min(100, barWidth)}%`;
 
-                // 清除所有警告樣式
-                dashboard.classList.remove('alert-siren', 'shake-dead');
-                ratioBox.className = "bg-[#1E293B] rounded-xl p-4 text-center border-b-4";
-                
                 if (ratio < 25) {
-                    // 斷頭 (小於 25%)
-                    healthBar.style.backgroundColor = 'var(--c-dark)';
-                    ratioDisplay.className = "text-3xl md:text-4xl font-black text-white";
-                    ratioBox.classList.add('border-[var(--c-dark)]', 'bg-[var(--c-danger)]');
                     dashboard.classList.add('shake-dead');
-                    
-                    statusStamp.innerText = "💀 斷頭出場";
-                    statusStamp.className = "absolute -top-6 -right-2 md:right-4 bg-[var(--c-dark)] text-white border-4 border-[var(--c-danger)] font-black text-2xl md:text-4xl px-4 py-2 rounded-xl transform rotate-12 shadow-lg";
-                    
-                    teachingText.innerHTML = "【悲劇發生】大盤暴漲讓你承受巨大虧損，權益數幾乎歸零。券商已經強制將你的部位市價平倉出局！<br><span class='text-[var(--c-primary)]'>💡 教訓：賣方沒有無限本金，絕不能凹單。</span>";
-
+                    statusStamp.innerText = "💀 斷頭";
+                    statusStamp.style.backgroundColor = "var(--c-dark)";
+                    ratioTxt.className = "text-4xl font-black text-white";
+                    healthBar.style.backgroundColor = "var(--c-dark)";
+                    teaching.innerHTML = "【斷頭發生】大盤暴漲導致維持率跌破 25%，券商已強制平倉。";
                 } else if (ratio < 100) {
-                    // 追繳 (小於 100%)
-                    healthBar.style.backgroundColor = 'var(--c-danger)';
-                    ratioDisplay.className = "text-3xl md:text-4xl font-black text-[var(--c-danger)]";
-                    ratioBox.classList.add('border-[var(--c-danger)]');
                     dashboard.classList.add('alert-siren');
-
-                    statusStamp.innerText = "⚠️ 追繳 Margin Call";
-                    statusStamp.className = "absolute -top-6 -right-2 md:right-4 bg-[var(--c-danger)] text-white border-4 border-white font-black text-2xl md:text-3xl px-4 py-2 rounded-xl transform -rotate-6 shadow-lg alert-siren";
-
-                    if (elapsedDays > 0) {
-                        teachingText.innerHTML = "【警報】維持率跌破 100%！雖然時間衰退幫你擋了一點傷害，但大盤漲太多了，你必須立刻補錢，否則面臨斷頭。";
-                    } else {
-                        teachingText.innerHTML = "【警報】維持率跌破 100%！大盤漲破 30000 點，虧損擴大，保證金要求提高。你必須立刻存錢進去！";
-                    }
-
+                    statusStamp.innerText = "⚠️ 追繳";
+                    statusStamp.style.backgroundColor = "var(--c-danger)";
+                    ratioTxt.className = "text-4xl font-black text-[var(--c-danger)]";
+                    healthBar.style.backgroundColor = "var(--c-danger)";
+                    ratioBox.classList.add('border-[var(--c-danger)]');
+                    teaching.innerHTML = "【警報】維持率跌破 100%！你必須立刻補足資金，否則面臨被斷頭的風險。";
                 } else {
-                    // 安全 (大於等於 100%)
-                    healthBar.style.backgroundColor = 'var(--c-success)';
-                    ratioDisplay.className = "text-3xl md:text-4xl font-black text-[var(--c-success)]";
-                    ratioBox.classList.add('border-[var(--c-success)]');
-
                     statusStamp.innerText = "安全 SAFE";
-                    statusStamp.className = "absolute -top-6 -right-2 md:right-4 bg-[var(--c-success)] text-white border-4 border-white font-black text-2xl md:text-4xl px-4 py-2 rounded-xl transform rotate-12 shadow-lg";
-
-                    if (currentIndex <= strikePrice && elapsedDays === maxDays) {
-                        teachingText.innerHTML = "【完美收租】大盤沒有漲過履約價，且時間已到期。合約價值歸零，你將當初的 $7,500 權利金完整放進口袋！";
-                    } else if (currentIndex > strikePrice) {
-                        teachingText.innerHTML = "大盤微漲穿價，目前有帳面虧損，但因為你的本金($10萬)夠厚，維持率還在安全範圍內。";
-                    } else if (elapsedDays > 5) {
-                        teachingText.innerHTML = `經過了 ${elapsedDays} 天，<strong class="text-[var(--c-primary)]">時間價值衰退 (Theta) 正在幫你賺錢</strong>！即使大盤微幅震盪，你的權益數依然在穩步上升。`;
-                    } else {
-                        teachingText.innerHTML = "帳戶資金充裕，維持率非常健康。只要大盤不發生暴漲，你就能靠時間流逝穩穩獲利。";
-                    }
+                    statusStamp.style.backgroundColor = "var(--c-success)";
+                    ratioTxt.className = "text-4xl font-black text-[var(--c-success)]";
+                    healthBar.style.backgroundColor = "var(--c-success)";
+                    ratioBox.classList.add('border-[var(--c-success)]');
+                    teaching.innerHTML = elapsed > 7 ? "時間價值正在快速融化，維持率穩定上升，這是賣方最愛的收租時刻。" : "帳戶目前非常健康。";
                 }
             }
 
-            // 綁定事件
-            indexSlider.addEventListener('input', updateSimulator);
-            daysSlider.addEventListener('input', updateSimulator);
-            
-            // 初始執行一次
-            updateSimulator();
+            indexSlider.addEventListener('input', update);
+            daysSlider.addEventListener('input', update);
+            update();
         });
     </script>
 </body>

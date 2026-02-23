@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BOOM! 結算日大揭密 | 歐大選擇權教室</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,13 +11,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* 結算主題專屬美式漫畫色調 */
         :root {
             --c-bg: #FAFAF9;
-            --c-primary: #FF3D00; /* 警示紅 (結算截止) */
-            --c-secondary: #2979FF; /* 專業藍 (合約週期) */
-            --c-accent: #FFD600; /* 亮黃色 (視覺焦點) */
-            --c-friday: #10B981; /* 週五選專用綠 */
+            --c-primary: #FF3D00; 
+            --c-secondary: #2979FF; 
+            --c-accent: #FFD600; 
+            --c-friday: #10B981; 
             --c-dark: #1A1A1A;
             --c-grid: #E5E7EB;
         }
@@ -26,9 +25,9 @@
             font-family: 'Noto Sans TC', sans-serif;
             background-color: var(--c-bg);
             color: var(--c-dark);
-            /* 普普風漫畫網點 */
             background-image: radial-gradient(var(--c-grid) 2px, transparent 2px);
             background-size: 24px 24px;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .font-comic {
@@ -36,33 +35,25 @@
             letter-spacing: 0.05em;
         }
 
-        /* 普普風卡通卡片 */
         .pop-card {
             border: 4px solid var(--c-dark);
             border-radius: 1rem;
             background-color: white;
             box-shadow: 8px 8px 0px var(--c-dark);
-            transition: transform 0.2s;
         }
 
-        /* 膠囊型容器 */
         .capsule-container {
             background: white;
             border: 4px solid var(--c-dark);
             border-radius: 9999px;
-            box-shadow: 0 8px 0 var(--c-dark);
+            box-shadow: 0 6px 0 var(--c-dark);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             width: 100%;
-            max-width: 900px;
         }
 
-        .header-capsule { padding: 0.6rem 2.5rem; }
-        .footer-capsule { padding: 1.5rem 2rem; margin-bottom: 2rem; }
-
-        /* 結算進度條動畫 */
+        /* 結算進度條掃描動畫 */
         @keyframes scan {
             0% { left: 0%; }
             100% { left: 100%; }
@@ -74,264 +65,197 @@
             animation: scan 3s linear infinite;
         }
 
-        /* 點選效果 */
+        /* Tab 按鈕優化 */
         .tab-btn.active {
             background-color: var(--c-dark);
             color: white;
             transform: scale(1.05);
+            box-shadow: 4px 4px 0px var(--c-secondary);
         }
 
-        /* 命名代碼分解動畫樣式 */
-        .code-part:hover {
-            transform: translateY(-5px);
-            background-color: var(--c-accent);
-            color: var(--c-dark);
-        }
-
-        /* 命名卡片特有樣式 */
         .name-tag {
             border: 3px solid var(--c-dark);
             border-radius: 0.75rem;
             transition: all 0.2s ease;
         }
-        .name-tag:hover {
-            transform: scale(1.02);
-            box-shadow: 4px 4px 0px var(--c-dark);
-        }
 
         @media (max-width: 640px) {
-            .capsule-container { border-radius: 1.5rem; padding: 1rem; }
-            .header-capsule { padding: 0.5rem 1rem; }
+            .capsule-container { border-radius: 1.5rem; padding: 0.75rem; border-width: 3px; }
+            .pop-card { border-width: 3px; box-shadow: 6px 6px 0px var(--c-dark); }
+            .naming-grid { grid-template-columns: repeat(2, 1fr); }
+            .monthly-col { grid-column: span 2; }
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center p-3 sm:p-4 md:p-8 overflow-x-hidden w-full relative z-0">
+<body class="min-h-screen flex flex-col items-center p-4 md:p-8 w-full max-w-[100vw] overflow-x-hidden">
 
-    <!-- 頁首：標頭設計 -->
-    <header class="w-full flex justify-center mb-10 md:mb-16 relative z-10 px-2">
-        <div class="capsule-container header-capsule flex-row w-full max-w-3xl">
-            <div class="flex items-center justify-center gap-3 md:gap-6 w-full">
-                <!-- Logo -->
-                <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl border-2 border-[var(--c-dark)] overflow-hidden shadow-sm shrink-0 bg-white">
-                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/FF3D00/FFFFFF?text=Logo&font=Bangers'">
-                </div>
-                <!-- 文字 -->
-                <div class="flex flex-col justify-center">
-                    <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-[var(--c-dark)] leading-none mb-1 tracking-wide">
-                        歐大選擇權教室
-                    </h1>
-                    <p class="text-[10px] sm:text-xs md:text-sm font-black text-[var(--c-secondary)] tracking-[0.1em] sm:tracking-[0.2em] uppercase leading-none mt-1 font-comic">
-                        JOPTION ACADEMY
-                    </p>
-                </div>
+    <!-- 頁首 -->
+    <header class="w-full flex justify-center mb-10 md:mb-16">
+        <div class="capsule-container py-3 px-6 max-w-2xl flex-row gap-4">
+            <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl border-2 border-[var(--c-dark)] overflow-hidden bg-white shrink-0">
+                <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/FF3D00/FFFFFF?text=J&font=Bangers'">
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-xl md:text-3xl font-black text-[var(--c-dark)] leading-tight">歐大選擇權教室</h1>
+                <p class="text-[10px] md:text-sm font-black text-[var(--c-secondary)] tracking-widest font-comic uppercase">JOPTION ACADEMY</p>
             </div>
         </div>
     </header>
 
-    <!-- 主要內容區 -->
-    <main class="w-full max-w-5xl flex-grow flex flex-col gap-10 md:gap-16">
+    <main class="w-full max-w-5xl flex flex-col gap-12 md:gap-20">
         
-        <!-- 大標題區 -->
+        <!-- 大標題 -->
         <div class="text-center px-2">
-            <div class="inline-block bg-[var(--c-accent)] px-6 sm:px-12 py-4 sm:py-6 pop-card transform -rotate-1 relative max-w-full">
-                <div class="absolute -top-6 -right-6 md:-top-8 md:-right-8 text-5xl md:text-7xl transform rotate-12 drop-shadow-md">⏰</div>
-                <h2 class="text-3xl sm:text-4xl md:text-6xl font-black text-[var(--c-dark)] tracking-wide font-comic uppercase">
-                    結算日完全攻略
-                </h2>
-                <div class="mt-2 text-lg md:text-2xl font-black text-white bg-[var(--c-primary)] px-4 py-1 inline-block rounded-lg transform rotate-1 border-2 border-[var(--c-dark)] shadow-[4px_4px_0_#000]">
+            <div class="inline-block bg-[var(--c-accent)] px-6 md:px-12 py-5 pop-card transform -rotate-1 relative">
+                <div class="absolute -top-6 -right-6 md:-top-10 md:-right-10 text-5xl md:text-7xl transform rotate-12 drop-shadow-md">⏰</div>
+                <h2 class="text-3xl md:text-6xl font-black text-[var(--c-dark)] font-comic">結算日完全攻略</h2>
+                <div class="mt-3 text-sm md:text-2xl font-bold bg-[var(--c-primary)] text-white px-4 py-1 inline-block rounded-lg transform rotate-1 border-2 border-[var(--c-dark)] shadow-[4px_4px_0_#000]">
                     看懂代碼，才能精準結算！
                 </div>
             </div>
         </div>
 
-        <!-- ★ 命名規則地圖 ★ -->
-        <section class="px-2 md:px-0 flex flex-col items-center">
-            <div class="bg-white pop-card p-6 md:p-10 w-full relative border-t-8 border-t-[var(--c-dark)]">
-                <h3 class="text-2xl md:text-4xl font-black mb-8 text-[var(--c-dark)] border-b-4 border-[var(--c-dark)] inline-block pb-2">
-                    🏷️ 合約身分證：W1 ~ W5 命名地圖
-                </h3>
+        <!-- 命名規則地圖 -->
+        <section class="px-2 md:px-0">
+            <div class="bg-white pop-card p-6 md:p-10 w-full border-t-8 border-t-[var(--c-dark)]">
+                <h3 class="text-2xl md:text-3xl font-black mb-6 text-[var(--c-dark)] border-b-4 border-[var(--c-dark)] inline-block pb-2">🏷️ W1 ~ W5 命名地圖</h3>
                 
-                <p class="text-base md:text-lg font-bold text-gray-700 mb-10 max-w-3xl leading-relaxed">
-                    台指選擇權針對「週三」與「週五」結算有不同的英文代碼標示。尤其注意 <strong class="text-[var(--c-primary)]">W3 (月選週)</strong> 在下單時不會有 W 字樣！
+                <p class="text-lg font-bold text-gray-700 mb-10 leading-relaxed">
+                    請注意：<span class="text-[var(--c-primary)]">W3 (月選)</span> 在下單軟體中通常不會標示 W，而是直接顯示月份代碼。
                 </p>
 
-                <!-- 對照網格 -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-                    <!-- Week 1 -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 naming-grid">
+                    <!-- W1 -->
                     <div class="flex flex-col gap-2">
-                        <div class="bg-[var(--c-dark)] text-white text-center py-2 font-black rounded-lg text-sm sm:text-base">第一週 (W1)</div>
+                        <div class="bg-gray-100 text-[var(--c-dark)] text-center py-1 font-black rounded-lg text-xs uppercase">Week 1</div>
                         <div class="name-tag bg-blue-50 p-3 text-center">
-                            <span class="block text-xs font-bold text-gray-500 uppercase">週三 Wed</span>
-                            <span class="text-2xl font-black font-comic text-[var(--c-secondary)]">TX1</span>
+                            <span class="block text-[10px] font-bold text-gray-400">週三</span>
+                            <span class="text-xl font-black font-comic text-[var(--c-secondary)]">TX1</span>
                         </div>
                         <div class="name-tag bg-green-50 p-3 text-center">
-                            <span class="block text-xs font-bold text-gray-500 uppercase">週五 Fri</span>
-                            <span class="text-2xl font-black font-comic text-[var(--c-friday)]">TXU</span>
+                            <span class="block text-[10px] font-bold text-gray-400">週五</span>
+                            <span class="text-xl font-black font-comic text-[var(--c-friday)]">TXU</span>
                         </div>
                     </div>
-                    <!-- Week 2 -->
+                    <!-- W2 -->
                     <div class="flex flex-col gap-2">
-                        <div class="bg-[var(--c-dark)] text-white text-center py-2 font-black rounded-lg text-sm sm:text-base">第二週 (W2)</div>
+                        <div class="bg-gray-100 text-[var(--c-dark)] text-center py-1 font-black rounded-lg text-xs uppercase">Week 2</div>
                         <div class="name-tag bg-blue-50 p-3 text-center">
-                            <span class="block text-xs font-bold text-gray-500 uppercase">週三 Wed</span>
-                            <span class="text-2xl font-black font-comic text-[var(--c-secondary)]">TX2</span>
+                            <span class="block text-[10px] font-bold text-gray-400">週三</span>
+                            <span class="text-xl font-black font-comic text-[var(--c-secondary)]">TX2</span>
                         </div>
                         <div class="name-tag bg-green-50 p-3 text-center">
-                            <span class="block text-xs font-bold text-gray-500 uppercase">週五 Fri</span>
-                            <span class="text-2xl font-black font-comic text-[var(--c-friday)]">TXV</span>
+                            <span class="block text-[10px] font-bold text-gray-400">週五</span>
+                            <span class="text-xl font-black font-comic text-[var(--c-friday)]">TXV</span>
                         </div>
                     </div>
-                    <!-- Week 3 - 月選 -->
-                    <div class="flex flex-col gap-2 transform md:scale-110 z-10">
-                        <div class="bg-[var(--c-primary)] text-white text-center py-2 font-black rounded-lg shadow-lg text-sm sm:text-base">第三週 (月選)</div>
+                    <!-- Monthly (W3) -->
+                    <div class="flex flex-col gap-2 transform md:scale-110 z-10 monthly-col">
+                        <div class="bg-[var(--c-primary)] text-white text-center py-1 font-black rounded-lg text-xs uppercase shadow-md">Monthly (W3)</div>
                         <div class="name-tag bg-pink-100 border-dashed p-3 text-center border-4 border-[var(--c-primary)]">
-                            <span class="block text-xs font-bold text-gray-600 uppercase font-bold">週三 Wed (月)</span>
-                            <span class="text-3xl font-black font-comic text-[var(--c-primary)]">TXO</span>
+                            <span class="block text-[10px] font-bold text-gray-600">週三 (月選)</span>
+                            <span class="text-2xl font-black font-comic text-[var(--c-primary)]">TXO</span>
                         </div>
                         <div class="name-tag bg-green-100 p-3 text-center">
-                            <span class="block text-xs font-bold text-gray-500 uppercase">週五 Fri</span>
-                            <span class="text-2xl font-black font-comic text-[var(--c-friday)]">TXX</span>
+                            <span class="block text-[10px] font-bold text-gray-400">週五</span>
+                            <span class="text-xl font-black font-comic text-[var(--c-friday)]">TXX</span>
                         </div>
                     </div>
-                    <!-- Week 4 -->
+                    <!-- W4 -->
                     <div class="flex flex-col gap-2">
-                        <div class="bg-[var(--c-dark)] text-white text-center py-2 font-black rounded-lg text-sm sm:text-base">第四週 (W4)</div>
+                        <div class="bg-gray-100 text-[var(--c-dark)] text-center py-1 font-black rounded-lg text-xs uppercase">Week 4</div>
                         <div class="name-tag bg-blue-50 p-3 text-center">
-                            <span class="block text-xs font-bold text-gray-500 uppercase">週三 Wed</span>
-                            <span class="text-2xl font-black font-comic text-[var(--c-secondary)]">TX4</span>
+                            <span class="block text-[10px] font-bold text-gray-400">週三</span>
+                            <span class="text-xl font-black font-comic text-[var(--c-secondary)]">TX4</span>
                         </div>
                         <div class="name-tag bg-green-50 p-3 text-center">
-                            <span class="block text-xs font-bold text-gray-500 uppercase">週五 Fri</span>
-                            <span class="text-2xl font-black font-comic text-[var(--c-friday)]">TXY</span>
+                            <span class="block text-[10px] font-bold text-gray-400">週五</span>
+                            <span class="text-xl font-black font-comic text-[var(--c-friday)]">TXY</span>
                         </div>
                     </div>
-                    <!-- Week 5 -->
+                    <!-- W5 -->
                     <div class="flex flex-col gap-2">
-                        <div class="bg-[var(--c-dark)] text-white text-center py-2 font-black rounded-lg text-sm sm:text-base">第五週 (W5)</div>
+                        <div class="bg-gray-100 text-[var(--c-dark)] text-center py-1 font-black rounded-lg text-xs uppercase">Week 5</div>
                         <div class="name-tag bg-blue-50 p-3 text-center">
-                            <span class="block text-xs font-bold text-gray-500 uppercase">週三 Wed</span>
-                            <span class="text-2xl font-black font-comic text-[var(--c-secondary)]">TX5</span>
+                            <span class="block text-[10px] font-bold text-gray-400">週三</span>
+                            <span class="text-xl font-black font-comic text-[var(--c-secondary)]">TX5</span>
                         </div>
                         <div class="name-tag bg-green-50 p-3 text-center">
-                            <span class="block text-xs font-bold text-gray-500 uppercase">週五 Fri</span>
-                            <span class="text-2xl font-black font-comic text-[var(--c-friday)]">TXZ</span>
+                            <span class="block text-[10px] font-bold text-gray-400">週五</span>
+                            <span class="text-xl font-black font-comic text-[var(--c-friday)]">TXZ</span>
                         </div>
-                    </div>
-                </div>
-
-                <!-- 歐大實戰提醒 -->
-                <div class="mt-10 bg-[var(--c-dark)] text-white p-6 rounded-xl border-4 border-white shadow-[4px_4px_0_var(--c-accent)] relative overflow-hidden">
-                    <div class="absolute -bottom-4 -right-4 text-7xl opacity-10 transform -rotate-12">💡</div>
-                    <h4 class="text-xl font-black mb-3 flex items-center gap-2">
-                        <span class="text-[var(--c-accent)]">💡</span> 歐大實戰提醒：
-                    </h4>
-                    <ul class="space-y-2 text-sm md:text-base font-bold text-gray-300">
-                        <li>• 週三月選結算日通常叫 <strong class="text-[var(--c-accent)]">TXO</strong>，代碼不會有 W。</li>
-                        <li>• 週五結算合約代碼末端會有特殊英文字母（如 <strong class="text-[var(--c-friday)]">U, V, X, Y, Z</strong>）。</li>
-                        <li>• 代碼後綴帶有 <strong class="text-blue-400">F</strong> 字樣（如 W1F、W2F）也是週五結算的明顯標示。</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- 解密身分證解析區 -->
-        <section class="px-2 md:px-0 flex flex-col items-center">
-            <div class="bg-white pop-card p-6 md:p-8 w-full relative overflow-hidden">
-                <h3 class="text-2xl md:text-3xl font-black mb-6 text-[var(--c-dark)] border-b-4 border-[var(--c-dark)] inline-block pb-2">
-                    🪪 拆解代碼字串
-                </h3>
-                <p class="text-lg font-bold text-gray-700 mb-8 leading-relaxed">
-                    以 <code class="bg-gray-100 px-2 py-1 border-2 border-dashed border-gray-400 rounded">TXO30000C6W1</code> 為例：
-                </p>
-
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                    <div class="code-part p-4 border-4 border-[var(--c-dark)] rounded-xl bg-gray-50 transition-all cursor-help">
-                        <div class="text-2xl md:text-3xl font-black font-comic text-[var(--c-secondary)]">TXO</div>
-                        <div class="text-xs font-black mt-2 text-gray-500 uppercase">標的</div>
-                        <div class="text-sm font-bold text-gray-800 mt-1">台指選擇權</div>
-                    </div>
-                    <div class="code-part p-4 border-4 border-[var(--c-dark)] rounded-xl bg-gray-50 transition-all cursor-help">
-                        <div class="text-2xl md:text-3xl font-black font-comic text-[var(--c-primary)]">30000</div>
-                        <div class="text-xs font-black mt-2 text-gray-500 uppercase">履約價</div>
-                        <div class="text-sm font-bold text-gray-800 mt-1">30,000點</div>
-                    </div>
-                    <div class="code-part p-4 border-4 border-[var(--c-dark)] rounded-xl bg-gray-50 transition-all cursor-help">
-                        <div class="text-2xl md:text-3xl font-black font-comic">C / P</div>
-                        <div class="text-xs font-black mt-2 text-gray-500 uppercase">類別</div>
-                        <div class="text-sm font-bold text-gray-800 mt-1">買權 / 賣權</div>
-                    </div>
-                    <div class="code-part p-4 border-4 border-[var(--c-dark)] rounded-xl bg-[var(--c-accent)] shadow-inner transition-all cursor-help">
-                        <div class="text-2xl md:text-3xl font-black font-comic">6W1</div>
-                        <div class="text-xs font-black mt-2 text-gray-800 uppercase">月份/週次</div>
-                        <div class="text-sm font-black text-[var(--c-primary)] mt-1">六月第一週</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 結算週期解析區 -->
+        <!-- 代碼拆解 -->
         <section class="px-2 md:px-0">
-            <h3 class="text-2xl md:text-3xl font-black mb-6 text-center text-[var(--c-dark)]">📅 合約週期：你買的是哪一種？</h3>
-            <div class="flex flex-wrap justify-center gap-3 mb-6">
-                <button onclick="switchCycle('weekly')" id="btn-weekly" class="tab-btn active px-6 py-2 border-4 border-[var(--c-dark)] font-black rounded-lg pop-card bg-white transition-all">週三選 (Weekly)</button>
-                <button onclick="switchCycle('friday')" id="btn-friday" class="tab-btn px-6 py-2 border-4 border-[var(--c-dark)] font-black rounded-lg pop-card bg-white transition-all">週五選 (Friday)</button>
-                <button onclick="switchCycle('monthly')" id="btn-monthly" class="tab-btn px-6 py-2 border-4 border-[var(--c-dark)] font-black rounded-lg pop-card bg-white transition-all">月選 (Monthly)</button>
-                <button onclick="switchCycle('next')" id="btn-next" class="tab-btn px-6 py-2 border-4 border-[var(--c-dark)] font-black rounded-lg pop-card bg-white transition-all">次月選 (Far Month)</button>
-            </div>
+            <div class="bg-white pop-card p-6 md:p-8 w-full relative">
+                <h3 class="text-2xl md:text-3xl font-black mb-6 text-[var(--c-dark)] border-b-4 border-[var(--c-dark)] inline-block pb-2">🪪 代碼字串拆解</h3>
+                <p class="text-sm font-bold text-gray-500 mb-6 uppercase tracking-widest">Example: TXO 30000 C 6W1</p>
 
-            <div id="cycle-content" class="bg-white pop-card p-6 md:p-10 relative min-h-[300px] flex flex-col items-center justify-center">
-                <!-- 內容由 JS 動態注入 -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="p-4 border-2 border-[var(--c-dark)] rounded-xl bg-gray-50">
+                        <div class="text-2xl font-black font-comic text-[var(--c-secondary)]">TXO</div>
+                        <div class="text-[10px] font-black text-gray-400 uppercase">標的: 台指選</div>
+                    </div>
+                    <div class="p-4 border-2 border-[var(--c-dark)] rounded-xl bg-gray-50">
+                        <div class="text-2xl font-black font-comic text-[var(--c-primary)]">30000</div>
+                        <div class="text-[10px] font-black text-gray-400 uppercase">履約價格</div>
+                    </div>
+                    <div class="p-4 border-2 border-[var(--c-dark)] rounded-xl bg-gray-50">
+                        <div class="text-2xl font-black font-comic">C / P</div>
+                        <div class="text-[10px] font-black text-gray-400 uppercase">買權 / 賣權</div>
+                    </div>
+                    <div class="p-4 border-2 border-[var(--c-dark)] rounded-xl bg-[var(--c-accent)]">
+                        <div class="text-2xl font-black font-comic">6W1</div>
+                        <div class="text-[10px] font-black text-[var(--c-dark)] uppercase">6月第一週</div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- ★ 超級互動區：結算價的誕生過程 ★ -->
-        <section class="px-2 md:px-0 flex flex-col items-center mt-4">
+        <!-- 結算價模擬器 -->
+        <section class="flex flex-col items-center">
             <div class="bg-[var(--c-dark)] text-white pop-card p-6 md:p-10 w-full relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gray-700">
-                    <div class="scanner-line absolute top-0 h-1"></div>
-                </div>
+                <div class="scanner-line absolute top-0 h-1"></div>
                 
-                <h3 class="text-2xl md:text-4xl font-black mb-4 text-[var(--c-accent)] tracking-widest font-comic">
-                    結算價的誕生過程
-                </h3>
-                <p class="text-base md:text-lg font-bold text-gray-300 mb-8 max-w-3xl">
-                    不管是週三選還是週五選，結算價計算方式皆相同：採計大盤（加權指數）在 <strong class="text-[var(--c-accent)] underline">13:00 到 13:30 的簡單算術平均值</strong>。
+                <h3 class="text-2xl md:text-4xl font-black mb-4 text-[var(--c-accent)] font-comic">FSP SIMULATOR</h3>
+                <p class="text-white font-bold mb-8 text-sm md:text-lg">
+                    結算價採計大盤在 <span class="text-[var(--c-accent)] underline">13:00 - 13:30 的簡單算術平均值</span>。
                 </p>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                    <!-- 左側：視覺化進度 -->
                     <div class="space-y-6">
-                        <div class="flex items-center justify-between bg-[#2D2D2D] p-4 rounded-xl border border-[#444]">
-                            <span class="font-black text-gray-400 uppercase tracking-widest text-xs">大盤目前位置</span>
-                            <span id="currentIndexDisplay" class="text-3xl font-black text-white font-comic">30,000.00</span>
+                        <div class="bg-white/5 border border-white/20 p-6 rounded-2xl text-center">
+                            <p class="text-xs text-gray-400 font-black mb-2 uppercase">大盤跳動中</p>
+                            <div id="currentIndexDisplay" class="text-4xl md:text-6xl font-black text-white font-comic">30,000.00</div>
                         </div>
                         
-                        <div class="bg-[#2D2D2D] p-4 rounded-xl border border-[#444] relative">
-                            <span class="font-black text-gray-400 uppercase tracking-widest text-xs block mb-4">結算價計算進度 (13:00 - 13:30)</span>
-                            <div class="w-full bg-gray-800 h-8 rounded-lg overflow-hidden border-2 border-[var(--c-dark)] relative">
-                                <div id="calculationProgress" class="h-full bg-[var(--c-accent)] transition-all duration-500" style="width: 0%;"></div>
-                            </div>
+                        <div class="w-full bg-white/10 h-6 rounded-full overflow-hidden border-2 border-white/20">
+                            <div id="calculationProgress" class="h-full bg-[var(--c-accent)] transition-all duration-300 w-0"></div>
                         </div>
 
-                        <button onclick="startSimulation()" id="startBtn" class="w-full bg-[var(--c-accent)] text-[var(--c-dark)] font-black text-xl py-4 rounded-xl shadow-[4px_4px_0_#fff] hover:translate-y-[-2px] transition-all flex items-center justify-center gap-2 font-comic uppercase">
+                        <button onclick="startSimulation()" id="startBtn" class="w-full bg-[var(--c-accent)] text-[var(--c-dark)] font-black text-xl py-4 rounded-2xl shadow-[6px_6px_0_#fff] active:translate-y-1 transition-all uppercase font-comic">
                             🚀 Start Simulation
                         </button>
                     </div>
 
-                    <!-- 右側：結果顯示面板 -->
-                    <div class="bg-white text-[var(--c-dark)] pop-card p-6 md:p-8 flex flex-col items-center justify-center relative min-h-[250px]">
-                        <div id="simEmpty" class="flex flex-col items-center opacity-30">
-                            <span class="text-6xl mb-2">📊</span>
-                            <p class="font-black">點擊按鈕開始計算平均值</p>
+                    <!-- 結果顯示 -->
+                    <div class="bg-white text-[var(--c-dark)] pop-card p-6 md:p-8 min-h-[250px] flex flex-col items-center justify-center">
+                        <div id="simEmpty" class="text-center opacity-30">
+                            <span class="text-5xl block mb-2">📊</span>
+                            <p class="font-black">點擊按鈕計算平均值</p>
                         </div>
 
-                        <div id="simResult" class="hidden flex flex-col items-center w-full animate-in zoom-in duration-500">
-                            <span class="text-sm font-bold text-gray-500 mb-1">最終結算價 (FSP)</span>
-                            <div id="finalPrice" class="text-5xl md:text-6xl font-black text-[var(--c-primary)] font-comic">--.---</div>
+                        <div id="simResult" class="hidden text-center w-full animate-in zoom-in duration-300">
+                            <p class="text-xs font-bold text-gray-400 uppercase mb-1">最終結算價 (FSP)</p>
+                            <div id="finalPrice" class="text-5xl md:text-6xl font-black text-[var(--c-primary)] font-comic">--</div>
                             
-                            <div class="mt-6 w-full border-t-4 border-dashed border-gray-200 pt-6 text-center">
-                                <h4 class="font-black mb-4">結算結果 (對於 30000 Call)</h4>
-                                <div id="settleStatus" class="inline-block px-6 py-2 rounded-lg font-black text-xl">--</div>
+                            <div class="mt-8 pt-8 border-t-4 border-dashed border-gray-100">
+                                <p class="font-black mb-4">結算結果 (對於 30000 Call)</p>
+                                <div id="settleStatus" class="inline-block px-6 py-2 rounded-xl font-black text-lg">--</div>
                             </div>
                         </div>
                     </div>
@@ -339,129 +263,56 @@
             </div>
         </section>
 
-        <!-- 結算規則表 -->
-        <section class="px-2 md:px-0 flex flex-col items-center">
-            <h3 class="text-2xl md:text-3xl font-black mb-8 text-[var(--c-dark)] font-comic">💡 結算機制重要規定</h3>
-            <div class="w-full pop-card p-0 overflow-hidden shadow-blue-500/10">
-                <div class="w-full overflow-x-auto">
-                    <table class="w-full text-left min-w-[600px] border-collapse">
+        <!-- 規則表格 -->
+        <section class="flex flex-col items-center">
+            <h3 class="text-2xl md:text-4xl font-black mb-6 text-[var(--c-dark)] font-comic">💡 SETTLEMENT RULES</h3>
+            <div class="w-full overflow-x-auto px-2">
+                <div class="min-w-[600px] bg-white pop-card p-0 overflow-hidden">
+                    <table class="w-full text-left">
                         <thead>
-                            <tr class="bg-[var(--c-dark)] text-white">
-                                <th class="py-4 px-6 font-black text-lg">規則項目</th>
-                                <th class="py-4 px-6 font-black text-lg">具體規定</th>
-                                <th class="py-4 px-6 font-black text-lg text-[var(--c-accent)]">重要提醒</th>
+                            <tr class="bg-[var(--c-dark)] text-white font-black text-sm">
+                                <th class="p-4">規則項目</th>
+                                <th class="p-4">具體規定</th>
+                                <th class="p-4 text-[var(--c-accent)]">重要提醒</th>
                             </tr>
                         </thead>
-                        <tbody class="text-gray-800 font-bold divide-y-2 divide-gray-100">
+                        <tbody class="text-sm font-bold divide-y-2">
                             <tr>
-                                <td class="py-5 px-6 font-black bg-gray-50/50">最後交易截止時間</td>
-                                <td class="py-5 px-6">到期日當天下午 1:30</td>
-                                <td class="py-5 px-6 text-red-500 underline">13:30 一到即停止下單，進入結算。</td>
+                                <td class="p-4 bg-gray-50">交易截止</td>
+                                <td class="p-4">到期日當天 13:30</td>
+                                <td class="p-4 text-[var(--c-primary)]">13:30 一到即停止下單</td>
                             </tr>
                             <tr>
-                                <td class="py-5 px-6 font-black bg-gray-50/50">結算價計算方式</td>
-                                <td class="py-5 px-6">13:00 - 13:30 加權指數簡單平均值</td>
-                                <td class="py-5 px-6">這半小時內的跳動是採樣基礎，大戶在此爭奪。</td>
+                                <td class="p-4 bg-gray-50">計算採樣</td>
+                                <td class="p-4">13:00 - 13:30 加權指數</td>
+                                <td class="p-4">大戶對決最激烈的半小時</td>
                             </tr>
                             <tr>
-                                <td class="py-5 px-6 font-black bg-gray-50/50">結算交割</td>
-                                <td class="py-5 px-6">現金交割 (Cash Settlement)</td>
-                                <td class="py-5 px-6">直接差額入帳，無需真的持有標的。</td>
-                            </tr>
-                            <tr>
-                                <td class="py-5 px-6 font-black bg-gray-50/50">週五選掛牌</td>
-                                <td class="py-5 px-6">每週五新合約上市</td>
-                                <td class="py-5 px-6">提供跨週末避險，交易靈活度更高。</td>
+                                <td class="p-4 bg-gray-50">交割方式</td>
+                                <td class="p-4">現金差額交割</td>
+                                <td class="p-4">直接將點數損益入帳</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </section>
-
     </main>
 
     <!-- 頁尾 -->
-    <footer class="w-full flex justify-center mt-16 pb-10 relative z-10 px-2">
-        <div class="capsule-container footer-capsule text-center">
-            <div class="flex flex-wrap items-center justify-center gap-2 md:gap-4 mb-3">
-                <div class="w-8 h-8 md:w-12 md:h-12 rounded-full border-2 border-gray-200 overflow-hidden shadow-sm shrink-0 bg-white">
-                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/FF3D00/000000?text=Logo&font=Bangers'">
-                </div>
-                <div class="flex items-center flex-wrap justify-center">
-                    <span class="text-lg md:text-2xl font-black tracking-tight text-[var(--c-dark)] font-comic">JOPTION</span>
-                    <span class="mx-2 md:mx-4 text-gray-300 font-light text-xl hidden sm:inline">|</span>
-                    <span class="text-base md:text-xl font-bold text-[var(--c-dark)] w-full sm:w-auto mt-1 sm:mt-0">歐大選擇權教室</span>
-                </div>
+    <footer class="w-full flex justify-center mt-20 pb-10">
+        <div class="capsule-container max-w-lg py-6 px-4 flex-col text-center">
+            <div class="flex items-center gap-3 mb-2">
+                <img src="IP標籤.jpg" class="w-8 h-8 rounded-full border border-gray-300" alt="Icon" onerror="this.style.display='none'">
+                <span class="text-xl font-black font-comic">JOPTION ACADEMY</span>
             </div>
-            <div class="text-center w-full mt-2">
-                <p class="text-[10px] md:text-sm text-gray-500 font-bold tracking-tight px-4">
-                    © 2026 Joption Academy - 金融教育僅供參考，投資有風險，操作需謹慎。<br>
-                    代碼參考自台指期結算實務 (TX1-TX5, TXU-TXZ)。
-                </p>
-            </div>
+            <p class="text-[10px] md:text-xs text-gray-500 font-bold">
+                © 2026 Joption Academy. 投資必有風險，教學內容僅供教育參考。
+            </p>
         </div>
     </footer>
 
-    <!-- 互動邏輯腳本 -->
     <script>
-        // 1. 合約週期切換邏輯
-        function switchCycle(type) {
-            const container = document.getElementById('cycle-content');
-            const btns = document.querySelectorAll('.tab-btn');
-            btns.forEach(b => b.classList.remove('active'));
-            document.getElementById(`btn-${type}`).classList.add('active');
-
-            let content = '';
-            if (type === 'weekly') {
-                content = `
-                <div class="flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div class="bg-blue-100 p-4 rounded-xl border-2 border-[var(--c-dark)] mb-4">
-                        <span class="text-4xl">🏹</span>
-                        <h4 class="text-2xl font-black text-[var(--c-secondary)] mt-2 italic font-comic">STANDARD WEEKLY (TX1/TX2/TX4)</h4>
-                    </div>
-                    <p class="text-lg font-bold text-gray-700 max-w-2xl">
-                        台指選最熱門的「週三結算」合約。代碼為 <strong class="text-[var(--c-secondary)]">TX1, TX2, TX4</strong>。節奏快，週三掛牌隔週三結算。
-                    </p>
-                </div>`;
-            } else if (type === 'friday') {
-                content = `
-                <div class="flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div class="bg-green-100 p-4 rounded-xl border-2 border-[var(--c-dark)] mb-4">
-                        <span class="text-4xl">⚡</span>
-                        <h4 class="text-2xl font-black text-green-600 mt-2 italic font-comic">FRIDAY OPTIONS (TXU~TXZ)</h4>
-                    </div>
-                    <p class="text-lg font-bold text-gray-700 max-w-2xl">
-                        <strong class="text-green-700">週末避險！</strong> 週五掛牌隔週五結算。代碼後綴常見英文字母 <strong class="text-[var(--c-friday)]">U, V, X, Y, Z</strong>，適合針對週末事件佈局。
-                    </p>
-                </div>`;
-            } else if (type === 'monthly') {
-                content = `
-                <div class="flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div class="bg-purple-100 p-4 rounded-xl border-2 border-[var(--c-dark)] mb-4">
-                        <span class="text-4xl">👑</span>
-                        <h4 class="text-2xl font-black text-purple-600 mt-2 italic font-comic">MONTHLY (TXO)</h4>
-                    </div>
-                    <p class="text-lg font-bold text-gray-700 max-w-2xl">
-                        <strong class="text-purple-700">核心大合約！</strong> 第三個週三結算，代碼固定為 <strong class="text-purple-700 underline">TXO</strong>。交易量最大，波動通常也最劇烈。
-                    </p>
-                </div>`;
-            } else {
-                content = `
-                <div class="flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div class="bg-orange-100 p-4 rounded-xl border-2 border-[var(--c-dark)] mb-4">
-                        <span class="text-4xl">🔭</span>
-                        <h4 class="text-2xl font-black text-orange-600 mt-2 italic font-comic">FAR MONTH</h4>
-                    </div>
-                    <p class="text-lg font-bold text-gray-700 max-w-2xl">
-                        遠期合約勝率穩，衰退慢。當月選結算後，遠期合約會遞補變成熟近月合約。適合長線佈局。
-                    </p>
-                </div>`;
-            }
-            container.innerHTML = content;
-        }
-
-        // 2. 結算價模擬器邏輯
         let isSimulating = false;
         function startSimulation() {
             if (isSimulating) return;
@@ -475,7 +326,7 @@
             const finalPriceEl = document.getElementById('finalPrice');
             const settleStatusEl = document.getElementById('settleStatus');
             
-            btn.innerText = "⏳ CALCULATING...";
+            btn.innerText = "CALCULATING...";
             btn.disabled = true;
             simEmpty.classList.add('hidden');
             simResult.classList.add('hidden');
@@ -487,11 +338,10 @@
             
             const interval = setInterval(() => {
                 count++;
-                const volatility = (Math.random() - 0.5) * 150;
-                const currentVal = 30000 + volatility;
+                const currentVal = 30000 + (Math.random() - 0.5) * 200;
                 
                 total += currentVal;
-                indexDisplay.innerText = currentVal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                indexDisplay.innerText = currentVal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
                 progress.style.width = `${(count / samples) * 100}%`;
                 
                 if (count >= samples) {
@@ -499,27 +349,22 @@
                     const avg = total / samples;
                     finalPriceEl.innerText = avg.toFixed(2);
                     
-                    const val = avg - 30000;
-                    if (val > 0) {
-                        settleStatusEl.innerText = `價內結算 🤑 (${val.toFixed(1)} 點)`;
-                        settleStatusEl.className = "bg-green-100 text-green-700 border-2 border-green-500 px-6 py-2 rounded-lg font-black text-xl";
+                    const profit = avg - 30000;
+                    if (profit > 0) {
+                        settleStatusEl.innerText = `價內結算 🤑 (+${profit.toFixed(1)} 點)`;
+                        settleStatusEl.className = "inline-block px-6 py-2 rounded-xl font-black text-lg bg-green-100 text-green-700 border-2 border-green-500";
                     } else {
                         settleStatusEl.innerText = "歸零廢紙 💀 (0 點)";
-                        settleStatusEl.className = "bg-red-100 text-red-700 border-2 border-red-500 px-6 py-2 rounded-lg font-black text-xl";
+                        settleStatusEl.className = "inline-block px-6 py-2 rounded-xl font-black text-lg bg-red-100 text-red-700 border-2 border-red-500";
                     }
                     
                     simResult.classList.remove('hidden');
-                    btn.innerText = "🔄 RE-SIMULATE";
+                    btn.innerText = "RE-SIMULATE";
                     btn.disabled = false;
                     isSimulating = false;
                 }
             }, 100);
         }
-
-        // 初始化
-        document.addEventListener('DOMContentLoaded', () => {
-            switchCycle('weekly');
-        });
     </script>
 </body>
 </html>
