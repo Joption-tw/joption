@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM! 權利金真相 | 歐大選擇權教室</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --c-bg: #FAF9F6;
+            --c-primary: #EF4444; /* 英雄紅 */
+            --c-secondary: #3B82F6; /* 正義藍 */
+            --c-accent: #FDE047; /* 閃電黃 */
+            --c-dark: #0F172A;
+            --c-halftone: #CBD5E1;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--c-bg);
+            color: var(--c-dark);
+            background-image: radial-gradient(var(--c-halftone) 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+
+        .font-comic {
+            font-family: 'Bangers', 'Noto Sans TC', cursive;
+            letter-spacing: 0.05em;
+        }
+
+        .pop-card {
+            border: 5px solid var(--c-dark);
+            border-radius: 1.5rem;
+            background-color: white;
+            box-shadow: 10px 10px 0px var(--c-dark);
+            transition: all 0.2s ease;
+        }
+
+        .pop-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 13px 13px 0px var(--c-dark);
+        }
+
+        .capsule-container {
+            background: white;
+            border: 4px solid var(--c-dark);
+            border-radius: 9999px;
+            box-shadow: 0 10px 0 var(--c-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        @keyframes text-flash {
+            0%, 100% { color: var(--c-dark); opacity: 1; }
+            50% { color: var(--c-primary); opacity: 0.8; }
+        }
+        .animate-important-flash {
+            animation: text-flash 0.8s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4 sm:p-8 overflow-x-hidden">
+
+    <!-- 頁首：膠囊式設計 -->
+    <header class="w-full flex justify-center mb-12">
+        <div class="capsule-container py-4 px-6 md:px-12 flex flex-row items-center justify-center">
+            <div class="flex items-center justify-center gap-4">
+                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl border-4 border-[var(--c-dark)] overflow-hidden bg-white shrink-0 shadow-sm">
+                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/3B82F6/FFFFFF?text=J&font=Bangers'">
+                </div>
+                <div class="flex flex-col">
+                    <h1 class="text-2xl md:text-4xl font-black text-[var(--c-dark)] leading-tight">歐大選擇權教室</h1>
+                    <p class="text-[10px] md:text-xs font-black text-[var(--c-secondary)] tracking-[0.15em] uppercase mt-0.5 font-comic italic">
+                        MARGIN CONTROL MASTERCLASS
+                    </p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-5xl flex-grow flex flex-col gap-12">
+        
+        <!-- 大標題：英雄出場風格 -->
+        <div class="text-center">
+            <div class="inline-block bg-[var(--c-accent)] px-8 py-5 pop-card transform -rotate-1 relative max-w-full">
+                <div class="absolute -top-10 -right-10 text-7xl md:text-9xl transform rotate-12">💰</div>
+                <h2 class="text-4xl sm:text-6xl md:text-7xl font-black text-[var(--c-dark)] tracking-wide font-comic uppercase">
+                    CASH IS NOT FREE!
+                </h2>
+                <div class="mt-2 text-xl md:text-3xl font-black text-white bg-[var(--c-primary)] px-5 py-2 inline-block rounded-xl border-4 border-black shadow-[4px_4px_0_#000]">
+                    收到的權利金為什麼不能花？
+                </div>
+            </div>
+        </div>
+
+        <!-- 實戰截圖展示區 -->
+        <section class="w-full">
+            <div class="pop-card bg-white p-4 md:p-8">
+                <h3 class="text-2xl font-black mb-4 flex items-center gap-2">
+                    <span class="bg-[var(--c-dark)] text-white px-3 py-1 rounded font-comic">01</span>
+                    實戰數據解讀
+                </h3>
+                <div class="border-4 border-dashed border-gray-300 rounded-2xl p-2 mb-8 bg-gray-50">
+                    <img src="2.jpg" alt="最新帳戶截圖" class="w-full h-auto rounded-xl" onerror="this.parentElement.innerHTML='<div class=\'p-12 text-center text-gray-400 font-bold\'>[請確認 2.jpg 圖片路徑]</div>'">
+                </div>
+
+                <!-- 數據卡片對決 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="pop-card border-t-[12px] border-t-[var(--c-secondary)] p-6 text-center">
+                        <span class="text-gray-400 font-black text-xs uppercase">買權點數</span>
+                        <div class="text-4xl font-black text-[var(--c-secondary)] font-comic">1,718.5</div>
+                    </div>
+                    <div class="pop-card border-t-[12px] border-t-[var(--c-primary)] p-6 text-center">
+                        <span class="text-gray-400 font-black text-xs uppercase">賣權點數</span>
+                        <div class="text-4xl font-black text-[var(--c-primary)] font-comic">1,184.0</div>
+                    </div>
+                    <div class="pop-card bg-[var(--c-dark)] text-white p-6 text-center shadow-purple-500/20">
+                        <span class="text-gray-400 font-black text-xs uppercase">總收受點數</span>
+                        <div class="text-4xl font-black text-[var(--c-accent)] font-comic">2,902.5</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 金額換算：衝擊波 -->
+        <section class="text-center py-8">
+            <div class="inline-block bg-white p-8 pop-card border-dashed">
+                <p class="text-xl font-bold text-gray-600 mb-2">這 2,902.5 點換算成台幣...</p>
+                <div class="text-5xl md:text-7xl font-black text-[var(--c-primary)] font-comic tracking-tighter">
+                    $145,125 元
+                </div>
+                <div class="mt-4 bg-red-100 text-red-700 px-6 py-3 rounded-full font-black text-lg inline-flex items-center gap-2">
+                    <i class="fa-solid fa-lock"></i> 它是「鎖定狀態」的義務金
+                </div>
+            </div>
+        </section>
+
+        <!-- 核心觀念：漫畫分鏡 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+            <div class="pop-card p-8 bg-white border-l-[16px] border-l-[var(--c-secondary)]">
+                <h3 class="text-2xl font-black mb-4 uppercase font-comic text-[var(--c-secondary)]">The Truth!</h3>
+                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-4">
+                    <strong>「先收錢，不代表賺錢」</strong><br>
+                    擔任賣方收到的 14.5 萬，是因為你承接了未來的履約責任。這筆錢目前是這筆交易的「質押物」，並非盈餘。
+                </p>
+                <div class="bg-blue-50 p-4 border-2 border-dashed border-[var(--c-secondary)] rounded-xl">
+                    <p class="text-sm font-bold text-blue-800">💡 在你的對帳單中，這筆錢會增加你的「保證金總額」，但它會被限制使用。</p>
+                </div>
+            </div>
+
+            <div class="pop-card p-8 bg-white border-l-[16px] border-l-[var(--c-primary)]">
+                <h3 class="text-2xl font-black mb-4 uppercase font-comic text-[var(--c-primary)]">Warning!</h3>
+                <p class="text-lg font-bold text-gray-700 leading-relaxed mb-4">
+                    <strong>「這不是可用現金」</strong><br>
+                    如果你把這 14.5 萬當成自己的錢拿去亂加碼，一旦市場波動變大，你的可用餘額會迅速歸零，導致斷頭風險。
+                </p>
+                <div class="bg-red-50 p-4 border-2 border-dashed border-[var(--c-primary)] rounded-xl">
+                    <p class="text-sm font-bold text-red-800">⚠️ 很多新手爆倉的原因，就是把「暫存的權利金」當成自己的獲利花掉。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 專家攻略表 -->
+        <section class="w-full">
+            <h3 class="text-3xl font-black mb-8 text-center font-comic uppercase tracking-widest">🛡️ 戰鬥防禦指標：30% 法則</h3>
+            <div class="pop-card p-0 overflow-hidden">
+                <table class="w-full text-center border-collapse">
+                    <thead>
+                        <tr class="bg-[var(--c-dark)] text-white">
+                            <th class="py-6 px-6 font-black text-lg">操作動作</th>
+                            <th class="py-6 px-6 font-black text-lg">建議比例</th>
+                            <th class="py-6 px-6 font-black text-lg">理由</th>
+                        </tr>
+                    </thead>
+                    <tbody class="font-bold divide-y-4 divide-gray-100">
+                        <tr>
+                            <td class="py-6 px-6 bg-gray-50 italic">保證金使用率</td>
+                            <td class="py-6 px-6 text-[var(--c-primary)] text-2xl font-black">70% 以下</td>
+                            <td class="py-6 px-6 text-gray-600">確保能扛住行情突發跳空</td>
+                        </tr>
+                        <tr class="bg-yellow-50">
+                            <td class="py-6 px-6 bg-yellow-100 font-black italic">可動用餘裕</td>
+                            <td class="py-6 px-6 text-[var(--c-secondary)] text-2xl font-black">30% 以上</td>
+                            <td class="py-6 px-6 text-gray-600">這是你遭遇危機時的「救命錢」</td>
+                        </tr>
+                        <tr class="bg-gray-900 text-white">
+                            <td colspan="3" class="py-8 px-6 text-xl md:text-2xl font-black italic animate-important-flash leading-tight">
+                                "收到的 14.5 萬是拿來抗風險的，不是拿來揮霍的！"
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="w-full flex justify-center mt-24 pb-16 px-4">
+        <div class="capsule-container py-8 px-6 flex flex-col items-center justify-center">
+            <div class="flex items-center justify-center gap-4 mb-4">
+                <div class="w-10 h-10 md:w-14 md:h-14 rounded-full border-2 border-gray-200 overflow-hidden bg-white">
+                    <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/3B82F6/FFFFFF?text=J&font=Bangers'">
+                </div>
+                <div class="flex items-center">
+                    <span class="text-xl md:text-3xl font-black italic tracking-tight font-comic text-[var(--c-dark)]">JOPTION</span>
+                    <span class="mx-5 text-gray-300 font-light text-2xl">|</span>
+                    <span class="text-lg md:text-2xl font-bold">歐大選擇權教室</span>
+                </div>
+            </div>
+            <p class="text-center text-[10px] md:text-sm text-gray-400 font-bold italic">
+                © 2026 Joption Academy - 收到的權利金為質押資產。投資有風險，操作需謹慎。
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>
