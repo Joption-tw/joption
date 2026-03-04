@@ -2,521 +2,529 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <title>歐大選擇權教室 | Joption Academy</title>
-
-    <meta property="og:title" content="歐大選擇權教室" />
-    <meta property="og:description" content="👉 你還在亂做選擇權嗎？從零開始到實戰體系，帶你建立真正「能賺錢」的交易邏輯。免費學習＋策略模擬，點進來看看 👇" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.joption.com.tw/" />
-    <!-- 針對 LINE 優化：將中文字元進行 URL 編碼 -->
-    <meta property="og:image" content="https://www.joption.com.tw/IP%E6%A8%99%E7%B1%A4.jpg" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:site_name" content="Joption" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歐大時間價值追蹤儀 - V5.7.2</title>
+    <!-- 載入必要 CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
-        
-        :root {
-            --forest-deep: #1b4332;
-            --forest-mid: #2d6a4f;
-            --sage-light: #f7f9f4;
-            --amber-accent: #d97706;
-        }
-
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden; 
-            background-color: var(--sage-light);
-        }
-
-        body { 
-            font-family: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif; 
-            -webkit-tap-highlight-color: transparent;
-            color: #292524;
-        }
-
-        /* 動畫效果 */
-        .animate-fade-in { 
-            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
-            opacity: 0;
-        }
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(15px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-
-        .submenu-enter { 
-            max-height: 0; 
-            overflow: hidden; 
-            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease; 
-            opacity: 0;
-        }
-        .submenu-open { 
-            max-height: 1500px; 
-            opacity: 1;
-        }
-
-        /* 滾動條美化 */
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 10px; }
-        
-        /* 漸層與陰影 */
-        .forest-gradient {
-            background: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%);
-        }
-
+        body { background-color: #f8fafc; color: #1e293b; font-family: sans-serif; overflow-x: hidden; }
+        #main-chart { height: 440px; width: 100%; } 
         .glass-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 0.75rem;
         }
-
-        .scroll-container {
-            flex: 1;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
-        }
-
-        .iframe-container {
-            width: 100%;
-            height: 100%;
-            flex: 1;
-            overflow: hidden; 
-            position: relative;
-        }
+        /* 極細捲軸 */
+        ::-webkit-scrollbar { width: 3px; height: 3px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         
-        .iframe-container iframe {
+        .version-badge {
+            background: linear-gradient(90deg, #f97316, #fb923c);
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 0.6rem;
+            font-weight: 900;
+            color: white;
+        }
+
+        /* 按壓感橘色浮水印按鈕 */
+        .session-btn {
             width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
-        }
-
-        /* 按鈕高級感 */
-        .btn-premium {
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-premium:active {
-            transform: scale(0.96);
-        }
-
-        .btn-amber {
-            background: linear-gradient(to bottom right, #fbbf24, #d97706);
-            box-shadow: 0 4px 15px -2px rgba(217, 119, 6, 0.3);
-        }
-
-        .visitor-badge {
-            padding: 8px 16px;
-            border-radius: 99px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            display: inline-flex;
+            padding: 0.375rem 0.25rem;
+            border-radius: 0.5rem;
+            font-size: 10px;
+            font-weight: 900;
+            transition: all 75ms;
+            border: 1px solid rgba(251, 146, 60, 0.2);
+            background-color: rgba(255, 247, 237, 0.3);
+            color: rgba(194, 65, 12, 0.7);
+            display: flex;
             align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(4px);
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
         }
+        .session-btn:active { transform: scale(0.9); box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); }
+        .session-btn.active {
+            background-color: #f97316;
+            color: white;
+            border-color: #ea580c;
+            box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.2);
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        .session-btn.night { background-color: rgba(241, 245, 249, 0.5); border-color: rgba(203, 213, 225, 0.5); color: #64748b; }
+        .session-btn.night.active { background-color: #1e293b; color: white; border-color: #0f172a; }
 
-        /* 針對行動裝置的 iframe 高度調整 */
-        @media (max-width: 768px) {
-            .iframe-container {
-                height: calc(100dvh - 64px); /* 扣除 Header 高度 */
-            }
+        /* Modal 樣式 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background-color: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
         }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-container {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 64rem; 
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 0.2s;
+            border: 1px solid #e2e8f0;
+        }
+        .modal-overlay.active .modal-container { transform: scale(1); }
+
+        .interactive-card { cursor: pointer; transition: all 75ms; user-select: none; }
+        .interactive-card:hover { border-color: #fdba74; }
+        .interactive-card:active { transform: scale(0.97); background-color: #f8fafc; }
+        
+        .excel-cell-ultra { border: 1px solid #e2e8f0; padding: 0.25rem; display: flex; flex-direction: column; justify-content: center; background-color: white; transition: background-color 0.2s; }
+        .excel-row-main { display: flex; align-items: center; justify-content: space-between; }
+        .excel-row-sub { display: flex; align-items: center; justify-content: space-between; margin-top: 0.125rem; padding-top: 0.125rem; border-top: 1px solid #f1f5f9; }
+        .excel-font-lg { font-size: 12px; font-weight: 900; letter-spacing: -0.025em; }
+        .excel-font-sm { font-size: 11px; font-weight: 700; font-family: ui-monospace, monospace; letter-spacing: -0.05em; }
     </style>
 </head>
-<body>
-    <div id="root" class="h-full"></div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
-
-        window.FirebaseSDK = { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp, getAnalytics, collection };
-    </script>
-
-    <script type="text/babel">
-        const { useState, useEffect, useMemo, useRef } = React;
-
-        const Icons = {
-            Home: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>,
-            Book: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>,
-            Target: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>,
-            TrendingUp: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>,
-            Shield: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>,
-            Zap: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>,
-            Code: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>,
-            ChevronDown: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7"></path></svg>,
-            Menu: () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>,
-            X: () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>,
-            ClipboardCheck: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>,
-            Leaf: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 11a9 9 0 019 9M4 11a9 9 0 019-9m-9 9l9 9m0-18l-9 9"></path></svg>,
-            ArrowRight: () => <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>,
-            Users: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>,
-            Clock: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        };
-
-        const App = () => {
-            const [activeChapterId, setActiveChapterId] = useState('home');
-            const [activeSubIndex, setActiveSubIndex] = useState(null);
-            const [isMenuOpen, setIsMenuOpen] = useState(false);
-            const [visitorStats, setVisitorStats] = useState({ total: null, daily: null });
-            
-            const hasIncrementedRef = useRef(false);
-            const scrollRef = useRef(null);
-
-            // Firebase Logic
-            useEffect(() => {
-                let unsubscribeAuth, unsubscribeTotal, unsubscribeDaily;
-                const initFirebase = async () => {
-                    if (!window.FirebaseSDK) { setTimeout(initFirebase, 200); return; }
-                    const { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp, collection } = window.FirebaseSDK;
-                    try {
-                        const firebaseConfig = {
-                            apiKey: "AIzaSyAkr2zItSSI9Saon6QikeUqGF_ufypXXYw",
-                            authDomain: "fir-console-9e02e.firebaseapp.com",
-                            projectId: "fir-console-9e02e",
-                            storageBucket: "fir-console-9e02e.firebasestorage.app",
-                            messagingSenderId: "652108941349",
-                            appId: "1:652108941349:web:ac058f3f692e841e7c97cc"
-                        };
-                        const app = initializeApp(firebaseConfig);
-                        const auth = getAuth(app);
-                        const db = getFirestore(app);
-                        const appId = 'fir-console-9e02e'; 
-                        const now = new Date();
-                        const taiwanTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Taipei"}));
-                        const dateKey = `${taiwanTime.getFullYear()}${String(taiwanTime.getMonth() + 1).padStart(2, '0')}${String(taiwanTime.getDate()).padStart(2, '0')}`;
-
-                        await signInAnonymously(auth);
-                        unsubscribeAuth = onAuthStateChanged(auth, async (u) => {
-                            if (!u) return;
-                            const statsCol = collection(db, 'artifacts', appId, 'public', 'data', 'analytics');
-                            const totalDocRef = doc(statsCol, 'totalStats');
-                            const dailyDocRef = doc(statsCol, `daily_${dateKey}`);
-                            
-                            if (!hasIncrementedRef.current) {
-                                hasIncrementedRef.current = true;
-                                try {
-                                    await Promise.all([
-                                        setDoc(totalDocRef, { count: increment(1), lastUpdated: serverTimestamp() }, { merge: true }),
-                                        setDoc(dailyDocRef, { count: increment(1), lastUpdated: serverTimestamp() }, { merge: true })
-                                    ]);
-                                } catch (e) {}
-                            }
-                            unsubscribeTotal = onSnapshot(totalDocRef, (s) => setVisitorStats(p => ({ ...p, total: s.data()?.count || 0 })));
-                            unsubscribeDaily = onSnapshot(dailyDocRef, (s) => setVisitorStats(p => ({ ...p, daily: s.data()?.count || 0 })));
-                        });
-                    } catch (e) {}
-                };
-                initFirebase();
-                return () => { unsubscribeAuth?.(); unsubscribeTotal?.(); unsubscribeDaily?.(); };
-            }, []);
-
-            const chapters = useMemo(() => [
-                {
-                    id: 'ch1', title: 'CH 1 選擇權入門', icon: <Icons.Book />, testUrl: 'chap1-test.html',
-                    subpages: [
-                        { title: '什麼是選擇權？', url: './1-1.html' },
-                        { title: '權利與義務的對稱性', url: './1-2.html' },
-                        { title: '買方與賣方的獲利概率', url: './1-3.html' }
-                    ]
-                },
-                {
-                    id: 'ch2', title: 'CH 2 基礎知識', icon: <Icons.Target />, testUrl: 'chap2-test.html',
-                    subpages: [
-                        { title: '履約價與權利金', url: './2-1.html' },
-                        { title: '價內、價平與價外', url: './2-2.html' },
-                        { title: '結算機制與到期效應', url: './2-3.html' },
-                        { title: '保證金與權利金', url: './2-4.html' },
-                        { title: '結算日', url: './2-5.html' }
-                    ]
-                },
-                {
-                    id: 'ch3', title: 'CH 3 權利金的秘密', icon: <Icons.Zap />, testUrl: 'chap3-test.html',
-                    subpages: [
-                        { title: '內涵價值 vs 時間價值', url: './3-1.html' },
-                        { title: '時間價值的流逝規律', url: './3-2.html' }
-                    ]
-                },
-                {
-                    id: 'ch4', title: 'CH 4 希臘字母實戰力', icon: <Icons.TrendingUp />, testUrl: 'chap4-test.html',
-                    subpages: [
-                        { title: 'Delta：方向敏感度', url: './4-1.html' },
-                        { title: 'Gamma：Delta 的加速度', url: './4-2.html' },
-                        { title: 'Theta：時間衰減', url: './4-3.html' },
-                        { title: 'Vega：波動率敏感度', url: './4-4.html' }
-                    ]
-                },
-                {
-                    id: 'ch5', title: 'CH 5 選擇權九九乘法', icon: <Icons.Zap />, testUrl: 'chap5-test.html',
-                    subpages: [
-                        { title: '買進買權 (Long Call)', url: './5-1.html' },
-                        { title: '賣出買權 (Short Call)', url: './5-2.html' },
-                        { title: '買進賣權 (Long Put)', url: './5-3.html' },
-                        { title: '賣出賣權 (Short Put)', url: './5-4.html' },
-                        { title: '雙賣組合 (Short Strangle)', url: './5-5.html' },
-                        { title: '雙買組合 (Long Strangle)', url: './5-6.html' },
-                        { title: '多頭價差 (Bull Spread)', url: './5-7.html' },
-                        { title: '空頭價差 (Bear Spread)', url: './5-8.html' },
-                        { title: '鐵禿鷹組合 (Iron Condor)', url: './5-9.html' },
-                        { title: '鐵蝴蝶組合 (Iron Butterfly)', url: './5-10.html' }
-                    ]
-                },
-                {
-                    id: 'ch6', title: 'CH 6 常見問題集', icon: <Icons.Shield />, testUrl: 'chap6-test.html',
-                    subpages: [
-                        { title: '保證金計算', url: './6-1.html' },
-                        { title: '歐式與美式選擇權', url: './6-2.html' },
-                        { title: '新手一定要知道的 10 個地雷', url: './6-3.html' },
-                        { title: '新手必須知道的知識', url: './6-4.html' },
-                        { title: '權利金觀念與保證金控管', url: './6-5.html' }
-                    ]
-                },
-                {
-                    id: 'ch7', title: '進階 : Joption 量化', icon: <Icons.Code />, testUrl: 'chap7-test.html',
-                    subpages: [
-                        { title: 'Joption 是什麼', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E6%98%AF%E4%BB%80%E9%BA%BC' },
-                        { title: '雙賣平衡模擬器', url: './7-2.html' },
-                        { title: 'Joption 策略核心', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E7%AD%96%E7%95%A5%E6%A0%B8%E5%BF%83' },
-                        { title: '訂閱與下載', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E4%B8%8B%E8%BC%89%E5%8F%8A%E5%AE%89%E8%A3%9D%E8%AA%AA%E6%98%8E' },
-                        { title: '歐大的自我介紹', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E6%AD%90%E5%A4%A7%E7%9A%84%E8%87%AA%E6%88%91%E4%BB%8B%E7%B4%B9' }
-                    ]
-                }
-            ], []);
-
-            const currentChapter = useMemo(() => chapters.find(c => c.id === activeChapterId), [activeChapterId, chapters]);
-
-            const handleChapterSelect = (id) => {
-                setActiveChapterId(id);
-                setActiveSubIndex(null);
-            };
-
-            const handleSubPageClick = (index) => {
-                const targetUrl = index === 'test' ? currentChapter?.testUrl : currentChapter?.subpages[index].url;
-                if (targetUrl && targetUrl.startsWith('http')) {
-                    window.open(targetUrl, '_blank');
-                    return;
-                }
-                setActiveSubIndex(index);
-                if (window.innerWidth < 768) setIsMenuOpen(false);
-                if (scrollRef.current) scrollRef.current.scrollTop = 0;
-            };
-
-            const LogoImage = ({ className }) => (
-                <img 
-                    src="IP標籤.jpg" 
-                    alt="Logo" 
-                    className={className} 
-                    onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "https://www.joption.com.tw/IP%E6%A8%99%E7%B1%A4.jpg";
-                    }}
-                />
-            );
-
-            return (
-                <div className="h-full flex flex-col md:flex-row bg-[#f7f9f4] overflow-hidden">
-                    {/* 側邊欄導航 */}
-                    <aside className={`fixed inset-y-0 left-0 z-50 w-[280px] lg:w-[320px] bg-[#fffcf5] border-r border-stone-200 transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'} md:relative md:translate-x-0 md:sticky md:top-0 md:h-screen flex flex-col`}>
-                        <div className="p-6 md:p-8 flex items-center gap-4 cursor-pointer group" onClick={() => {setActiveChapterId('home'); setActiveSubIndex(null); setIsMenuOpen(false);}}>
-                            <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 overflow-hidden rounded-2xl shadow-lg border-2 border-white group-hover:rotate-3 transition-transform bg-stone-100">
-                                <LogoImage className="w-full h-full object-cover" />
-                            </div>
-                            <div className="flex flex-col min-w-0">
-                                <h2 className="text-lg md:text-xl font-black tracking-tight text-emerald-900 leading-tight truncate">歐大選擇權教室</h2>
-                                <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest mt-1 flex items-center gap-1"><Icons.Leaf/> JOPTION</span>
-                            </div>
-                        </div>
-
-                        <nav className="flex-1 px-3 md:px-4 py-2 space-y-2 overflow-y-auto mb-6">
-                            {chapters.map((ch) => (
-                                <div key={ch.id} className="space-y-1">
-                                    <button 
-                                        onClick={() => handleChapterSelect(ch.id)}
-                                        className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all ${activeChapterId === ch.id ? 'bg-emerald-50 text-emerald-800' : 'text-stone-600 hover:bg-stone-50'}`}
-                                    >
-                                        <div className="flex items-center gap-3 truncate">
-                                            <span className={`shrink-0 ${activeChapterId === ch.id ? 'text-emerald-500' : 'text-stone-400'}`}>{ch.icon}</span>
-                                            <span className="font-extrabold text-sm md:text-[15px] truncate">{ch.title}</span>
-                                        </div>
-                                        <div className={`transition-transform shrink-0 ${activeChapterId === ch.id ? 'rotate-180 text-emerald-500' : 'text-stone-300'}`}>
-                                            <Icons.ChevronDown />
-                                        </div>
-                                    </button>
-
-                                    <div className={`submenu-enter ${activeChapterId === ch.id ? 'submenu-open' : ''}`}>
-                                        <div className="pl-10 pr-2 py-1 space-y-1 border-l-2 border-dashed border-emerald-100 ml-6 my-1">
-                                            {ch.subpages.map((sub, sIdx) => (
-                                                <button
-                                                    key={sIdx}
-                                                    onClick={() => handleSubPageClick(sIdx)}
-                                                    className={`w-full text-left py-2 px-3 rounded-xl text-[13px] font-bold transition-all ${activeChapterId === ch.id && activeSubIndex === sIdx ? 'bg-emerald-100 text-emerald-900' : 'text-stone-500 hover:text-emerald-600 hover:bg-emerald-50'}`}
-                                                >
-                                                    {sub.title}
-                                                </button>
-                                            ))}
-                                            {ch.id !== 'ch7' && (
-                                                <button
-                                                    onClick={() => handleSubPageClick('test')}
-                                                    className={`w-full text-left py-2 px-3 rounded-xl text-[13px] font-bold transition-all flex items-center gap-2 mt-1 ${activeChapterId === ch.id && activeSubIndex === 'test' ? 'bg-amber-400 text-amber-900 shadow-sm' : 'text-amber-600 hover:bg-amber-50'}`}
-                                                >
-                                                    <Icons.ClipboardCheck /> 旅途試煉
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </nav>
-                    </aside>
-
-                    {/* 主要內容區域 */}
-                    <main className="flex-1 flex flex-col h-[100dvh] min-w-0 relative">
-                        {/* 手機版頂欄 */}
-                        <header className="md:hidden flex items-center justify-between px-5 py-3.5 bg-white border-stone-100 shrink-0 z-40 sticky top-0 shadow-sm">
-                            <div className="flex items-center gap-3" onClick={() => setActiveChapterId('home')}>
-                                <div className="w-9 h-9">
-                                    <LogoImage className="w-full h-full rounded-lg object-cover shadow-sm border border-stone-100" />
-                                </div>
-                                <span className="font-black text-emerald-950 text-base tracking-tight truncate">歐大選擇權教室</span>
-                            </div>
-                            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-stone-600 bg-stone-50 rounded-xl">
-                                {isMenuOpen ? <Icons.X /> : <Icons.Menu />}
-                            </button>
-                        </header>
-
-                        <div ref={scrollRef} className="scroll-container bg-[#f7f9f4]">
-                            <div className={`flex-1 flex flex-col ${activeSubIndex !== null ? 'p-0 h-full' : 'p-4 sm:p-6 md:p-10 lg:p-16'}`}>
-                                {activeChapterId === 'home' ? (
-                                    <div key="home" className="animate-fade-in space-y-8 md:space-y-16 max-w-6xl mx-auto w-full pb-10">
-                                        <div className="forest-gradient text-white p-8 sm:p-12 md:p-20 rounded-[2rem] md:rounded-[3.5rem] shadow-2xl relative overflow-hidden">
-                                            <div className="absolute -top-24 -right-24 w-64 h-64 md:w-96 md:h-96 bg-emerald-400 rounded-full blur-[80px] md:blur-[120px] opacity-20"></div>
-                                            <div className="relative z-10 space-y-6 md:space-y-10 text-center md:text-left">
-                                                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-emerald-50 text-xs font-bold tracking-widest">
-                                                    <Icons.Leaf /> JOPTION ACADEMY
-                                                </div>
-                                                <h1 className="text-3xl sm:text-4xl md:text-6xl font-black leading-[1.15] tracking-tight">
-                                                    掌握選擇權：<br/><span className="text-amber-300">獲利與風險的平衡魔法</span>
-                                                </h1>
-                                                <p className="text-base md:text-xl text-emerald-100/80 font-medium max-w-2xl mx-auto md:mx-0">
-                                                    從基礎出發，建立您的專業交易體系，讓數據成為您的指南針。
-                                                </p>
-                                                <div className="pt-4">
-                                                    <button onClick={() => setActiveChapterId('ch1')} className="btn-premium btn-amber px-8 md:px-12 py-4 md:py-5 rounded-full font-black text-white flex items-center justify-center gap-3 text-lg md:text-xl mx-auto md:mx-0 group">
-                                                        開始學習之旅 <Icons.ArrowRight />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="glass-card p-6 sm:p-10 md:p-14 rounded-[2rem] md:rounded-[3rem] shadow-sm border border-emerald-100/50">
-                                            <div className="space-y-10 md:space-y-14">
-                                                <div className="text-center md:text-left space-y-4">
-                                                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-emerald-950 leading-tight">
-                                                        進入量化交易的世界<br/>
-                                                        <span className="text-emerald-700">Joption 雙賣平衡下單機</span>
-                                                    </h2>
-                                                    <p className="text-stone-500 font-medium text-sm md:text-lg max-w-2xl mx-auto md:mx-0">
-                                                        透過專業量化工具，讓交易更具紀律，專注於長期穩健的獲利邏輯。
-                                                    </p>
-                                                    <a href="https://www.joption.com.tw/" target="_blank" className="btn-premium bg-[#1a2e25] px-8 md:px-10 py-3.5 md:py-4 rounded-full font-bold text-white inline-flex items-center gap-3 text-sm md:text-base mt-4 shadow-xl">
-                                                        前往 Joption 官網 <Icons.ArrowRight />
-                                                    </a>
-                                                </div>
-                                                
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                                                    {[
-                                                        { emoji: "🧐", title: "什麼是 Joption", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E6%98%AF%E4%BB%80%E9%BA%BC", desc: "開發初衷與核心功能簡介。" },
-                                                        { emoji: "🧠", title: "策略核心邏輯", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E7%AD%96%E7%95%A5%E6%A0%B8%E5%BF%83", desc: "深入探討量化交易邏輯。" },
-                                                        { emoji: "📥", title: "訂閱與下載", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E4%B8%8B%E8%BC%89%E5%8F%8A%E5%AE%89%E8%A3%9D%E8%AA%AA%E6%98%8E", desc: "獲取最新版軟體與安裝說明。" },
-                                                        { emoji: "👨‍🏫", title: "歐大自我介紹", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E6%AD%90%E5%A4%A7%E7%9A%84%E8%87%AA%E6%88%91%E4%BB%8B%E7%B4%B9", desc: "多年選擇權實戰經驗分享。" }
-                                                    ].map((item, i) => (
-                                                        <a key={i} href={item.url} target="_blank" className="p-6 bg-white rounded-3xl border border-stone-100 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md hover:-translate-y-1 block group">
-                                                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform origin-left">{item.emoji}</div>
-                                                            <h4 className="font-black text-emerald-950 mb-1.5 text-base md:text-lg">{item.title}</h4>
-                                                            <p className="text-stone-400 text-[13px] leading-relaxed font-medium">{item.desc}</p>
-                                                        </a>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex flex-col items-center gap-6 pt-6">
-                                            <div className="flex flex-wrap justify-center gap-3">
-                                                <div className="visitor-badge bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                                    <Icons.Users /> 累積：<span className="font-black">{visitorStats.total !== null ? visitorStats.total.toLocaleString() : '...'}</span>
-                                                </div>
-                                                <div className="visitor-badge bg-amber-50 text-amber-700 border border-amber-100">
-                                                    <Icons.Clock /> 今日：<span className="font-black">{visitorStats.daily !== null ? visitorStats.daily.toLocaleString() : '...'}</span>
-                                                </div>
-                                            </div>
-                                            <p className="text-[10px] font-bold text-stone-300 tracking-[0.2em] uppercase">© JOPTION ACADEMY - Since 2026</p>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div key={activeChapterId} className={`animate-fade-in flex-1 flex flex-col bg-white overflow-hidden transition-all ${activeSubIndex !== null ? 'h-full shadow-none border-none' : 'rounded-[2rem] md:rounded-[3rem] border-4 border-white shadow-xl min-h-[500px] mb-8'}`}>
-                                        {activeSubIndex === null ? (
-                                            <div className="p-8 md:p-16 flex flex-col items-center flex-1 justify-center relative">
-                                                <div className="mb-4 text-emerald-500 font-extrabold tracking-[0.3em] text-[10px] uppercase bg-emerald-50 px-4 py-1 rounded-full border border-emerald-100">Joption Chapter</div>
-                                                <h2 className="text-2xl md:text-4xl font-black mb-10 text-emerald-950 text-center leading-tight">
-                                                    {(currentChapter?.title || "章節內容")}
-                                                </h2>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full max-w-5xl mx-auto">
-                                                    {currentChapter?.subpages.map((sub, i) => (
-                                                        <button key={i} onClick={() => handleSubPageClick(i)} className="group p-5 md:p-6 rounded-3xl border-2 border-stone-50 bg-stone-50/50 hover:bg-emerald-50 hover:border-emerald-200 hover:shadow-lg transition-all text-left flex items-start gap-4">
-                                                            <span className="w-10 h-10 shrink-0 rounded-2xl bg-white text-emerald-600 flex items-center justify-center font-black text-sm border border-stone-100 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-sm">{i+1}</span>
-                                                            <span className="font-extrabold text-stone-700 text-sm md:text-base pt-2 group-hover:text-emerald-950 leading-snug">{sub.title}</span>
-                                                        </button>
-                                                    ))}
-                                                    {currentChapter?.id !== 'ch7' && currentChapter?.testUrl && (
-                                                        <button onClick={() => handleSubPageClick('test')} className="group p-5 md:p-6 rounded-3xl border-2 border-amber-100 bg-amber-50/30 hover:bg-amber-100 hover:border-amber-300 hover:shadow-lg transition-all text-left flex items-start gap-4">
-                                                            <span className="w-10 h-10 shrink-0 rounded-2xl bg-amber-400 text-amber-950 flex items-center justify-center font-black text-sm shadow-sm group-hover:scale-110 transition-transform">?</span>
-                                                            <span className="font-extrabold text-amber-900 text-sm md:text-base pt-2 leading-snug">旅途試煉</span>
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="iframe-container">
-                                                <iframe 
-                                                    src={activeSubIndex === 'test' ? currentChapter?.testUrl : currentChapter?.subpages[activeSubIndex].url} 
-                                                    title="Course Content"
-                                                    sandbox="allow-scripts allow-same-origin allow-forms"
-                                                    loading="lazy"
-                                                ></iframe>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </main>
-
-                    {isMenuOpen && (
-                        <div className="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-40 md:hidden" onClick={() => setIsMenuOpen(false)}></div>
-                    )}
+<body class="p-2 md:p-4">
+    <div class="max-w-[1600px] mx-auto space-y-2">
+        <!-- Header -->
+        <header class="flex items-center justify-between glass-card px-4 py-1.5 shadow-sm">
+            <div class="flex items-center gap-2">
+                <img src="IP標籤.jpg" alt="Logo" class="w-9 h-9 rounded-md object-cover shadow-sm" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="hidden bg-orange-500/10 p-1.5 rounded-md"><i data-lucide="layout" class="text-orange-600 w-4 h-4"></i></div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <h1 class="text-base font-black tracking-tight text-slate-800 leading-none">歐大時間價值追蹤儀</h1>
+                        <span class="version-badge">V5.7.2</span>
+                    </div>
                 </div>
-            );
-        };
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <div id="status-tag" class="hidden sm:flex items-center gap-1.5 px-2 py-1 bg-slate-50 rounded text-[9px] font-bold border border-slate-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="data-count" class="text-slate-500">同步就緒</span>
+                </div>
+                <button id="refresh-btn" class="flex items-center gap-1.5 px-3 py-1 bg-orange-600 hover:bg-orange-700 active:scale-90 text-white rounded-md font-black text-[11px] shadow-sm transition-all duration-75">
+                    <i data-lucide="refresh-ccw" class="w-3 h-3"></i> 同步
+                </button>
+            </div>
+        </header>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        <!-- Session Switcher -->
+        <div class="glass-card p-2 shadow-sm">
+            <div id="session-switcher" class="grid grid-cols-5 md:grid-cols-10 gap-1 w-full">
+                <!-- JS 產生按鈕 -->
+            </div>
+        </div>
+
+        <!-- Spotlight Panel -->
+        <div id="spotlight-panel" class="grid grid-cols-1 md:grid-cols-4 gap-2">
+            <div id="card-50pt" class="glass-card p-2.5 border-l-4 border-l-orange-400 interactive-card flex flex-col justify-center">
+                <p class="stat-label-mini text-orange-500 mb-1 flex items-center gap-1"><i data-lucide="activity" class="w-2.5 h-2.5"></i> 50點波段 (漲/跌/合)</p>
+                <div class="flex items-baseline justify-between">
+                    <span id="spot-up-50" class="stat-value-mini text-red-500 font-bold">--</span>
+                    <span class="text-slate-300 mx-1 text-[10px]">|</span>
+                    <span id="spot-down-50" class="stat-value-mini text-emerald-600 font-bold">--</span>
+                    <span class="text-slate-300 mx-1 text-[10px]">|</span>
+                    <span id="spot-sum-50" class="stat-sum-highlight">--</span>
+                </div>
+            </div>
+
+            <div id="card-100pt" class="glass-card p-2.5 border-l-4 border-l-orange-600 interactive-card flex flex-col justify-center">
+                <p class="stat-label-mini text-orange-700 mb-1 flex items-center gap-1"><i data-lucide="flame" class="w-2.5 h-2.5"></i> 100點波段 (漲/跌/合)</p>
+                <div class="flex items-baseline justify-between">
+                    <span id="spot-up-100" class="stat-value-mini text-red-500 font-black">--</span>
+                    <span class="text-slate-300 mx-1 text-[10px]">|</span>
+                    <span id="spot-down-100" class="stat-value-mini text-emerald-600 font-black">--</span>
+                    <span class="text-slate-300 mx-1 text-[10px]">|</span>
+                    <span id="spot-sum-100" class="stat-sum-highlight text-orange-700">--</span>
+                </div>
+            </div>
+
+            <div id="card-wed" class="glass-card p-2.5 border-l-4 border-l-sky-500 interactive-card flex items-center justify-between">
+                <div class="flex flex-col">
+                    <p class="stat-label-mini text-sky-600 mb-0.5 uppercase">週三選耗損</p>
+                    <span id="spot-wed-val" class="text-[18px] font-black tracking-tighter leading-none text-slate-800">--</span>
+                </div>
+                <span id="spot-wed-pct" class="text-[11px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">--%</span>
+            </div>
+
+            <div id="card-fri" class="glass-card p-2.5 border-l-4 border-l-emerald-500 interactive-card flex items-center justify-between">
+                <div class="flex flex-col">
+                    <p class="stat-label-mini text-emerald-600 mb-0.5 uppercase">週五選耗損</p>
+                    <span id="spot-fri-val" class="text-[18px] font-black tracking-tighter leading-none text-slate-800">--</span>
+                </div>
+                <span id="spot-fri-pct" class="text-[11px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">--%</span>
+            </div>
+        </div>
+
+        <!-- Chart Area -->
+        <div class="glass-card p-2 shadow-sm relative overflow-hidden ring-1 ring-black/5">
+            <div id="loading-overlay" class="absolute inset-0 z-50 flex items-center justify-center bg-white/90 backdrop-blur-sm transition-opacity duration-300">
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-8 h-8 border-3 border-orange-600/20 border-t-orange-600 rounded-full animate-spin"></div>
+                    <p class="text-orange-600 font-bold text-[11px]">數據精確定位中</p>
+                </div>
+            </div>
+            <div id="main-chart"></div>
+        </div>
+
+        <!-- 常駐型波段掃描明細 -->
+        <div id="on-page-scan-details" class="glass-card p-3 shadow-sm overflow-hidden bg-slate-50/30">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                    <div class="p-1 bg-slate-800 rounded text-white"><i data-lucide="scan-line" class="w-3.5 h-3.5"></i></div>
+                    <h2 id="scan-details-title" class="text-[12px] font-black text-slate-700 uppercase tracking-tighter">當前波段掃描報表 (100pt)</h2>
+                </div>
+                <div id="scan-details-summary" class="flex gap-4 text-[10px] font-black">
+                    <!-- JS 動態填入總和 -->
+                </div>
+            </div>
+            <div id="scan-details-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-0.5">
+                <div class="col-span-full py-4 text-center text-slate-300 italic font-medium">請選擇時段以查看報表</div>
+            </div>
+        </div>
+
+        <!-- Minimal Detail Table (全盤匯總) -->
+        <div class="glass-card p-3 shadow-sm overflow-hidden">
+            <div class="flex items-center gap-2 mb-2">
+                <div class="p-1 bg-orange-50 rounded text-orange-600"><i data-lucide="table-2" class="w-3.5 h-3.5"></i></div>
+                <h2 class="text-[12px] font-black text-slate-700 uppercase tracking-tighter">全盤分級明細匯總</h2>
+            </div>
+            <div class="overflow-x-auto text-[10px]">
+                <table class="w-full text-left decay-table border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 border-b border-slate-100 text-center font-bold">
+                            <th class="p-1 border-r text-left pl-2">時段</th>
+                            <th class="p-1 text-orange-600">50點 (漲/跌)</th>
+                            <th class="p-1 text-orange-700 border-r">100點 (漲/跌)</th>
+                            <th class="p-1 text-sky-600">週三 (%)</th>
+                            <th class="p-1 text-emerald-600">週五 (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="decay-table-body" class="font-mono text-slate-700">
+                        <tr><td colspan="5" class="text-center py-4 text-slate-300 italic font-sans font-medium">數據載入中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="detailed-modal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/80 backdrop-blur-sm">
+                <div class="flex items-center gap-2">
+                    <div id="modal-icon-bg" class="p-1.5 bg-orange-500 rounded-lg text-white shadow-sm">
+                        <i id="modal-icon" data-lucide="file-text" class="w-4 h-4"></i>
+                    </div>
+                    <h3 id="modal-title" class="text-sm font-black text-slate-800">詳細報表</h3>
+                </div>
+                <button id="btn-close-modal" class="p-1.5 hover:bg-slate-200 rounded transition-all">
+                    <i data-lucide="x" class="w-4 h-4 text-slate-400"></i>
+                </button>
+            </div>
+            <div id="modal-summary-bar" class="hidden bg-slate-900 px-4 py-2 flex items-center justify-between text-white shadow-inner border-b border-white/5 font-black text-[11px]"></div>
+            <div class="max-h-[70vh] overflow-y-auto p-1 bg-slate-100 custom-scrollbar" id="modal-content"></div>
+            <div class="p-2 bg-white border-t border-slate-200 flex justify-end">
+                <button id="btn-modal-ok" class="px-6 py-1.5 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white text-[10px] font-black rounded shadow-sm transition-all">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/1AsY4_MJipaMp_cNLpyeXTpFGnG0FD4vWJu-SDRdvtME/export?format=csv&gid=2119845045';
+        let chart; let globalData = null; let currentSessionIdx = -1;
+        
+        const rowRanges = [
+            { label: '周三晚', start: 2, end: 419, type: 'night' },
+            { label: '週四早', start: 420, end: 569, type: 'day' },
+            { label: '周四晚', start: 570, end: 989, type: 'night' },
+            { label: '週五早', start: 990, end: 1139, type: 'day' },
+            { label: '週五晚', start: 1140, end: 1559, type: 'night' },
+            { label: '周一早', start: 1560, end: 1709, type: 'day' },
+            { label: '周一晚', start: 1710, end: 2129, type: 'night' },
+            { label: '週二早', start: 2130, end: 2279, type: 'day' },
+            { label: '周二晚', start: 2280, end: 2699, type: 'night' },
+            { label: '週三早', start: 2700, end: 2849, type: 'day' }
+        ];
+
+        function parseCSVLine(text) {
+            const res = []; let cur = ""; let inQ = false;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (char === '"') { if (inQ && text[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
+                else if (char === ',' && !inQ) { res.push(cur.trim()); cur = ""; }
+                else cur += char;
+            }
+            res.push(cur.trim()); return res;
+        }
+
+        function cleanNumeric(v) {
+            if (v === undefined || v === null || v.toString().trim() === "") return null;
+            const num = parseFloat(v.toString().replace(/,/g, '').replace(/[^0-9.-]/g, ''));
+            return (isNaN(num) || num === 0) ? null : num;
+        }
+
+        // V5.7.2 修復：修正 detectSwings 結尾檢查時 currentHigh 未定義的問題
+        function detectSwings(prices, times, threshold) {
+            let dataArr = [];
+            for (let i = 0; i < prices.length; i++) if (prices[i] !== null) dataArr.push({ val: prices[i], time: times[i] });
+            if (dataArr.length < 2) return { upCount: 0, upSum: 0, downCount: 0, downSum: 0, list: [] };
+            
+            let upC = 0, upS = 0, downC = 0, downS = 0, list = [];
+            let lastE = dataArr[0], curH = dataArr[0], curL = dataArr[0], trend = 0; 
+
+            for (let i = 1; i < dataArr.length; i++) {
+                let p = dataArr[i];
+                if (trend === 0) {
+                    if (p.val >= lastE.val + threshold) { trend = 1; curH = p; }
+                    else if (p.val <= lastE.val - threshold) { trend = -1; curL = p; }
+                } else if (trend === 1) {
+                    if (p.val > curH.val) curH = p;
+                    else if (p.val <= curH.val - threshold) {
+                        upC++; let d = curH.val - lastE.val; upS += d;
+                        list.push({ type: '上漲', from: lastE, to: curH, diff: d });
+                        trend = -1; lastE = curH; curL = p;
+                    }
+                } else if (trend === -1) {
+                    if (p.val < curL.val) curL = p;
+                    else if (p.val >= curL.val + threshold) {
+                        downC++; let d = lastE.val - curL.val; downS += d;
+                        list.push({ type: '下跌', from: lastE, to: curL, diff: d });
+                        trend = 1; lastE = curL; curH = p;
+                    }
+                }
+            }
+            // 修正：將 currentHigh 改為 curH，currentLow 改為 curL
+            if (trend === 1 && curH.val > lastE.val + threshold) { 
+                upC++; let d = curH.val - lastE.val; upS += d; 
+                list.push({ type: '上漲', from: lastE, to: curH, diff: d }); 
+            } else if (trend === -1 && curL.val < lastE.val - threshold) { 
+                downC++; let d = lastE.val - curL.val; downS += d; 
+                list.push({ type: '下跌', from: lastE, to: curL, diff: d }); 
+            }
+            return { upCount: upC, upSum: upS, downCount: downC, downSum: downS, list };
+        }
+
+        function getDecay(sub) {
+            const f = sub.filter(v => v !== null);
+            if (f.length < 6) return null;
+            const d = f[f.length - 3] - f[2];
+            return { d, p: (d / f[2]) * 100, p3: f[2], plast3: f[f.length-3] };
+        }
+
+        function calculateStats(range, data) {
+            const start = range.start - 2; const end = range.end - 2;
+            const subY1 = [], subTimes = [], subWed = [], subFri = [];
+            for (let i = start; i <= end; i++) {
+                subY1.push(data.y1[i]); subTimes.push(data.x[i]);
+                subWed.push(data.y2a[i]); subFri.push(data.y2b[i]);
+            }
+            return { s50: detectSwings(subY1, subTimes, 50), s100: detectSwings(subY1, subTimes, 100), wed: getDecay(subWed), fri: getDecay(subFri) };
+        }
+
+        function renderOnPageDetails(idx) {
+            if (idx === -1 || !globalData) return;
+            const range = rowRanges[idx];
+            const stats = calculateStats(range, globalData);
+            const grid = document.getElementById('scan-details-grid');
+            const summary = document.getElementById('scan-details-summary');
+            const title = document.getElementById('scan-details-title');
+
+            title.innerText = `${range.label} - 波段掃描報表 (100pt)`;
+            summary.innerHTML = `
+                <span class="text-red-500">漲: ${stats.s100.upCount}次/${stats.s100.upSum.toFixed(0)}點</span>
+                <span class="text-emerald-600">跌: ${stats.s100.downCount}次/${stats.s100.downSum.toFixed(0)}點</span>
+                <span class="text-orange-600 border-l border-slate-200 pl-2">合: ${(stats.s100.upSum + stats.s100.downSum).toFixed(0)}點</span>
+            `;
+
+            grid.innerHTML = '';
+            if (stats.s100.list.length === 0) {
+                grid.innerHTML = '<div class="col-span-full py-6 text-center text-slate-300 italic font-bold uppercase tracking-widest text-[11px]">此盤無 100pt 以上波動</div>';
+            } else {
+                stats.s100.list.forEach((it, i) => {
+                    const isUp = it.type === '上漲';
+                    const timeOnly = it.from.time.split(' ')[1] || it.from.time;
+                    const div = document.createElement('div');
+                    div.className = `excel-cell-ultra shadow-xs border-l-4 ${isUp ? 'border-l-red-500' : 'border-l-emerald-500'}`;
+                    div.innerHTML = `
+                        <div class="excel-row-main">
+                            <div class="flex items-center gap-1">
+                                <span class="excel-font-lg text-slate-400">#${i+1}</span>
+                                <span class="excel-font-lg ${isUp ? 'text-red-500' : 'text-emerald-600'}">${it.type}</span>
+                                <span class="excel-font-lg ${isUp ? 'text-red-600' : 'text-emerald-700'}">${it.diff.toFixed(0)}</span>
+                            </div>
+                        </div>
+                        <div class="excel-row-sub">
+                            <span class="excel-font-lg text-slate-500 opacity-80">${timeOnly}</span>
+                            <span class="excel-font-sm text-slate-600">${it.from.val.toFixed(0)} → ${it.to.val.toFixed(0)}</span>
+                        </div>
+                    `;
+                    grid.appendChild(div);
+                });
+            }
+        }
+
+        function updateSpotlight(idx) {
+            if (idx === -1 || !globalData) return;
+            const stats = calculateStats(rowRanges[idx], globalData);
+            document.getElementById('spot-up-50').innerText = `${stats.s50.upCount}/${stats.s50.upSum.toFixed(0)}`;
+            document.getElementById('spot-down-50').innerText = `${stats.s50.downCount}/${stats.s50.downSum.toFixed(0)}`;
+            document.getElementById('spot-sum-50').innerText = (stats.s50.upSum + stats.s50.downSum).toFixed(0);
+            document.getElementById('spot-up-100').innerText = `${stats.s100.upCount}/${stats.s100.upSum.toFixed(0)}`;
+            document.getElementById('spot-down-100').innerText = `${stats.s100.downCount}/${stats.s100.downSum.toFixed(0)}`;
+            document.getElementById('spot-sum-100').innerText = (stats.s100.upSum + stats.s100.downSum).toFixed(0);
+            const fmt = (vId, pId, d) => {
+                const el = document.getElementById(vId), pEl = document.getElementById(pId);
+                if (!d) { el.innerText = '--'; pEl.innerText = '--%'; return; }
+                const s = d.d > 0 ? '+' : ''; el.innerText = `${s}${d.d.toFixed(1)}`;
+                el.className = `text-[18px] font-black tracking-tighter leading-none ${d.d < 0 ? 'text-red-500' : 'text-emerald-500'}`;
+                pEl.innerText = `${s}${d.p.toFixed(1)}%`;
+            };
+            fmt('spot-wed-val', 'spot-wed-pct', stats.wed); fmt('spot-fri-val', 'spot-fri-pct', stats.fri);
+        }
+
+        function showDetailedModal(type) {
+            if (currentSessionIdx === -1) return;
+            const range = rowRanges[currentSessionIdx];
+            const stats = calculateStats(range, globalData);
+            const overlay = document.getElementById('detailed-modal');
+            const summaryBar = document.getElementById('modal-summary-bar');
+            const content = document.getElementById('modal-content');
+            content.innerHTML = ''; summaryBar.classList.add('hidden');
+
+            if (type === '50pt' || type === '100pt') {
+                const threshold = type === '50pt' ? 50 : 100;
+                const swingData = type === '50pt' ? stats.s50 : stats.s100;
+                document.getElementById('modal-title').innerText = `${range.label} - ${threshold}pt 波段細節`;
+                summaryBar.classList.remove('hidden');
+                summaryBar.innerHTML = `<div class="flex-1 text-red-400">漲: ${swingData.upCount}x/${swingData.upSum.toFixed(0)}pt</div><div class="flex-1 text-emerald-400 pl-3">跌: ${swingData.downCount}x/${swingData.downSum.toFixed(0)}pt</div><div class="flex-1 text-orange-400 text-right">合: ${(swingData.upSum + swingData.downSum).toFixed(0)} pt</div>`;
+                let html = `<div class="grid grid-cols-2 lg:grid-cols-4 gap-0.5">`;
+                swingData.list.forEach((it, i) => {
+                    const isUp = it.type === '上漲';
+                    const t = it.from.time.split(' ')[1] || it.from.time;
+                    html += `<div class="excel-cell-ultra border-l-4 ${isUp?'border-l-red-500':'border-l-emerald-500'}"><div class="excel-row-main"><span class="excel-font-lg text-slate-400">#${i+1}</span><span class="excel-font-lg ${isUp?'text-red-500':'text-emerald-600'}">${it.type} ${it.diff.toFixed(0)}</span></div><div class="excel-row-sub"><span class="excel-font-lg text-slate-500">${t}</span><span class="excel-font-sm">${it.from.val.toFixed(0)}→${it.to.val.toFixed(0)}</span></div></div>`;
+                });
+                html += `</div>`; content.innerHTML = html;
+            } else {
+                const isW = type === 'wed'; const d = isW ? stats.wed : stats.fri;
+                document.getElementById('modal-title').innerText = `${range.label} - ${isW?'週三':'週五'}選詳細基準`;
+                if (d) content.innerHTML = `<div class="grid grid-cols-2 gap-1 p-1"><div class="border p-2 bg-white rounded flex flex-col items-center"><span class="text-[9px] font-bold text-slate-400">P3 START</span><span class="text-lg font-black text-slate-800">${d.p3.toFixed(1)}</span></div><div class="border p-2 bg-white rounded flex flex-col items-center"><span class="text-[9px] font-bold text-slate-400">PL3 END</span><span class="text-lg font-black text-slate-800">${d.plast3.toFixed(1)}</span></div></div><div class="mx-1 bg-slate-900 rounded-lg p-5 text-center text-white shadow-xl mt-1"><p class="text-5xl font-black tracking-tighter">${d.d>0?'+':''}${d.d.toFixed(1)}</p><p class="text-lg font-black text-orange-400 mt-1">${d.p.toFixed(2)}%</p></div>`;
+            }
+            overlay.classList.add('active');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function selectSession(idx) {
+            currentSessionIdx = idx;
+            document.querySelectorAll('.session-btn').forEach((btn, i) => btn.classList.toggle('active', i === idx));
+            updateSpotlight(idx);
+            renderOnPageDetails(idx);
+            
+            if (chart && idx !== -1) {
+                const r = rowRanges[idx]; const sIdx = r.start - 2; const eIdx = Math.min(r.end - 2, globalData.x.length - 1);
+                const sX = (sIdx / globalData.x.length) * 100; const eX = (eIdx / globalData.x.length) * 100;
+                const subY1 = globalData.y1.slice(sIdx, eIdx + 1).filter(v => v !== null);
+                const subY2 = [...globalData.y2a.slice(sIdx, eIdx+1), ...globalData.y2b.slice(sIdx, eIdx+1)].filter(v => v !== null);
+                const allY1 = globalData.y1.filter(v => v !== null); const allY2 = [...globalData.y2a, ...globalData.y2b].filter(v => v !== null);
+                const gMinY1 = Math.min(...allY1), gMaxY1 = Math.max(...allY1), gMinY2 = Math.min(...allY2), gMaxY2 = Math.max(...allY2);
+                const getPct = (v, min, max) => Math.max(0, Math.min(100, ((v - min) / (max - min)) * 100));
+                chart.dispatchAction({
+                    type: 'dataZoom',
+                    batch: [
+                        { dataZoomIndex: 0, start: sX, end: eX },
+                        { dataZoomIndex: 1, start: getPct(Math.min(...subY1)*0.996, gMinY1, gMaxY1), end: getPct(Math.max(...subY1)*1.004, gMinY1, gMaxY1) },
+                        { dataZoomIndex: 2, start: getPct(Math.min(...subY2)*0.92, gMinY2, gMaxY2), end: getPct(Math.max(...subY2)*1.08, gMinY2, gMaxY2) }
+                    ]
+                });
+            }
+        }
+
+        function initChart(data) {
+            const chartDom = document.getElementById('main-chart');
+            if (chart) chart.dispose(); chart = echarts.init(chartDom, null, { renderer: 'canvas' });
+            const tbody = document.getElementById('decay-table-body'); tbody.innerHTML = '';
+            const markAreas = []; const markExtrema = { symbol: 'pin', symbolSize: 22, label: { show: true, fontSize: 8, fontWeight: 'bold' }, data: [{ type: 'max', itemStyle: { color: '#ef4444' } }, { type: 'min', itemStyle: { color: '#3b82f6' } }] };
+            rowRanges.forEach((range, i) => {
+                const start = range.start - 2;
+                if (start >= 0 && start < data.x.length) {
+                    const stats = calculateStats(range, data);
+                    const color = range.type === 'night' ? 'rgba(241, 245, 249, 0.7)' : 'rgba(255, 255, 255, 1)';
+                    const fmtD = (d) => d ? `${d.p.toFixed(0)}%` : '--';
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-orange-50/30 border-b border-slate-50 transition-colors text-center";
+                    tr.innerHTML = `<td class="p-1 font-bold border-r text-slate-500 text-left pl-2">${range.label}</td><td class="p-1 text-red-500 font-bold">${stats.s50.upCount}/${stats.s50.upSum.toFixed(0)} <span class="text-emerald-500 font-normal ml-1">${stats.s50.downCount}/${stats.s50.downSum.toFixed(0)}</span></td><td class="p-1 text-red-600 font-black border-r">${stats.s100.upCount}/${stats.s100.upSum.toFixed(0)} <span class="text-emerald-600 font-black ml-1">${stats.s100.downCount}/${stats.s100.downSum.toFixed(0)}</span></td><td class="p-1 ${stats.wed?.d<0?'text-red-500 font-bold':''}">${fmtD(stats.wed)}</td><td class="p-1 ${stats.fri?.d<0?'text-red-500 font-bold':''}">${fmtD(stats.fri)}</td>`;
+                    tbody.appendChild(tr);
+                    markAreas.push([{ name: `${range.label}\n漲${stats.s100.upCount}跌${stats.s100.downCount}`, xAxis: data.x[start], itemStyle: { color: color }, label: { show: true, position: 'insideTopLeft', distance: 10, color: '#94a3b8', fontWeight: 'bold', fontSize: 8, lineHeight: 10, backgroundColor: 'rgba(255,255,255,0.7)', padding: [2, 4], borderRadius: 4, formatter: '{b}' } }, { xAxis: data.x[Math.min(range.end-2, data.x.length-1)] }]);
+                }
+            });
+            const opt = {
+                backgroundColor: '#ffffff', legend: { data: ['期貨指數', '週三選', '週五選'], top: 2, textStyle: { color: '#64748b', fontWeight: 'bold', fontSize: 11 } },
+                grid: { top: '8%', left: '50', right: '50', bottom: '50', containLabel: true }, tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+                dataZoom: [{ type: 'slider', xAxisIndex:[0], bottom: 5, height: 25, fillerColor: 'rgba(249, 115, 22, 0.1)', handleStyle: { color: '#f97316' } }, { type: 'slider', yAxisIndex:[0], left: '1', width: 10 }, { type: 'slider', yAxisIndex:[1], right: '1', width: 10 }, { type: 'inside', xAxisIndex:[0] }],
+                xAxis: { type: 'category', data: data.x, boundaryGap: false, axisLabel: { fontSize: 8, color: '#cbd5e1' } },
+                yAxis: [{ type: 'value', name: '期指', scale: true, axisLabel: { fontSize: 8, color: '#c2410c' } }, { type: 'value', name: '選', position: 'right', scale: true, axisLabel: { fontSize: 8, color: '#c2410c' } }],
+                series: [{ name: '期貨指數', type: 'line', yAxisIndex: 0, data: data.y1, smooth: true, showSymbol: false, lineStyle: { width: 2, color: '#2563eb' }, areaStyle: { color: 'rgba(37, 99, 235, 0.1)' }, markArea: { silent: true, data: markAreas }, markPoint: markExtrema }, { name: '週三選', type: 'line', yAxisIndex: 1, data: data.y2a, smooth: true, showSymbol: false, lineStyle: { width: 1.5, color: '#059669' }, markPoint: markExtrema }, { name: '週五選', type: 'line', yAxisIndex: 1, data: data.y2b, smooth: true, showSymbol: false, lineStyle: { width: 1.5, color: '#d97706', type: 'dashed' }, markPoint: markExtrema }]
+            };
+            chart.setOption(opt);
+        }
+
+        async function fetchData() {
+            const overlay = document.getElementById('loading-overlay'); overlay.style.opacity = '1'; overlay.classList.remove('hidden');
+            try {
+                const response = await fetch(`${CSV_URL}&t=${Date.now()}`);
+                const text = await response.text();
+                const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+                const data = { x: [], y1: [], y2a: [], y2b: [] };
+                for (let i = 1; i < lines.length; i++) {
+                    const cols = parseCSVLine(lines[i]);
+                    if (cols.length >= 4) {
+                        data.x.push(cols[0]); data.y1.push(cleanNumeric(cols[1]));
+                        data.y2a.push(cleanNumeric(cols[2])); data.y2b.push(cleanNumeric(cols[3]));
+                    }
+                }
+                globalData = data; initChart(data);
+                const switcher = document.getElementById('session-switcher'); switcher.innerHTML = '';
+                rowRanges.forEach((range, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = `session-btn ${range.type === 'night' ? 'night' : ''}`; btn.innerText = range.label;
+                    btn.onclick = () => selectSession(i); switcher.appendChild(btn);
+                });
+                let lastValid = rowRanges.length - 1; while(lastValid >= 0 && (rowRanges[lastValid].start - 2) >= data.x.length) lastValid--;
+                if(lastValid >= 0) selectSession(lastValid);
+            } catch (e) { console.error(e); }
+            finally { setTimeout(() => { overlay.style.opacity = '0'; setTimeout(() => overlay.classList.add('hidden'), 300); }, 500); }
+        }
+
+        window.onload = () => {
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            fetchData();
+            
+            document.getElementById('card-50pt').onclick = () => showDetailedModal('50pt');
+            document.getElementById('card-100pt').onclick = () => showDetailedModal('100pt');
+            document.getElementById('card-wed').onclick = () => showDetailedModal('wed');
+            document.getElementById('card-fri').onclick = () => showDetailedModal('fri');
+            document.getElementById('btn-close-modal').onclick = () => document.getElementById('detailed-modal').classList.remove('active');
+            document.getElementById('btn-modal-ok').onclick = () => document.getElementById('detailed-modal').classList.remove('active');
+            document.getElementById('refresh-btn').onclick = fetchData;
+        };
+        window.onresize = () => chart && chart.resize();
     </script>
 </body>
 </html>
