@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
+
     <title>歐大選擇權教室 | Joption Academy</title>
 
     <meta property="og:title" content="歐大選擇權教室" />
@@ -18,11 +18,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
+    <script src="https://unpkg.com/htm@3/dist/htm.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
-        
+
         :root {
             --forest-deep: #1b4332;
             --forest-mid: #2d6a4f;
@@ -34,40 +34,41 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden; 
+            overflow: hidden;
             background-color: var(--sage-light);
         }
 
-        body { 
-            font-family: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif; 
+        body {
+            font-family: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
             -webkit-tap-highlight-color: transparent;
             color: #292524;
         }
 
-        .animate-fade-in { 
-            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+        .animate-fade-in {
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
             opacity: 0;
         }
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(15px); } 
-            to { opacity: 1; transform: translateY(0); } 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .submenu-enter { 
-            max-height: 0; 
-            overflow: hidden; 
-            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease; 
+        .submenu-enter {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
             opacity: 0;
         }
-        .submenu-open { 
-            max-height: 1500px; 
+        .submenu-open {
+            max-height: 1500px;
             opacity: 1;
         }
 
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 10px; }
-        
+
         .forest-gradient {
             background: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%);
         }
@@ -89,10 +90,10 @@
             width: 100%;
             height: 100%;
             flex: 1;
-            overflow: hidden; 
+            overflow: hidden;
             position: relative;
         }
-        
+
         .iframe-container iframe {
             width: 100%;
             height: 100%;
@@ -134,11 +135,10 @@
 </head>
 <body>
     <div id="root" class="h-full">
-        <div id="loading-screen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background-color:#f7f9f4;gap:16px;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background-color:#f7f9f4;gap:16px;">
             <div style="width:48px;height:48px;border:4px solid #d1fae5;border-top-color:#2d6a4f;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
             <p style="font-family:'Noto Sans TC',sans-serif;font-size:1rem;color:#6b7280;margin:0;">載入中，請稍候…</p>
         </div>
-        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
     </div>
 
     <script type="module">
@@ -149,35 +149,36 @@
         window.FirebaseSDK = { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, getFirestore, doc, setDoc, onSnapshot, increment, serverTimestamp, collection };
     </script>
 
-    <script type="text/babel">
+    <script>
+        const html = htm.bind(React.createElement);
         const { useState, useEffect, useMemo, useRef } = React;
 
         const Icons = {
-            Home: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>,
-            Book: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>,
-            Target: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>,
-            TrendingUp: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>,
-            Shield: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>,
-            Zap: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>,
-            Code: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>,
-            Terminal: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>,
-            ChevronDown: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7"></path></svg>,
-            Menu: () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>,
-            X: () => <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>,
-            ClipboardCheck: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>,
-            Leaf: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 11a9 9 0 019 9M4 11a9 9 0 019-9m-9 9l9 9m0-18l-9 9"></path></svg>,
-            ArrowRight: () => <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>,
-            Users: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>,
-            Clock: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>,
-            MessageQuestion: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Home:            () => html`<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>`,
+            Book:            () => html`<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>`,
+            Target:          () => html`<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+            TrendingUp:      () => html`<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>`,
+            Shield:          () => html`<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>`,
+            Zap:             () => html`<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>`,
+            Code:            () => html`<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>`,
+            Terminal:        () => html`<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>`,
+            ChevronDown:     () => html`<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7"></path></svg>`,
+            Menu:            () => html`<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>`,
+            X:               () => html`<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>`,
+            ClipboardCheck:  () => html`<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>`,
+            Leaf:            () => html`<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 11a9 9 0 019 9M4 11a9 9 0 019-9m-9 9l9 9m0-18l-9 9"></path></svg>`,
+            ArrowRight:      () => html`<svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>`,
+            Users:           () => html`<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`,
+            Clock:           () => html`<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+            MessageQuestion: () => html`<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
         };
 
         const App = () => {
             const [activeChapterId, setActiveChapterId] = useState('home');
-            const [activeSubIndex, setActiveSubIndex] = useState(null);
-            const [isMenuOpen, setIsMenuOpen] = useState(false);
-            const [visitorStats, setVisitorStats] = useState({ total: null, daily: null });
-            
+            const [activeSubIndex, setActiveSubIndex]   = useState(null);
+            const [isMenuOpen, setIsMenuOpen]           = useState(false);
+            const [visitorStats, setVisitorStats]       = useState({ total: null, daily: null });
+
             const hasIncrementedRef = useRef(false);
             const scrollRef = useRef(null);
 
@@ -195,10 +196,10 @@
                             messagingSenderId: "652108941349",
                             appId: "1:652108941349:web:ac058f3f692e841e7c97cc"
                         };
-                        const app = initializeApp(firebaseConfig);
+                        const app  = initializeApp(firebaseConfig);
                         const auth = getAuth(app);
-                        const db = getFirestore(app);
-                        const appId = 'fir-console-9e02e'; 
+                        const db   = getFirestore(app);
+                        const appId = 'fir-console-9e02e';
                         const now = new Date();
                         const taiwanTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Taipei"}));
                         const dateKey = `${taiwanTime.getFullYear()}${String(taiwanTime.getMonth() + 1).padStart(2, '0')}${String(taiwanTime.getDate()).padStart(2, '0')}`;
@@ -206,10 +207,10 @@
                         await signInAnonymously(auth);
                         unsubscribeAuth = onAuthStateChanged(auth, async (u) => {
                             if (!u) return;
-                            const statsCol = collection(db, 'artifacts', appId, 'public', 'data', 'analytics');
+                            const statsCol    = collection(db, 'artifacts', appId, 'public', 'data', 'analytics');
                             const totalDocRef = doc(statsCol, 'totalStats');
                             const dailyDocRef = doc(statsCol, `daily_${dateKey}`);
-                            
+
                             if (!hasIncrementedRef.current) {
                                 hasIncrementedRef.current = true;
                                 try {
@@ -230,7 +231,7 @@
 
             const chapters = useMemo(() => [
                 {
-                    id: 'ch1', title: 'CH 1 選擇權入門', icon: <Icons.Book />, testUrl: 'chap1-test.html',
+                    id: 'ch1', title: 'CH 1 選擇權入門', icon: html`<${Icons.Book} />`, testUrl: 'chap1-test.html',
                     subpages: [
                         { title: '什麼是選擇權？', url: './1-1.html' },
                         { title: '權利與義務的對稱性', url: './1-2.html' },
@@ -238,7 +239,7 @@
                     ]
                 },
                 {
-                    id: 'ch2', title: 'CH 2 基礎知識', icon: <Icons.Target />, testUrl: 'chap2-test.html',
+                    id: 'ch2', title: 'CH 2 基礎知識', icon: html`<${Icons.Target} />`, testUrl: 'chap2-test.html',
                     subpages: [
                         { title: '履約價與權利金', url: './2-1.html' },
                         { title: '價內、價平與價外', url: './2-2.html' },
@@ -248,14 +249,14 @@
                     ]
                 },
                 {
-                    id: 'ch3', title: 'CH 3 權利金的秘密', icon: <Icons.Zap />, testUrl: 'chap3-test.html',
+                    id: 'ch3', title: 'CH 3 權利金的秘密', icon: html`<${Icons.Zap} />`, testUrl: 'chap3-test.html',
                     subpages: [
                         { title: '內涵價值 vs 時間價值', url: './3-1.html' },
-                        { title: '時間價值的流逝規規律', url: './3-2.html' }
+                        { title: '時間價值的流逝規律', url: './3-2.html' }
                     ]
                 },
                 {
-                    id: 'ch4', title: 'CH 4 希臘字母實戰力', icon: <Icons.TrendingUp />, testUrl: 'chap4-test.html',
+                    id: 'ch4', title: 'CH 4 希臘字母實戰力', icon: html`<${Icons.TrendingUp} />`, testUrl: 'chap4-test.html',
                     subpages: [
                         { title: 'Delta：方向敏感度', url: './4-1.html' },
                         { title: 'Gamma：Delta 的加速度', url: './4-2.html' },
@@ -264,7 +265,7 @@
                     ]
                 },
                 {
-                    id: 'ch5', title: 'CH 5 選擇權九九乘法', icon: <Icons.Zap />, testUrl: 'chap5-test.html',
+                    id: 'ch5', title: 'CH 5 選擇權九九乘法', icon: html`<${Icons.Zap} />`, testUrl: 'chap5-test.html',
                     subpages: [
                         { title: '買進買權 (Long Call)', url: './5-1.html' },
                         { title: '賣出買權 (Short Call)', url: './5-2.html' },
@@ -279,7 +280,7 @@
                     ]
                 },
                 {
-                    id: 'ch6', title: 'CH 6 常見問題集', icon: <Icons.Shield />, testUrl: 'chap6-test.html',
+                    id: 'ch6', title: 'CH 6 常見問題集', icon: html`<${Icons.Shield} />`, testUrl: 'chap6-test.html',
                     subpages: [
                         { title: '保證金計算', url: './6-1.html' },
                         { title: '歐式與美式選擇權', url: './6-2.html' },
@@ -289,13 +290,13 @@
                     ]
                 },
                 {
-                    id: 'ch7', title: 'CH 7 Joption 問題集', icon: <Icons.MessageQuestion />,
+                    id: 'ch7', title: 'CH 7 Joption 問題集', icon: html`<${Icons.MessageQuestion} />`,
                     subpages: [
                         { title: '加碼策略 2 的指南', url: 'https://joption-tw.github.io/7-1/' }
                     ]
                 },
                 {
-                    id: 'ch8', title: 'CH 8 進階 : Joption 量化', icon: <Icons.Code />, testUrl: 'chap7-test.html',
+                    id: 'ch8', title: 'CH 8 進階 : Joption 量化', icon: html`<${Icons.Code} />`, testUrl: 'chap7-test.html',
                     subpages: [
                         { title: 'Joption 是什麼', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E6%98%AF%E4%BB%80%E9%BA%BC' },
                         { title: '雙賣平衡模擬器', url: './7-2.html' },
@@ -305,7 +306,7 @@
                     ]
                 },
                 {
-                    id: 'ch9', title: 'CH 9 常用的輔助程式', icon: <Icons.Terminal />, 
+                    id: 'ch9', title: 'CH 9 常用的輔助程式', icon: html`<${Icons.Terminal} />`,
                     subpages: [
                         { title: '富台指轉換器', url: 'https://joption-tw.github.io/FTSE-Taiwan-Index-Futures/' },
                         { title: '每日震幅追蹤器', url: 'https://joption-tw.github.io/Volatility/' }
@@ -331,211 +332,201 @@
                 if (scrollRef.current) scrollRef.current.scrollTop = 0;
             };
 
-            const LogoImage = ({ className }) => (
-                <img 
-                    src="IP標籤.jpg" 
-                    alt="Logo" 
-                    className={className} 
-                    onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "https://www.joption.com.tw/IP%E6%A8%99%E7%B1%A4.jpg";
-                    }}
-                />
-            );
+            const LogoImage = ({ className }) => html`<img
+                src="IP標籤.jpg"
+                alt="Logo"
+                className=${className}
+                onError=${(e) => { e.target.onerror = null; e.target.src = "https://www.joption.com.tw/IP%E6%A8%99%E7%B1%A4.jpg"; }}
+            />`;
 
-            return (
+            const homeCards = [
+                { emoji: "🚀", title: "加碼策略指南", url: "https://joption-tw.github.io/7-1/", desc: "學習進階加碼技巧，提升整體獲利效能。", internal: true },
+                { emoji: "🧐", title: "什麼是 Joption", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E6%98%AF%E4%BB%80%E9%BA%BC", desc: "開發初衷與核心功能簡介。" },
+                { emoji: "🧠", title: "策略核心邏輯", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E7%AD%96%E7%95%A5%E6%A0%B8%E5%BF%83", desc: "深入探討量化交易邏輯。" },
+                { emoji: "📥", title: "訂閱與下載", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E4%B8%8B%E8%BC%89%E5%8F%8A%E5%AE%89%E8%A3%9D%E8%AA%AA%E6%98%8E", desc: "獲取最新版軟體與安裝說明。" },
+                { emoji: "👨‍🏫", title: "歐大自我介紹", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E6%AD%90%E5%A4%A7%E7%9A%84%E8%87%AA%E6%88%91%E4%BB%8B%E7%B4%B9", desc: "多年選擇權實戰經驗分享。" }
+            ];
+
+            const mainContent = activeChapterId === 'home'
+                ? html`
+                    <div key="home" className="animate-fade-in space-y-8 md:space-y-16 max-w-6xl mx-auto w-full pb-10">
+                        <div className="forest-gradient text-white p-8 sm:p-12 md:p-20 rounded-[2rem] md:rounded-[3.5rem] shadow-2xl relative overflow-hidden">
+                            <div className="absolute -top-24 -right-24 w-64 h-64 md:w-96 md:h-96 bg-emerald-400 rounded-full blur-[80px] md:blur-[120px] opacity-20"></div>
+                            <div className="relative z-10 space-y-6 md:space-y-10 text-center md:text-left">
+                                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-emerald-50 text-xs font-bold tracking-widest">
+                                    <${Icons.Leaf} /> JOPTION ACADEMY
+                                </div>
+                                <h1 className="text-3xl sm:text-4xl md:text-6xl font-black leading-[1.15] tracking-tight">
+                                    掌握選擇權：<br/><span className="text-amber-300">獲利與風險的平衡魔法</span>
+                                </h1>
+                                <p className="text-base md:text-xl text-emerald-100/80 font-medium max-w-2xl mx-auto md:mx-0">
+                                    從基礎出發，建立您的專業交易體系，讓數據成為您的指南針。
+                                </p>
+                                <div className="pt-4">
+                                    <button onClick=${() => setActiveChapterId('ch1')} className="btn-premium btn-amber px-8 md:px-12 py-4 md:py-5 rounded-full font-black text-white flex items-center justify-center gap-3 text-lg md:text-xl mx-auto md:mx-0 group">
+                                        開始學習之旅 <${Icons.ArrowRight} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="glass-card p-6 sm:p-10 md:p-14 rounded-[2rem] md:rounded-[3rem] shadow-sm border border-emerald-100/50">
+                            <div className="space-y-10 md:space-y-14">
+                                <div className="text-center md:text-left space-y-4">
+                                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-emerald-950 leading-tight">
+                                        進入量化交易的世界<br/>
+                                        <span className="text-emerald-700">Joption 雙賣平衡下單機</span>
+                                    </h2>
+                                    <p className="text-stone-500 font-medium text-sm md:text-lg max-w-2xl mx-auto md:mx-0">
+                                        透過專業量化工具，讓交易更具紀律，專注於長期穩健的獲利邏輯。
+                                    </p>
+                                    <a href="https://www.joption.com.tw/" target="_blank" className="btn-premium bg-[#1a2e25] px-8 md:px-10 py-3.5 md:py-4 rounded-full font-bold text-white inline-flex items-center gap-3 text-sm md:text-base mt-4 shadow-xl">
+                                        前往 Joption 官網 <${Icons.ArrowRight} />
+                                    </a>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-4">
+                                    ${homeCards.map((item, i) => item.internal
+                                        ? html`<button key=${i} onClick=${() => { setActiveChapterId('ch7'); setActiveSubIndex(0); }} className="p-6 bg-white rounded-3xl border border-stone-100 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md hover:-translate-y-1 block group text-left">
+                                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform origin-left">${item.emoji}</div>
+                                            <h4 className="font-black text-emerald-950 mb-1.5 text-base md:text-lg leading-tight">${item.title}</h4>
+                                            <p className="text-stone-400 text-[13px] leading-relaxed font-medium">${item.desc}</p>
+                                          </button>`
+                                        : html`<a key=${i} href=${item.url} target="_blank" className="p-6 bg-white rounded-3xl border border-stone-100 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md hover:-translate-y-1 block group">
+                                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform origin-left">${item.emoji}</div>
+                                            <h4 className="font-black text-emerald-950 mb-1.5 text-base md:text-lg leading-tight">${item.title}</h4>
+                                            <p className="text-stone-400 text-[13px] leading-relaxed font-medium">${item.desc}</p>
+                                          </a>`
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col items-center gap-6 pt-6">
+                            <div className="flex flex-wrap justify-center gap-3">
+                                <div className="visitor-badge bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                    <${Icons.Users} /> 累積：<span className="font-black">${visitorStats.total !== null ? visitorStats.total.toLocaleString() : '...'}</span>
+                                </div>
+                                <div className="visitor-badge bg-amber-50 text-amber-700 border border-amber-100">
+                                    <${Icons.Clock} /> 今日：<span className="font-black">${visitorStats.daily !== null ? visitorStats.daily.toLocaleString() : '...'}</span>
+                                </div>
+                            </div>
+                            <p className="text-[10px] font-bold text-stone-300 tracking-[0.2em] uppercase">© JOPTION ACADEMY - Since 2026</p>
+                        </div>
+                    </div>`
+                : html`
+                    <div key=${activeChapterId} className=${"animate-fade-in flex-1 flex flex-col bg-white overflow-hidden transition-all " + (activeSubIndex !== null ? 'h-full shadow-none border-none' : 'rounded-[2rem] md:rounded-[3rem] border-4 border-white shadow-xl min-h-[500px] mb-8')}>
+                        ${activeSubIndex === null
+                            ? html`<div className="p-8 md:p-16 flex flex-col items-center flex-1 justify-center relative">
+                                <div className="mb-4 text-emerald-500 font-extrabold tracking-[0.3em] text-[10px] uppercase bg-emerald-50 px-4 py-1 rounded-full border border-emerald-100">Joption Chapter</div>
+                                <h2 className="text-2xl md:text-4xl font-black mb-10 text-emerald-950 text-center leading-tight">
+                                    ${currentChapter?.title || "章節內容"}
+                                </h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full max-w-5xl mx-auto">
+                                    ${currentChapter?.subpages.map((sub, i) => html`
+                                        <button key=${i} onClick=${() => handleSubPageClick(i)} className="group p-5 md:p-6 rounded-3xl border-2 border-stone-50 bg-stone-50/50 hover:bg-emerald-50 hover:border-emerald-200 hover:shadow-lg transition-all text-left flex items-start gap-4">
+                                            <span className="w-10 h-10 shrink-0 rounded-2xl bg-white text-emerald-600 flex items-center justify-center font-black text-sm border border-stone-100 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-sm">${i + 1}</span>
+                                            <span className="font-extrabold text-stone-700 text-sm md:text-base pt-2 group-hover:text-emerald-950 leading-snug">${sub.title}</span>
+                                        </button>
+                                    `)}
+                                    ${activeChapterId !== 'ch7' && activeChapterId !== 'ch8' && activeChapterId !== 'ch9' && currentChapter?.testUrl && html`
+                                        <button onClick=${() => handleSubPageClick('test')} className="group p-5 md:p-6 rounded-3xl border-2 border-amber-100 bg-amber-50/30 hover:bg-amber-100 hover:border-amber-300 hover:shadow-lg transition-all text-left flex items-start gap-4">
+                                            <span className="w-10 h-10 shrink-0 rounded-2xl bg-amber-400 text-amber-950 flex items-center justify-center font-black text-sm shadow-sm group-hover:scale-110 transition-transform">?</span>
+                                            <span className="font-extrabold text-amber-900 text-sm md:text-base pt-2 leading-snug">旅途試煉</span>
+                                        </button>
+                                    `}
+                                </div>
+                              </div>`
+                            : html`<div className="iframe-container">
+                                <iframe
+                                    src=${activeSubIndex === 'test' ? currentChapter?.testUrl : currentChapter?.subpages[activeSubIndex].url}
+                                    title="Course Content"
+                                    sandbox="allow-scripts allow-same-origin allow-forms"
+                                    loading="lazy"
+                                ></iframe>
+                              </div>`
+                        }
+                    </div>`;
+
+            return html`
                 <div className="h-full flex flex-col md:flex-row bg-[#f7f9f4] overflow-hidden">
-                    <aside className={`fixed inset-y-0 left-0 z-50 w-[280px] lg:w-[320px] bg-[#fffcf5] border-r border-stone-200 transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'} md:relative md:translate-x-0 md:sticky md:top-0 md:h-screen flex flex-col`}>
-                        <div className="p-6 md:p-8 flex items-center gap-4 cursor-pointer group" onClick={() => {setActiveChapterId('home'); setActiveSubIndex(null); setIsMenuOpen(false);}}>
+                    <aside className=${"fixed inset-y-0 left-0 z-50 w-[280px] lg:w-[320px] bg-[#fffcf5] border-r border-stone-200 transform transition-transform duration-300 ease-in-out " + (isMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full') + " md:relative md:translate-x-0 md:sticky md:top-0 md:h-screen flex flex-col"}>
+                        <div className="p-6 md:p-8 flex items-center gap-4 cursor-pointer group" onClick=${() => { setActiveChapterId('home'); setActiveSubIndex(null); setIsMenuOpen(false); }}>
                             <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 overflow-hidden rounded-2xl shadow-lg border-2 border-white group-hover:rotate-3 transition-transform bg-stone-100">
-                                <LogoImage className="w-full h-full object-cover" />
+                                <${LogoImage} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex flex-col min-w-0">
                                 <h2 className="text-lg md:text-xl font-black tracking-tight text-emerald-900 leading-tight truncate">歐大選擇權教室</h2>
-                                <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest mt-1 flex items-center gap-1"><Icons.Leaf/> JOPTION</span>
+                                <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest mt-1 flex items-center gap-1"><${Icons.Leaf} /> JOPTION</span>
                             </div>
                         </div>
 
                         <nav className="flex-1 px-3 md:px-4 py-2 space-y-2 overflow-y-auto mb-6">
-                            {chapters.map((ch) => (
-                                <div key={ch.id} className="space-y-1">
-                                    <button 
-                                        onClick={() => handleChapterSelect(ch.id)}
-                                        className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all ${activeChapterId === ch.id ? 'bg-emerald-50 text-emerald-800' : 'text-stone-600 hover:bg-stone-50'}`}
+                            ${chapters.map((ch) => html`
+                                <div key=${ch.id} className="space-y-1">
+                                    <button
+                                        onClick=${() => handleChapterSelect(ch.id)}
+                                        className=${"w-full flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all " + (activeChapterId === ch.id ? 'bg-emerald-50 text-emerald-800' : 'text-stone-600 hover:bg-stone-50')}
                                     >
                                         <div className="flex items-center gap-3 truncate">
-                                            <span className={`shrink-0 ${activeChapterId === ch.id ? 'text-emerald-500' : 'text-stone-400'}`}>{ch.icon}</span>
-                                            <span className="font-extrabold text-sm md:text-[15px] truncate">{ch.title}</span>
+                                            <span className=${"shrink-0 " + (activeChapterId === ch.id ? 'text-emerald-500' : 'text-stone-400')}>${ch.icon}</span>
+                                            <span className="font-extrabold text-sm md:text-[15px] truncate">${ch.title}</span>
                                         </div>
-                                        <div className={`transition-transform shrink-0 ${activeChapterId === ch.id ? 'rotate-180 text-emerald-500' : 'text-stone-300'}`}>
-                                            <Icons.ChevronDown />
+                                        <div className=${"transition-transform shrink-0 " + (activeChapterId === ch.id ? 'rotate-180 text-emerald-500' : 'text-stone-300')}>
+                                            <${Icons.ChevronDown} />
                                         </div>
                                     </button>
-
-                                    <div className={`submenu-enter ${activeChapterId === ch.id ? 'submenu-open' : ''}`}>
+                                    <div className=${"submenu-enter " + (activeChapterId === ch.id ? 'submenu-open' : '')}>
                                         <div className="pl-10 pr-2 py-1 space-y-1 border-l-2 border-dashed border-emerald-100 ml-6 my-1">
-                                            {ch.subpages.map((sub, sIdx) => (
+                                            ${ch.subpages.map((sub, sIdx) => html`
                                                 <button
-                                                    key={sIdx}
-                                                    onClick={() => handleSubPageClick(sIdx)}
-                                                    className={`w-full text-left py-2 px-3 rounded-xl text-[13px] font-bold transition-all ${activeChapterId === ch.id && activeSubIndex === sIdx ? 'bg-emerald-100 text-emerald-900' : 'text-stone-500 hover:text-emerald-600 hover:bg-emerald-50'}`}
+                                                    key=${sIdx}
+                                                    onClick=${() => handleSubPageClick(sIdx)}
+                                                    className=${"w-full text-left py-2 px-3 rounded-xl text-[13px] font-bold transition-all " + (activeChapterId === ch.id && activeSubIndex === sIdx ? 'bg-emerald-100 text-emerald-900' : 'text-stone-500 hover:text-emerald-600 hover:bg-emerald-50')}
                                                 >
-                                                    {sub.title}
+                                                    ${sub.title}
                                                 </button>
-                                            ))}
-                                            {ch.id !== 'ch7' && ch.id !== 'ch8' && ch.id !== 'ch9' && (
+                                            `)}
+                                            ${ch.id !== 'ch7' && ch.id !== 'ch8' && ch.id !== 'ch9' && html`
                                                 <button
-                                                    onClick={() => handleSubPageClick('test')}
-                                                    className={`w-full text-left py-2 px-3 rounded-xl text-[13px] font-bold transition-all flex items-center gap-2 mt-1 ${activeChapterId === ch.id && activeSubIndex === 'test' ? 'bg-amber-400 text-amber-900 shadow-sm' : 'text-amber-600 hover:bg-amber-50'}`}
+                                                    onClick=${() => handleSubPageClick('test')}
+                                                    className=${"w-full text-left py-2 px-3 rounded-xl text-[13px] font-bold transition-all flex items-center gap-2 mt-1 " + (activeChapterId === ch.id && activeSubIndex === 'test' ? 'bg-amber-400 text-amber-900 shadow-sm' : 'text-amber-600 hover:bg-amber-50')}
                                                 >
-                                                    <Icons.ClipboardCheck /> 旅途試煉
+                                                    <${Icons.ClipboardCheck} /> 旅途試煉
                                                 </button>
-                                            )}
+                                            `}
                                         </div>
                                     </div>
                                 </div>
-                            ))}
+                            `)}
                         </nav>
                     </aside>
 
                     <main className="flex-1 flex flex-col h-[100dvh] min-w-0 relative">
                         <header className="md:hidden flex items-center justify-between px-5 py-3.5 bg-white border-stone-100 shrink-0 z-40 sticky top-0 shadow-sm">
-                            <div className="flex items-center gap-3" onClick={() => setActiveChapterId('home')}>
+                            <div className="flex items-center gap-3" onClick=${() => setActiveChapterId('home')}>
                                 <div className="w-9 h-9">
-                                    <LogoImage className="w-full h-full rounded-lg object-cover shadow-sm border border-stone-100" />
+                                    <${LogoImage} className="w-full h-full rounded-lg object-cover shadow-sm border border-stone-100" />
                                 </div>
                                 <span className="font-black text-emerald-950 text-base tracking-tight truncate">歐大選擇權教室</span>
                             </div>
-                            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-stone-600 bg-stone-50 rounded-xl">
-                                {isMenuOpen ? <Icons.X /> : <Icons.Menu />}
+                            <button onClick=${() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-stone-600 bg-stone-50 rounded-xl">
+                                ${isMenuOpen ? html`<${Icons.X} />` : html`<${Icons.Menu} />`}
                             </button>
                         </header>
 
-                        <div ref={scrollRef} className="scroll-container bg-[#f7f9f4]">
-                            <div className={`flex-1 flex flex-col ${activeSubIndex !== null ? 'p-0 h-full' : 'p-4 sm:p-6 md:p-10 lg:p-16'}`}>
-                                {activeChapterId === 'home' ? (
-                                    <div key="home" className="animate-fade-in space-y-8 md:space-y-16 max-w-6xl mx-auto w-full pb-10">
-                                        <div className="forest-gradient text-white p-8 sm:p-12 md:p-20 rounded-[2rem] md:rounded-[3.5rem] shadow-2xl relative overflow-hidden">
-                                            <div className="absolute -top-24 -right-24 w-64 h-64 md:w-96 md:h-96 bg-emerald-400 rounded-full blur-[80px] md:blur-[120px] opacity-20"></div>
-                                            <div className="relative z-10 space-y-6 md:space-y-10 text-center md:text-left">
-                                                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-emerald-50 text-xs font-bold tracking-widest">
-                                                    <Icons.Leaf /> JOPTION ACADEMY
-                                                </div>
-                                                <h1 className="text-3xl sm:text-4xl md:text-6xl font-black leading-[1.15] tracking-tight">
-                                                    掌握選擇權：<br/><span className="text-amber-300">獲利與風險的平衡魔法</span>
-                                                </h1>
-                                                <p className="text-base md:text-xl text-emerald-100/80 font-medium max-w-2xl mx-auto md:mx-0">
-                                                    從基礎出發，建立您的專業交易體系，讓數據成為您的指南針。
-                                                </p>
-                                                <div className="pt-4">
-                                                    <button onClick={() => setActiveChapterId('ch1')} className="btn-premium btn-amber px-8 md:px-12 py-4 md:py-5 rounded-full font-black text-white flex items-center justify-center gap-3 text-lg md:text-xl mx-auto md:mx-0 group">
-                                                        開始學習之旅 <Icons.ArrowRight />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="glass-card p-6 sm:p-10 md:p-14 rounded-[2rem] md:rounded-[3rem] shadow-sm border border-emerald-100/50">
-                                            <div className="space-y-10 md:space-y-14">
-                                                <div className="text-center md:text-left space-y-4">
-                                                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-emerald-950 leading-tight">
-                                                        進入量化交易的世界<br/>
-                                                        <span className="text-emerald-700">Joption 雙賣平衡下單機</span>
-                                                    </h2>
-                                                    <p className="text-stone-500 font-medium text-sm md:text-lg max-w-2xl mx-auto md:mx-0">
-                                                        透過專業量化工具，讓交易更具紀律，專注於長期穩健的獲利邏輯。
-                                                    </p>
-                                                    <a href="https://www.joption.com.tw/" target="_blank" className="btn-premium bg-[#1a2e25] px-8 md:px-10 py-3.5 md:py-4 rounded-full font-bold text-white inline-flex items-center gap-3 text-sm md:text-base mt-4 shadow-xl">
-                                                        前往 Joption 官網 <Icons.ArrowRight />
-                                                    </a>
-                                                </div>
-                                                
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-4">
-                                                    {[
-                                                        { emoji: "🚀", title: "加碼策略指南", url: "https://joption-tw.github.io/7-1/", desc: "學習進階加碼技巧，提升整體獲利效能。", internal: true },
-                                                        { emoji: "🧐", title: "什麼是 Joption", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E6%98%AF%E4%BB%80%E9%BA%BC", desc: "開發初衷與核心功能簡介。" },
-                                                        { emoji: "🧠", title: "策略核心邏輯", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E7%AD%96%E7%95%A5%E6%A0%B8%E5%BF%83", desc: "深入探討量化交易邏輯。" },
-                                                        { emoji: "📥", title: "訂閱與下載", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E4%B8%8B%E8%BC%89%E5%8F%8A%E5%AE%89%E8%A3%9D%E8%AA%AA%E6%98%8E", desc: "獲取最新版軟體與安裝說明。" },
-                                                        { emoji: "👨‍🏫", title: "歐大自我介紹", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E6%AD%90%E5%A4%A7%E7%9A%84%E8%87%AA%E6%88%91%E4%BB%8B%E7%B4%B9", desc: "多年選擇權實戰經驗分享。" }
-                                                    ].map((item, i) => (
-                                                        item.internal ? (
-                                                            <button key={i} onClick={() => {setActiveChapterId('ch7'); setActiveSubIndex(0);}} className="p-6 bg-white rounded-3xl border border-stone-100 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md hover:-translate-y-1 block group text-left">
-                                                                <div className="text-3xl mb-3 group-hover:scale-110 transition-transform origin-left">{item.emoji}</div>
-                                                                <h4 className="font-black text-emerald-950 mb-1.5 text-base md:text-lg leading-tight">{item.title}</h4>
-                                                                <p className="text-stone-400 text-[13px] leading-relaxed font-medium">{item.desc}</p>
-                                                            </button>
-                                                        ) : (
-                                                            <a key={i} href={item.url} target="_blank" className="p-6 bg-white rounded-3xl border border-stone-100 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md hover:-translate-y-1 block group">
-                                                                <div className="text-3xl mb-3 group-hover:scale-110 transition-transform origin-left">{item.emoji}</div>
-                                                                <h4 className="font-black text-emerald-950 mb-1.5 text-base md:text-lg leading-tight">{item.title}</h4>
-                                                                <p className="text-stone-400 text-[13px] leading-relaxed font-medium">{item.desc}</p>
-                                                            </a>
-                                                        )
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex flex-col items-center gap-6 pt-6">
-                                            <div className="flex flex-wrap justify-center gap-3">
-                                                <div className="visitor-badge bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                                    <Icons.Users /> 累積：<span className="font-black">{visitorStats.total !== null ? visitorStats.total.toLocaleString() : '...'}</span>
-                                                </div>
-                                                <div className="visitor-badge bg-amber-50 text-amber-700 border border-amber-100">
-                                                    <Icons.Clock /> 今日：<span className="font-black">{visitorStats.daily !== null ? visitorStats.daily.toLocaleString() : '...'}</span>
-                                                </div>
-                                            </div>
-                                            <p className="text-[10px] font-bold text-stone-300 tracking-[0.2em] uppercase">© JOPTION ACADEMY - Since 2026</p>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div key={activeChapterId} className={`animate-fade-in flex-1 flex flex-col bg-white overflow-hidden transition-all ${activeSubIndex !== null ? 'h-full shadow-none border-none' : 'rounded-[2rem] md:rounded-[3rem] border-4 border-white shadow-xl min-h-[500px] mb-8'}`}>
-                                        {activeSubIndex === null ? (
-                                            <div className="p-8 md:p-16 flex flex-col items-center flex-1 justify-center relative">
-                                                <div className="mb-4 text-emerald-500 font-extrabold tracking-[0.3em] text-[10px] uppercase bg-emerald-50 px-4 py-1 rounded-full border border-emerald-100">Joption Chapter</div>
-                                                <h2 className="text-2xl md:text-4xl font-black mb-10 text-emerald-950 text-center leading-tight">
-                                                    {(currentChapter?.title || "章節內容")}
-                                                </h2>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full max-w-5xl mx-auto">
-                                                    {currentChapter?.subpages.map((sub, i) => (
-                                                        <button key={i} onClick={() => handleSubPageClick(i)} className="group p-5 md:p-6 rounded-3xl border-2 border-stone-50 bg-stone-50/50 hover:bg-emerald-50 hover:border-emerald-200 hover:shadow-lg transition-all text-left flex items-start gap-4">
-                                                            <span className="w-10 h-10 shrink-0 rounded-2xl bg-white text-emerald-600 flex items-center justify-center font-black text-sm border border-stone-100 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-sm">{i+1}</span>
-                                                            <span className="font-extrabold text-stone-700 text-sm md:text-base pt-2 group-hover:text-emerald-950 leading-snug">{sub.title}</span>
-                                                        </button>
-                                                    ))}
-                                                    {activeChapterId !== 'ch7' && activeChapterId !== 'ch8' && activeChapterId !== 'ch9' && currentChapter?.testUrl && (
-                                                        <button onClick={() => handleSubPageClick('test')} className="group p-5 md:p-6 rounded-3xl border-2 border-amber-100 bg-amber-50/30 hover:bg-amber-100 hover:border-amber-300 hover:shadow-lg transition-all text-left flex items-start gap-4">
-                                                            <span className="w-10 h-10 shrink-0 rounded-2xl bg-amber-400 text-amber-950 flex items-center justify-center font-black text-sm shadow-sm group-hover:scale-110 transition-transform">?</span>
-                                                            <span className="font-extrabold text-amber-900 text-sm md:text-base pt-2 leading-snug">旅途試煉</span>
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="iframe-container">
-                                                <iframe 
-                                                    src={activeSubIndex === 'test' ? currentChapter?.testUrl : currentChapter?.subpages[activeSubIndex].url} 
-                                                    title="Course Content"
-                                                    sandbox="allow-scripts allow-same-origin allow-forms"
-                                                    loading="lazy"
-                                                ></iframe>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
+                        <div ref=${scrollRef} className="scroll-container bg-[#f7f9f4]">
+                            <div className=${"flex-1 flex flex-col " + (activeSubIndex !== null ? 'p-0 h-full' : 'p-4 sm:p-6 md:p-10 lg:p-16')}>
+                                ${mainContent}
                             </div>
                         </div>
                     </main>
 
-                    {isMenuOpen && (
-                        <div className="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-40 md:hidden" onClick={() => setIsMenuOpen(false)}></div>
-                    )}
-                </div>
-            );
+                    ${isMenuOpen && html`<div className="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-40 md:hidden" onClick=${() => setIsMenuOpen(false)}></div>`}
+                </div>`;
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        root.render(html`<${App} />`);
     </script>
 </body>
 </html>
