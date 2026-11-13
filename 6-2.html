@@ -6,23 +6,25 @@
     <title>BOOM! 歐式 vs 美式選擇權 | 歐大選擇權教室</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jo-theme -->
+    <script src="jo-theme.js"></script>
     <!-- 引入 Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         /* 英雄普普風專屬色調 */
         :root {
-            --c-bg: #FAF9F6;
-            --c-primary: #EF4444; /* 英雄紅 (美式) */
-            --c-secondary: #3B82F6; /* 正義藍 (歐式) */
-            --c-accent: #FDE047; /* 閃電黃 */
-            --c-dark: #0F172A;
-            --c-halftone: #CBD5E1;
+            --c-bg: #FFF1DA;
+            --c-primary: #D9321F; /* 英雄紅 (美式) */
+            --c-secondary: #3A35C4; /* 正義藍 (歐式) */
+            --c-accent: #FFC62E; /* 閃電黃 */
+            --c-dark: #17142B;
+            --c-halftone: #DEDCF7;
         }
 
         body {
-            font-family: 'Noto Sans TC', sans-serif;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
             background-color: var(--c-bg);
             color: var(--c-dark);
             /* 漫畫半色調網點背景 */
@@ -31,7 +33,7 @@
         }
 
         .font-comic {
-            font-family: 'Bangers', 'Noto Sans TC', cursive;
+            font-family: 'Lilita One', 'Noto Sans TC', cursive;
             letter-spacing: 0.05em;
         }
 
@@ -99,7 +101,7 @@
 
         @keyframes pulse-red {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); background-color: #F87171; }
+            50% { transform: scale(1.05); background-color: #D9321F; }
         }
         .active-american { animation: pulse-red 1s infinite; }
 
@@ -195,7 +197,7 @@
                 🕹️ 互動實驗：行使權利的時間點
             </h3>
             
-            <div class="w-full pop-card bg-[#1E293B] p-6 md:p-12 relative overflow-hidden">
+            <div class="w-full pop-card bg-[#17142B] p-6 md:p-12 relative overflow-hidden">
                 <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 20px 20px;"></div>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">

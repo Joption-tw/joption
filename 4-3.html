@@ -6,23 +6,25 @@
     <title>BOOM! Theta 時間衰減圖解 | 歐大選擇權教室</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jo-theme -->
+    <script src="jo-theme.js"></script>
     <!-- 引入 Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         /* 吸血鬼普普風專屬色調 */
         :root {
-            --c-bg: #F5F3FF; /* 極淺紫底 */
-            --c-primary: #A855F7; /* 螢光紫 (Theta) */
-            --c-secondary: #FF007F; /* 桃紅 (血/權利金) */
-            --c-accent: #39FF14; /* 螢光綠 (獲利/能量) */
-            --c-dark: #0F172A;
-            --c-grid: #E2E8F0;
+            --c-bg: #EEEDFB; /* 極淺紫底 */
+            --c-primary: #3A35C4; /* 螢光紫 (Theta) */
+            --c-secondary: #F0A30A; /* 桃紅 (血/權利金) */
+            --c-accent: #0A7F4D; /* 螢光綠 (獲利/能量) */
+            --c-dark: #17142B;
+            --c-grid: #DEDCF7;
         }
 
         body {
-            font-family: 'Noto Sans TC', sans-serif;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
             background-color: var(--c-bg);
             color: var(--c-dark);
             /* 普普風大型交叉網格背景 */
@@ -33,7 +35,7 @@
         }
 
         .font-comic {
-            font-family: 'Bangers', 'Noto Sans TC', cursive;
+            font-family: 'Lilita One', 'Noto Sans TC', cursive;
             letter-spacing: 0.05em;
         }
 
@@ -192,7 +194,7 @@
                 🕹️ Theta 吸血量模擬儀 (台指 30,000)
             </h3>
             
-            <div class="w-full pop-card bg-[#1E293B] p-6 md:p-12 relative overflow-hidden">
+            <div class="w-full pop-card bg-[#17142B] p-6 md:p-12 relative overflow-hidden">
                 <!-- 沙漏裝飾 -->
                 <div class="absolute inset-0 opacity-5" style="background: repeating-linear-gradient(0deg, transparent, transparent 40px, #fff 40px, #fff 41px);"></div>
                 

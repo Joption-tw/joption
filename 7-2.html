@@ -14,11 +14,14 @@
     
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jo-theme -->
+    <script src="jo-theme.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 
     <style>
-        body { margin: 0; padding: 0; background-color: #f8fafc; overflow-x: hidden; }
+        body { margin: 0; padding: 0; background-color: #e8f9fd; overflow-x: hidden; }
         .wood-texture {
-            background-color: #8B4513;
+            background-color: #F0A30A;
             background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, transparent 75%, transparent);
             background-size: 20px 20px;
         }
@@ -28,13 +31,13 @@
             margin: 0;
         }
         .pop-card {
-            border: 3px solid #0F172A;
-            box-shadow: 6px 6px 0px #0F172A;
+            border: 3px solid #17142B;
+            box-shadow: 6px 6px 0px #17142B;
         }
         @media (min-width: 768px) {
             .pop-card {
                 border-width: 4px;
-                box-shadow: 10px 10px 0px #0F172A;
+                box-shadow: 10px 10px 0px #17142B;
             }
         }
         .no-select {
@@ -48,7 +51,7 @@
             background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
+            background: #dedcf7;
             border-radius: 10px;
         }
     </style>
@@ -62,11 +65,11 @@
         // --- 圖示組件 ---
         const SeesawLogo = ({ size = 48, className = "" }) => (
             <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-                <rect width="64" height="64" rx="16" fill="#EFF6FF"/>
-                <path d="M32 50L26 58H38L32 50Z" fill="#4B5563"/>
-                <rect x="12" y="46" width="40" height="4" rx="2" fill="#1F2937" transform="rotate(-5 32 48)"/>
-                <circle cx="16" cy="42" r="6" fill="#EF4444" transform="rotate(-5 32 48)" stroke="white" strokeWidth="2"/>
-                <circle cx="48" cy="42" r="6" fill="#10B981" transform="rotate(-5 32 48)" stroke="white" strokeWidth="2"/>
+                <rect width="64" height="64" rx="16" fill="#E8F9FD"/>
+                <path d="M32 50L26 58H38L32 50Z" fill="#403C55"/>
+                <rect x="12" y="46" width="40" height="4" rx="2" fill="#17142B" transform="rotate(-5 32 48)"/>
+                <circle cx="16" cy="42" r="6" fill="#D9321F" transform="rotate(-5 32 48)" stroke="white" strokeWidth="2"/>
+                <circle cx="48" cy="42" r="6" fill="#0A7F4D" transform="rotate(-5 32 48)" stroke="white" strokeWidth="2"/>
             </svg>
         );
 

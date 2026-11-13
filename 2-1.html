@@ -6,31 +6,33 @@
     <title>BOOM! 履約價與權利金 | 歐大選擇權教室 JOPTION</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jo-theme -->
+    <script src="jo-theme.js"></script>
     <!-- 引入 Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --c-bg: #E0FBFC; 
-            --c-primary: #EF476F; 
-            --c-secondary: #118AB2; 
-            --c-accent: #FFD166; 
-            --c-success: #06D6A0; 
-            --c-dark: #073B4C; 
+            --c-bg: #E8F9FD; 
+            --c-primary: #3A35C4; 
+            --c-secondary: #1588AB; 
+            --c-accent: #FFC62E; 
+            --c-success: #0A7F4D; 
+            --c-dark: #17142B; 
         }
 
         body {
-            font-family: 'Noto Sans TC', sans-serif;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
             background-color: var(--c-bg);
             color: var(--c-dark);
-            background-image: radial-gradient(#CBD5E1 2px, transparent 2px);
+            background-image: radial-gradient(#DEDCF7 2px, transparent 2px);
             background-size: 30px 30px;
             -webkit-tap-highlight-color: transparent;
         }
 
         .font-comic {
-            font-family: 'Bangers', 'Noto Sans TC', cursive;
+            font-family: 'Lilita One', 'Noto Sans TC', cursive;
             letter-spacing: 0.05em;
         }
 
@@ -210,7 +212,7 @@
                 <div class="w-full max-w-2xl mb-12 bg-gray-50 p-6 md:p-8 rounded-3xl border-4 border-dashed border-gray-300">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-2">
                         <span class="text-lg font-black text-gray-500">目前台指期大盤：</span>
-                        <div class="bg-white px-6 py-2 rounded-full border-4 border-[var(--c-dark)] shadow-[4px_4px_0_#073B4C]">
+                        <div class="bg-white px-6 py-2 rounded-full border-4 border-[var(--c-dark)] shadow-[4px_4px_0_#17142B]">
                             <span class="text-4xl md:text-5xl font-black text-[var(--c-secondary)]" id="currentIndexDisplay">30,000</span>
                         </div>
                     </div>
@@ -251,7 +253,7 @@
 
                 <!-- 最終成本 -->
                 <div class="mt-10 w-full max-w-md">
-                    <div class="bg-[var(--c-primary)] border-4 border-[var(--c-dark)] p-6 rounded-2xl text-center shadow-[8px_8px_0_#073B4C] transform hover:rotate-1 transition-transform">
+                    <div class="bg-[var(--c-primary)] border-4 border-[var(--c-dark)] p-6 rounded-2xl text-center shadow-[8px_8px_0_#17142B] transform hover:rotate-1 transition-transform">
                         <p class="text-white font-black text-sm mb-1">實際台幣投資金額</p>
                         <div id="ntdCost" class="text-5xl md:text-6xl font-black text-[var(--c-accent)] drop-shadow-[3px_3px_0_#000]">
                             $7,500

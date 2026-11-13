@@ -6,28 +6,30 @@
     <title>BOOM! 保證金與權利金 | 歐大選擇權教室</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jo-theme -->
+    <script src="jo-theme.js"></script>
     <!-- 引入 Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --c-bg: #F1F5F9; 
-            --c-primary: #EAB308; /* 工業黃 */
-            --c-secondary: #3B82F6; /* 科技藍 */
-            --c-danger: #EF4444; /* 警戒紅 */
-            --c-success: #22C55E; /* 安全綠 */
-            --c-dark: #0F172A; 
+            --c-bg: #E8F9FD; 
+            --c-primary: #FFC62E; /* 工業黃 */
+            --c-secondary: #3A35C4; /* 科技藍 */
+            --c-danger: #D9321F; /* 警戒紅 */
+            --c-success: #0A7F4D; /* 安全綠 */
+            --c-dark: #17142B; 
         }
 
         body {
-            font-family: 'Noto Sans TC', sans-serif;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
             background-color: var(--c-bg);
             color: var(--c-dark);
             background-image: repeating-linear-gradient(
                 45deg,
-                #E2E8F0 0,
-                #E2E8F0 2px,
+                #DEDCF7 0,
+                #DEDCF7 2px,
                 transparent 2px,
                 transparent 12px
             );
@@ -36,7 +38,7 @@
         }
 
         .font-comic {
-            font-family: 'Bangers', 'Noto Sans TC', cursive;
+            font-family: 'Lilita One', 'Noto Sans TC', cursive;
             letter-spacing: 0.05em;
         }
 
@@ -87,7 +89,7 @@
         /* 警報動畫 */
         @keyframes siren {
             0% { background-color: white; }
-            50% { background-color: #FEE2E2; border-color: var(--c-danger); }
+            50% { background-color: #FDECEA; border-color: var(--c-danger); }
             100% { background-color: white; }
         }
         .alert-siren {
@@ -178,7 +180,7 @@
         <section class="flex flex-col items-center mt-10">
             <h3 class="text-2xl md:text-4xl font-black mb-6 text-[var(--c-dark)] font-comic">🕹️ SELLER SURVIVAL SIMULATOR</h3>
             
-            <div class="w-full bg-[#1E293B] pop-card p-4 md:p-10 border-t-[12px] border-t-[var(--c-primary)]">
+            <div class="w-full bg-[#17142B] pop-card p-4 md:p-10 border-t-[12px] border-t-[var(--c-primary)]">
                 <div class="bg-white/10 p-4 rounded-xl mb-8 text-white font-bold text-sm md:text-base text-center">
                     本金 10 萬，賣出 30000 點 Call (收 150 點)。<br class="hidden md:block">
                     觀察大盤暴漲與時間流逝對維持率的衝擊！
@@ -205,7 +207,7 @@
                 </div>
 
                 <!-- 儀表板 -->
-                <div id="dashboard" class="bg-[#0F172A] border-4 border-[#334155] rounded-3xl p-6 md:p-10 relative overflow-hidden transition-all duration-300">
+                <div id="dashboard" class="bg-[#17142B] border-4 border-[#403c55] rounded-3xl p-6 md:p-10 relative overflow-hidden transition-all duration-300">
                     <div id="statusStamp" class="absolute top-4 right-4 bg-[var(--c-success)] text-white font-black px-4 py-2 rounded-xl transform rotate-12 border-2 border-white shadow-lg text-xl md:text-3xl z-10">
                         安全 SAFE
                     </div>
@@ -352,7 +354,7 @@
                 ratioTxt.innerText = `${ratio}%`;
 
                 // 顏色與狀態
-                dashboard.className = "bg-[#0F172A] border-4 border-[#334155] rounded-3xl p-6 md:p-10 relative overflow-hidden transition-all duration-300";
+                dashboard.className = "bg-[#17142B] border-4 border-[#403c55] rounded-3xl p-6 md:p-10 relative overflow-hidden transition-all duration-300";
                 ratioBox.className = "text-center bg-white/5 rounded-2xl p-4 border-2";
                 statusStamp.className = "absolute top-4 right-4 text-white font-black px-4 py-2 rounded-xl transform rotate-12 border-2 border-white shadow-lg text-xl md:text-3xl z-10";
 

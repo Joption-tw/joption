@@ -6,34 +6,36 @@
     <title>BOOM! 權利與義務的對稱性 | 歐大選擇權教室 JOPTION</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jo-theme -->
+    <script src="jo-theme.js"></script>
     <!-- 引入 Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         /* 全新色系：薄荷綠與霓虹紫的普普風 */
         :root {
-            --c-bg: #F0FDF4; /* 薄荷淺綠背景 */
-            --c-main: #22C55E; /* 亮綠色 */
-            --c-accent: #A855F7; /* 霓虹紫色 */
-            --c-dark: #1E293B; /* 深邃藍灰邊框 */
-            --c-contrast: #FDE047; /* 亮黃色對比 */
-            --c-orange-shadow: #16A34A; /* 頁首膠囊陰影(深綠) */
-            --c-text-orange: #16A34A; 
+            --c-bg: #E6F4EC; /* 薄荷淺綠背景 */
+            --c-main: #0A7F4D; /* 亮綠色 */
+            --c-accent: #7FD8EE; /* 霓虹紫色 */
+            --c-dark: #17142B; /* 深邃藍灰邊框 */
+            --c-contrast: #FFC62E; /* 亮黃色對比 */
+            --c-orange-shadow: #0A7F4D; /* 頁首膠囊陰影(深綠) */
+            --c-text-orange: #0A7F4D; 
             
             /* 買方 / 賣方 專屬色彩 */
-            --c-buyer: #3B82F6; /* 買方：安全藍 */
-            --c-buyer-bg: #EFF6FF;
-            --c-seller: #F97316; /* 賣方：警戒橘 */
-            --c-seller-bg: #FFF7ED;
+            --c-buyer: #3A35C4; /* 買方：安全藍 */
+            --c-buyer-bg: #E8F9FD;
+            --c-seller: #F0A30A; /* 賣方：警戒橘 */
+            --c-seller-bg: #FFF1DA;
 
             /* 損益圖表專屬色 (依據台灣看盤軟體習慣：看漲紅、看跌/賣出綠) */
-            --c-buy-call: #EF4444; /* 紅色系 */
-            --c-sell-call: #22C55E; /* 綠色系 */
+            --c-buy-call: #D9321F; /* 紅色系 */
+            --c-sell-call: #0A7F4D; /* 綠色系 */
         }
 
         body {
-            font-family: 'Nunito', 'Noto Sans TC', sans-serif;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
             background-color: var(--c-bg);
             color: var(--c-dark);
             /* 普普風微小點點背景 */
@@ -204,7 +206,7 @@
                 </div>
 
                 <!-- 賣方特性 (深色質感) -->
-                <div class="pop-border pop-shadow-accent bg-[#1E293B] text-white p-6 md:p-8 flex flex-col h-full relative">
+                <div class="pop-border pop-shadow-accent bg-[#17142B] text-white p-6 md:p-8 flex flex-col h-full relative">
                     <div class="flex items-center mb-6">
                         <div class="bg-gray-700 rounded-xl p-2 mr-3 border-2 border-black shadow-sm">
                             <span class="text-2xl md:text-3xl block">😰</span>
@@ -248,7 +250,7 @@
             <!-- 小標題 -->
             <div class="relative inline-block mb-6 text-center w-full">
                 <!-- 優化手機版：讓浮水印在小螢幕變小，避免破版 -->
-                <div class="absolute -top-5 sm:-top-8 left-1/2 transform -translate-x-1/2 text-[var(--c-bg)] text-4xl sm:text-6xl md:text-8xl font-black opacity-80 tracking-widest whitespace-nowrap" style="-webkit-text-stroke: 1px #CBD5E1; z-index: -1;">PSYCHOLOGY</div>
+                <div class="absolute -top-5 sm:-top-8 left-1/2 transform -translate-x-1/2 text-[var(--c-bg)] text-4xl sm:text-6xl md:text-8xl font-black opacity-80 tracking-widest whitespace-nowrap" style="-webkit-text-stroke: 1px #DEDCF7; z-index: -1;">PSYCHOLOGY</div>
                 <h3 class="text-2xl md:text-4xl font-black text-[var(--c-dark)] tracking-wide relative z-10 px-2">
                     買方與賣方的靈魂博弈
                 </h3>
@@ -327,7 +329,7 @@
                     <div class="w-full relative bg-gray-50 rounded-xl border-2 border-gray-100 p-4 mb-6 flex justify-center items-center h-48 md:h-64 min-h-[200px]">
                         <svg viewBox="0 0 300 200" class="w-full h-full max-w-sm drop-shadow-sm overflow-visible">
                             <!-- X 軸 (零軸) -->
-                            <line x1="10" y1="100" x2="290" y2="100" stroke="#CBD5E1" stroke-width="2" />
+                            <line x1="10" y1="100" x2="290" y2="100" stroke="#DEDCF7" stroke-width="2" />
                             
                             <!-- PnL 折線 -->
                             <!-- 水平線 (虧損權利金) -> 轉折往上 (獲利無限) -->
@@ -335,10 +337,10 @@
                             
                             <!-- 履約價標示 -->
                             <circle cx="130" cy="150" r="5" fill="var(--c-buy-call)" />
-                            <text x="130" y="175" fill="#94A3B8" font-size="12" font-weight="bold" font-family="sans-serif" text-anchor="middle">履約價</text>
+                            <text x="130" y="175" fill="#3A35C4" font-size="12" font-weight="bold" font-family="sans-serif" text-anchor="middle">履約價</text>
                             
                             <!-- 箭頭標示 -->
-                            <text x="280" y="90" fill="#94A3B8" font-size="10" font-weight="bold" font-family="sans-serif" text-anchor="end">標的漲幅 ➔</text>
+                            <text x="280" y="90" fill="#3A35C4" font-size="10" font-weight="bold" font-family="sans-serif" text-anchor="end">標的漲幅 ➔</text>
                         </svg>
                     </div>
 
@@ -365,7 +367,7 @@
                     <div class="w-full relative bg-gray-50 rounded-xl border-2 border-gray-100 p-4 mb-6 flex justify-center items-center h-48 md:h-64 min-h-[200px]">
                         <svg viewBox="0 0 300 200" class="w-full h-full max-w-sm drop-shadow-sm overflow-visible">
                             <!-- X 軸 (零軸) -->
-                            <line x1="10" y1="100" x2="290" y2="100" stroke="#CBD5E1" stroke-width="2" />
+                            <line x1="10" y1="100" x2="290" y2="100" stroke="#DEDCF7" stroke-width="2" />
                             
                             <!-- PnL 折線 -->
                             <!-- 水平線 (賺取權利金) -> 轉折往下 (虧損無限) -->
@@ -373,7 +375,7 @@
                             
                             <!-- 履約價標示 -->
                             <circle cx="130" cy="50" r="5" fill="var(--c-sell-call)" />
-                            <text x="130" y="35" fill="#94A3B8" font-size="12" font-weight="bold" font-family="sans-serif" text-anchor="middle">履約價</text>
+                            <text x="130" y="35" fill="#3A35C4" font-size="12" font-weight="bold" font-family="sans-serif" text-anchor="middle">履約價</text>
                         </svg>
                     </div>
 
@@ -426,7 +428,7 @@
                 </div>
                 <div class="flex-1 flex justify-center w-full">
                     <!-- SVG 插圖：彩券與金幣 -->
-                    <svg viewBox="0 0 200 200" class="w-48 h-48 md:w-64 md:h-64 drop-shadow-[4px_4px_0px_#1E293B]">
+                    <svg viewBox="0 0 200 200" class="w-48 h-48 md:w-64 md:h-64 drop-shadow-[4px_4px_0px_#17142B]">
                         <rect x="30" y="60" width="140" height="80" rx="10" fill="var(--c-contrast)" stroke="var(--c-dark)" stroke-width="8"/>
                         <!-- 虛線 -->
                         <line x1="130" y1="60" x2="130" y2="140" stroke="var(--c-dark)" stroke-width="4" stroke-dasharray="8 8"/>
@@ -454,7 +456,7 @@
                 </div>
                 <div class="flex-1 flex justify-center w-full">
                     <!-- SVG 插圖：天平/保險箱 -->
-                    <svg viewBox="0 0 200 200" class="w-48 h-48 md:w-64 md:h-64 drop-shadow-[4px_4px_0px_#1E293B]">
+                    <svg viewBox="0 0 200 200" class="w-48 h-48 md:w-64 md:h-64 drop-shadow-[4px_4px_0px_#17142B]">
                         <rect x="40" y="40" width="120" height="120" rx="15" fill="var(--c-seller)" stroke="var(--c-dark)" stroke-width="8"/>
                         <!-- 金庫轉盤 -->
                         <circle cx="100" cy="100" r="30" fill="var(--c-bg)" stroke="var(--c-dark)" stroke-width="8"/>

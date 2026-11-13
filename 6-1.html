@@ -6,23 +6,25 @@
     <title>BOOM! 保證金計算完全圖解 | 歐大選擇權教室</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jo-theme -->
+    <script src="jo-theme.js"></script>
     <!-- 引入 Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         /* 重工業普普風專屬色調 */
         :root {
-            --c-bg: #F1F5F9;
-            --c-primary: #EAB308; /* 工業黃 (保證金/金錢) */
-            --c-secondary: #06B6D4; /* 科技青 (公式/邏輯) */
-            --c-accent: #F43F5E; /* 警告紅 (風險) */
-            --c-dark: #0F172A;
-            --c-halftone: #CBD5E1;
+            --c-bg: #E8F9FD;
+            --c-primary: #FFC62E; /* 工業黃 (保證金/金錢) */
+            --c-secondary: #1588AB; /* 科技青 (公式/邏輯) */
+            --c-accent: #3A35C4; /* 警告紅 (風險) */
+            --c-dark: #17142B;
+            --c-halftone: #DEDCF7;
         }
 
         body {
-            font-family: 'Noto Sans TC', sans-serif;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
             background-color: var(--c-bg);
             color: var(--c-dark);
             /* 漫畫半色調網格背景 */
@@ -31,7 +33,7 @@
         }
 
         .font-comic {
-            font-family: 'Bangers', 'Noto Sans TC', cursive;
+            font-family: 'Lilita One', 'Noto Sans TC', cursive;
             letter-spacing: 0.05em;
         }
 
@@ -150,7 +152,7 @@
                 🏗️ 互動實驗：策略組合與資金需求
             </h3>
             
-            <div class="w-full pop-card bg-[#1E293B] p-6 md:p-12 relative overflow-hidden">
+            <div class="w-full pop-card bg-[#17142B] p-6 md:p-12 relative overflow-hidden">
                 <!-- 裝飾網格 -->
                 <div class="absolute inset-0 opacity-10" style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 50px 50px;"></div>
                 

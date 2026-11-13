@@ -6,30 +6,32 @@
     <title>BOOM! 什麼是選擇權？ | 歐大選擇權教室 JOPTION</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jo-theme -->
+    <script src="jo-theme.js"></script>
     <!-- 引入 Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         /* 4-4.html 的專屬 CSS 變數與特效 */
         :root {
-            --c-bg: #FFF5E1;
-            --c-main: #FF8A5B;
-            --c-accent: #FFC947;
-            --c-dark: #5C4033; /* 深褐色邊框 */
-            --c-blue: #A2D2FF;
-            --c-orange-shadow: #F28C63; /* 實心陰影色 */
-            --c-text-orange: #F28C63; 
+            --c-bg: #FFF1DA;
+            --c-main: #F0A30A;
+            --c-accent: #FFC62E;
+            --c-dark: #17142B; /* 深褐色邊框 */
+            --c-blue: #7FD8EE;
+            --c-orange-shadow: #F0A30A; /* 實心陰影色 */
+            --c-text-orange: #F0A30A; 
             
             /* 新增：Call / Put 專屬色彩 (參考圖片) */
-            --c-call: #516BF0;
-            --c-call-bg: #F0F5FF;
-            --c-put: #C43D3D;
-            --c-put-bg: #FFF5F5;
+            --c-call: #D9321F;
+            --c-call-bg: #FDECEA;
+            --c-put: #0A7F4D;
+            --c-put-bg: #E6F4EC;
         }
 
         body {
-            font-family: 'Nunito', 'Noto Sans TC', sans-serif;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
             background-color: var(--c-bg);
             color: var(--c-dark);
             /* 普普風微小點點背景 */
@@ -119,15 +121,15 @@
         <div class="capsule-container header-capsule flex-row w-full max-w-3xl">
             <div class="flex items-center justify-center gap-3 md:gap-6 w-full">
                 <!-- Logo 圖片：圓角正方形 -->
-                <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl border-2 border-[#5C4033] overflow-hidden shadow-sm shrink-0 bg-white">
+                <div class="w-12 h-12 md:w-16 md:h-16 rounded-xl border-2 border-[#403C55] overflow-hidden shadow-sm shrink-0 bg-white">
                     <img src="IP標籤.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/FF8A5B/FFFFFF?text=Logo&font=Nunito'">
                 </div>
                 <!-- 文字：上下排列 -->
                 <div class="flex flex-col">
-                    <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-[#5C4033] leading-none mb-1 tracking-wide">
+                    <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-[#403C55] leading-none mb-1 tracking-wide">
                         歐大選擇權教室
                     </h1>
-                    <p class="text-[10px] sm:text-xs md:text-sm font-black text-[#F28C63] tracking-[0.1em] sm:tracking-[0.2em] uppercase leading-none mt-1">
+                    <p class="text-[10px] sm:text-xs md:text-sm font-black text-[#F0A30A] tracking-[0.1em] sm:tracking-[0.2em] uppercase leading-none mt-1">
                         JOPTION ACADEMY
                     </p>
                 </div>
@@ -190,7 +192,7 @@
                 </div>
 
                 <!-- 選擇權必備四要素 (深色質感還原) -->
-                <div class="pop-border pop-shadow-accent bg-[#262E3D] text-white p-6 md:p-8 flex flex-col h-full relative">
+                <div class="pop-border pop-shadow-accent bg-[#17142B] text-white p-6 md:p-8 flex flex-col h-full relative">
                     <div class="flex items-center mb-6">
                         <div class="bg-gray-700 rounded-xl p-2 mr-3 border-2 border-gray-900 shadow-sm">
                             <span class="text-2xl md:text-3xl block">🔑</span>
@@ -263,10 +265,10 @@
                 </div>
                 <div class="flex-1 flex justify-center w-full">
                     <!-- SVG 插圖：上漲的箭頭與火箭 -->
-                    <svg viewBox="0 0 200 200" class="w-48 h-48 md:w-64 md:h-64 drop-shadow-[4px_4px_0px_#5C4033]">
-                        <circle cx="100" cy="100" r="90" fill="var(--c-blue)" stroke="#5C4033" stroke-width="8"/>
-                        <path d="M60 140 L140 60 M140 60 L100 60 M140 60 L140 100" fill="none" stroke="#5C4033" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="140" cy="60" r="12" fill="var(--c-accent)" stroke="#5C4033" stroke-width="4"/>
+                    <svg viewBox="0 0 200 200" class="w-48 h-48 md:w-64 md:h-64 drop-shadow-[4px_4px_0px_#403C55]">
+                        <circle cx="100" cy="100" r="90" fill="var(--c-blue)" stroke="#403C55" stroke-width="8"/>
+                        <path d="M60 140 L140 60 M140 60 L100 60 M140 60 L140 100" fill="none" stroke="#403C55" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="140" cy="60" r="12" fill="var(--c-accent)" stroke="#403C55" stroke-width="4"/>
                     </svg>
                 </div>
             </div>
@@ -289,14 +291,14 @@
                 </div>
                 <div class="flex-1 flex justify-center w-full">
                     <!-- SVG 插圖：保護傘與下跌箭頭 -->
-                    <svg viewBox="0 0 200 200" class="w-48 h-48 md:w-64 md:h-64 drop-shadow-[4px_4px_0px_#5C4033]">
-                        <circle cx="100" cy="100" r="90" fill="var(--c-accent)" stroke="#5C4033" stroke-width="8"/>
+                    <svg viewBox="0 0 200 200" class="w-48 h-48 md:w-64 md:h-64 drop-shadow-[4px_4px_0px_#403C55]">
+                        <circle cx="100" cy="100" r="90" fill="var(--c-accent)" stroke="#403C55" stroke-width="8"/>
                         <!-- 傘 -->
-                        <path d="M50 110 Q100 30 150 110 Z" fill="var(--c-main)" stroke="#5C4033" stroke-width="8"/>
-                        <path d="M100 110 L100 160 Q110 160 110 150" fill="none" stroke="#5C4033" stroke-width="8" stroke-linecap="round"/>
+                        <path d="M50 110 Q100 30 150 110 Z" fill="var(--c-main)" stroke="#403C55" stroke-width="8"/>
+                        <path d="M100 110 L100 160 Q110 160 110 150" fill="none" stroke="#403C55" stroke-width="8" stroke-linecap="round"/>
                         <!-- 擋住下跌箭頭 -->
-                        <path d="M70 40 L70 80 M60 70 L70 80 L80 70" fill="none" stroke="#5C4033" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M130 50 L130 90 M120 80 L130 90 L140 80" fill="none" stroke="#5C4033" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M70 40 L70 80 M60 70 L70 80 L80 70" fill="none" stroke="#403C55" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M130 50 L130 90 M120 80 L130 90 L140 80" fill="none" stroke="#403C55" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
             </div>
@@ -380,9 +382,9 @@
                 </div>
                 <!-- 文字組合 -->
                 <div class="flex items-center flex-wrap justify-center">
-                    <span class="text-lg md:text-2xl font-black tracking-tight text-[#5C4033]">JOPTION</span>
+                    <span class="text-lg md:text-2xl font-black tracking-tight text-[#403C55]">JOPTION</span>
                     <span class="mx-2 md:mx-4 text-gray-300 font-light text-xl hidden sm:inline">|</span>
-                    <span class="text-base md:text-xl font-bold text-[#5C4033] w-full sm:w-auto mt-1 sm:mt-0">歐大選擇權教室</span>
+                    <span class="text-base md:text-xl font-bold text-[#403C55] w-full sm:w-auto mt-1 sm:mt-0">歐大選擇權教室</span>
                 </div>
             </div>
             <!-- 下方免責聲明 -->
