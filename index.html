@@ -21,123 +21,213 @@
     <script src="https://unpkg.com/htm@3/dist/htm.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Noto+Sans+TC:wght@400;700;900&display=swap');
 
+        /* Joption 品牌風格（跟官網 joption-site/theme/site.css 同一套）：金幣黃 + 天藍 + 靛藍，粗黑描邊加硬陰影 */
         :root {
-            --forest-deep: #1b4332;
-            --forest-mid: #2d6a4f;
-            --sage-light: #f7f9f4;
-            --amber-accent: #d97706;
+            --coin: #ffc62e;
+            --coin-deep: #f0a30a;
+            --sky: #cff3fb;
+            --sky-deep: #7fd8ee;
+            --indigo: #3a35c4;
+            --indigo-deep: #241f86;
+            --ink: #17142b;
+            --muted: #5c5870;
+            --paper: #fffcf5;
+            --kraft: #fff1da;
+            --call: #d9321f;
+            --put: #0a7f4d;
+            --edge: 2.5px solid var(--ink);
+            --pop: 4px 4px 0 var(--ink);
+            --pop-big: 6px 6px 0 var(--ink);
+            --display: "Lilita One", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+            --hatch: repeating-linear-gradient(115deg, rgba(58, 53, 196, .11) 0 2px, transparent 2px 10px);
         }
 
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: var(--sage-light);
-        }
-
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background: var(--paper); }
         body {
-            font-family: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+            font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;
+            color: var(--ink);
             -webkit-tap-highlight-color: transparent;
-            color: #292524;
         }
+        button { font-family: inherit; }
+        :focus-visible { outline: 3px solid var(--indigo); outline-offset: 2px; }
 
-        .animate-fade-in {
-            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-            opacity: 0;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .animate-fade-in { animation: fadeIn .4s cubic-bezier(.4, 0, .2, 1) forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .submenu-enter {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
-            opacity: 0;
-        }
-        .submenu-open {
-            max-height: 1500px;
-            opacity: 1;
-        }
+        .submenu-enter { max-height: 0; overflow: hidden; opacity: 0; transition: max-height .4s cubic-bezier(.4, 0, .2, 1), opacity .25s ease; }
+        .submenu-open { max-height: 1500px; opacity: 1; }
 
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #d9c9ab; border-radius: 10px; }
 
-        .forest-gradient {
-            background: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%);
-        }
+        .scroll-container { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; background: var(--paper); }
+        .iframe-container { flex: 1; width: 100%; height: 100%; overflow: hidden; position: relative; }
+        .iframe-container iframe { display: block; width: 100%; height: 100%; border: none; }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+        /* 頂列：跟官網一樣的金幣黃 */
+        .jo-topbar {
+            flex: none; position: relative; z-index: 60;
+            display: flex; align-items: center; gap: 12px;
+            height: 60px; padding: 0 16px;
+            background: var(--coin); border-bottom: 3px solid var(--ink);
         }
+        .jo-brand {
+            display: flex; align-items: center; gap: 8px; padding: 0; border: 0; background: none; cursor: pointer;
+            font-family: var(--display); font-size: 18px; color: var(--ink); white-space: nowrap; letter-spacing: .02em;
+        }
+        .jo-brand img { flex: none; width: 40px; height: 40px; object-fit: contain; }
+        .jo-brand small { font-size: 13px; color: var(--indigo-deep); letter-spacing: .08em; margin-left: 2px; }
+        .jo-menu-btn {
+            flex: none; width: 42px; height: 42px; padding: 10px 9px;
+            background: #fff; border: var(--edge); border-radius: 10px; box-shadow: 2px 2px 0 var(--ink); cursor: pointer;
+        }
+        .jo-menu-btn span { display: block; height: 3px; margin: 3px 0; background: var(--ink); border-radius: 2px; }
+        .jo-menu-btn:active { transform: translate(2px, 2px); box-shadow: none; }
+        .jo-top-link {
+            margin-left: auto; padding: 6px 16px; border: var(--edge); border-radius: 999px;
+            background: #fff; box-shadow: 2px 2px 0 var(--ink);
+            font-weight: 900; font-size: 14px; color: var(--ink); text-decoration: none; white-space: nowrap;
+        }
+        .jo-top-link:hover { background: var(--sky); }
+        .jo-top-link:active { transform: translate(2px, 2px); box-shadow: none; }
 
-        .scroll-container {
-            flex: 1;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
+        /* 側邊選單：牛皮紙底，現在這章是靛藍貼紙 */
+        .jo-side {
+            flex: none; width: 290px; overflow-y: auto; padding: 18px 10px 40px;
+            background: var(--kraft); border-right: 3px solid var(--ink);
+            font-size: 15px; line-height: 1.45;
         }
+        .jo-ch {
+            width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 10px;
+            border: 2px solid transparent; border-radius: 8px; background: none; cursor: pointer; text-align: left;
+            color: var(--indigo-deep); font-weight: 900; font-size: 16px;
+        }
+        .jo-ch:hover { background: var(--coin); }
+        .jo-ch.is-active { background: var(--indigo); color: #fff; border-color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+        .jo-ch .chev { margin-left: auto; flex: none; transition: transform .2s; }
+        .jo-ch.is-active .chev { transform: rotate(180deg); }
+        .jo-subs { margin: 4px 0 10px 18px; padding-left: 8px; border-left: 2px dashed #d9c9ab; }
+        .jo-sub {
+            width: 100%; display: flex; align-items: center; gap: 6px; padding: 7px 10px;
+            border: 0; border-radius: 8px; background: none; cursor: pointer; text-align: left;
+            color: var(--ink); font-size: 14.5px;
+        }
+        .jo-sub:hover { background: var(--coin); }
+        .jo-sub.is-active { background: var(--sky-deep); box-shadow: inset 0 0 0 2px var(--ink); font-weight: 700; }
+        .jo-sub-test { color: var(--indigo); font-weight: 700; }
+        .jo-sub-test.is-active { background: var(--coin); color: var(--ink); }
 
-        .iframe-container {
-            width: 100%;
-            height: 100%;
-            flex: 1;
-            overflow: hidden;
-            position: relative;
-        }
+        /* 首頁大圖：天藍斜線底、雙賣損益圖當底邊 */
+        .jo-hero { position: relative; overflow: hidden; background: var(--hatch), var(--sky); border: 3px solid var(--ink); border-radius: 22px; box-shadow: var(--pop-big); }
+        .jo-hero-inner { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 330px); align-items: center; gap: 20px; padding: 36px 44px 104px; }
+        .jo-kicker { margin: 0 0 10px; font-size: 15px; font-weight: 700; color: var(--indigo-deep); letter-spacing: .08em; }
+        .jo-hero-title { margin: 0; font-family: var(--display); font-weight: 900; font-size: clamp(26px, 3.4vw, 40px); line-height: 1.3; word-break: keep-all; }
+        .jo-hero-title b { display: block; font-weight: 400; font-size: 1.4em; line-height: 1.15; color: var(--indigo); text-shadow: 3px 3px 0 var(--coin); letter-spacing: .02em; }
+        .jo-hero-lead { margin: 16px 0 24px; font-size: 17px; line-height: 1.75; max-width: 34em; }
+        .jo-hero-art { position: relative; }
+        .jo-hero-art::before { content: ""; position: absolute; inset: 6%; border-radius: 50%; background: var(--coin); border: 3px solid var(--ink); box-shadow: var(--pop-big); }
+        .jo-hero-art img { position: relative; display: block; width: 100%; height: auto; }
+        .payoff { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: 84px; display: block; }
+        .payoff-fill { fill: var(--paper); }
+        .payoff-line { fill: none; stroke: var(--ink); stroke-width: 4; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+        .payoff-tag { position: absolute; z-index: 2; padding: 1px 12px; border: 2px solid var(--ink); border-radius: 999px; font-family: var(--display); font-size: 15px; line-height: 1.5; color: #fff; white-space: nowrap; box-shadow: 2px 2px 0 var(--ink); }
+        .payoff-tag.put { left: 13%; bottom: 40px; background: var(--put); transform: rotate(-6deg); }
+        .payoff-tag.call { right: 13%; bottom: 40px; background: var(--call); transform: rotate(6deg); }
+        .payoff-tag.theta { left: 50%; bottom: 66px; background: var(--coin); color: var(--ink); transform: translateX(-50%); }
 
-        .iframe-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
+        .jo-btn {
+            display: inline-flex; align-items: center; gap: 10px; padding: 12px 26px;
+            border: var(--edge); border-radius: 999px; box-shadow: var(--pop); cursor: pointer;
+            font-weight: 900; font-size: 18px; color: var(--ink); text-decoration: none;
+            transition: transform .12s, box-shadow .12s;
         }
+        .jo-btn:hover { transform: translate(-2px, -2px); box-shadow: var(--pop-big); }
+        .jo-btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+        .jo-btn-coin { background: var(--coin); }
+        .jo-btn-indigo { background: var(--indigo); color: #fff; font-size: 16px; padding: 10px 22px; }
 
-        .btn-premium {
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-premium:active {
-            transform: scale(0.96);
-        }
+        .jo-panel { background: #fff; border: var(--edge); border-radius: 22px; box-shadow: var(--pop-big); padding: 32px 36px; }
+        .jo-h2 { margin: 0; font-family: var(--display); font-weight: 900; font-size: clamp(22px, 2.8vw, 32px); line-height: 1.35; }
+        .jo-h2 span { display: block; color: var(--indigo); }
+        .jo-lead { margin: 10px 0 18px; color: var(--muted); font-size: 16px; line-height: 1.7; }
 
-        .btn-amber {
-            background: linear-gradient(to bottom right, #fbbf24, #d97706);
-            box-shadow: 0 4px 15px -2px rgba(217, 119, 6, 0.3);
+        /* 卡片：跟官網首頁卡片一樣黃、藍、靛藍輪流 */
+        .jo-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-top: 26px; }
+        .jo-card {
+            display: block; padding: 16px 18px; border: var(--edge); border-radius: 14px; box-shadow: var(--pop);
+            background: #fff; color: var(--ink); text-decoration: none; text-align: left; cursor: pointer;
+            transition: transform .12s, box-shadow .12s;
         }
+        .jo-card:hover { transform: translate(-2px, -2px); box-shadow: var(--pop-big); }
+        .jo-card:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+        .jo-card:nth-child(5n+1) { background: var(--coin); }
+        .jo-card:nth-child(5n+2) { background: var(--sky-deep); }
+        .jo-card:nth-child(5n+3) { background: var(--indigo); color: #fff; }
+        .jo-card:nth-child(5n+4) { background: var(--kraft); }
+        .jo-card .emoji { display: block; font-size: 30px; line-height: 1; transition: transform .15s; }
+        .jo-card:hover .emoji { transform: rotate(-10deg) scale(1.08); }
+        .jo-card h4 { margin: 10px 0 0; font-size: 17px; font-weight: 900; line-height: 1.4; }
+        .jo-card p { margin: 6px 0 0; font-size: 14px; line-height: 1.55; opacity: .85; }
 
-        .visitor-badge {
-            padding: 8px 16px;
-            border-radius: 99px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(4px);
-        }
+        .jo-visits { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px; }
+        .jo-visit { min-width: 150px; padding: 10px 18px; border: var(--edge); border-radius: 14px; box-shadow: var(--pop); background: #fff; text-align: center; }
+        .jo-visit:nth-child(1) { background: var(--coin); }
+        .jo-visit:nth-child(2) { background: var(--sky); }
+        .jo-visit b { display: block; font-family: var(--display); font-weight: 400; font-size: 30px; line-height: 1.15; color: var(--indigo); }
+        .jo-visit span { font-size: 14px; font-weight: 700; }
+        .jo-foot { margin: 0; font-family: var(--display); font-size: 13px; letter-spacing: .15em; color: var(--muted); text-align: center; }
 
-        @media (max-width: 768px) {
-            .iframe-container {
-                height: calc(100dvh - 64px);
-            }
+        /* 章節頁：課程按鈕是白色貼紙，測驗是金幣黃 */
+        .jo-chapter { max-width: 1040px; margin: 0 auto; width: 100%; }
+        .jo-tag { display: inline-block; padding: 2px 14px; border: var(--edge); border-radius: 999px; background: var(--coin); box-shadow: 2px 2px 0 var(--ink); font-family: var(--display); font-size: 14px; letter-spacing: .1em; }
+        .jo-chapter-title { margin: 16px 0 28px; font-family: var(--display); font-weight: 900; font-size: clamp(26px, 3.4vw, 40px); line-height: 1.25; }
+        .jo-lessons { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+        .jo-lesson {
+            display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+            border: var(--edge); border-radius: 14px; box-shadow: var(--pop); background: #fff; cursor: pointer; text-align: left;
+            color: var(--ink); font-size: 16px; font-weight: 900; line-height: 1.4;
+            transition: transform .12s, box-shadow .12s;
         }
+        .jo-lesson:hover { transform: translate(-2px, -2px); box-shadow: var(--pop-big); background: var(--sky); }
+        .jo-lesson:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+        .jo-lesson .num { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border: var(--edge); border-radius: 50%; background: var(--sky); font-family: var(--display); font-weight: 400; font-size: 18px; }
+        .jo-lesson:hover .num { background: #fff; }
+        .jo-lesson-test { background: var(--coin); }
+        .jo-lesson-test:hover { background: var(--coin-deep); }
+        .jo-lesson-test .num { background: #fff; }
+
+        @media (min-width: 768px) { .jo-menu-btn { display: none; } }
+        @media (max-width: 767px) {
+            .jo-side { position: fixed; top: 60px; bottom: 0; left: 0; z-index: 50; width: 280px; transform: translateX(-102%); transition: transform .25s ease; }
+            .jo-side.open { transform: none; }
+            .jo-brand { font-size: 16px; }
+            .jo-brand small { display: none; }
+            .jo-top-link { padding: 5px 12px; font-size: 13px; }
+            .jo-hero-inner { grid-template-columns: 1fr; text-align: center; padding: 26px 20px 96px; gap: 8px; }
+            .jo-hero-art { order: -1; width: min(60vw, 230px); margin: 0 auto 6px; }
+            .jo-hero-lead { margin-left: auto; margin-right: auto; font-size: 16px; }
+            .payoff { height: 70px; }
+            .payoff-tag { font-size: 13px; }
+            .payoff-tag.put { left: 6%; bottom: 30px; }
+            .payoff-tag.call { right: 6%; bottom: 30px; }
+            .payoff-tag.theta { bottom: 54px; }
+            .jo-panel { padding: 22px 18px; }
+            .jo-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+            .jo-card { padding: 14px; }
+            .jo-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+        }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation-duration: 0s !important; } }
     </style>
 </head>
 <body>
     <div id="root" class="h-full">
-        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background-color:#f7f9f4;gap:16px;">
-            <div style="width:48px;height:48px;border:4px solid #d1fae5;border-top-color:#2d6a4f;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
-            <p style="font-family:'Noto Sans TC',sans-serif;font-size:1rem;color:#6b7280;margin:0;">載入中，請稍候…</p>
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#fffcf5;gap:16px;">
+            <div style="width:48px;height:48px;border:5px solid #cff3fb;border-top-color:#3a35c4;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+            <p style="font-family:'Noto Sans TC',sans-serif;font-size:1rem;color:#5c5870;margin:0;">載入中，請稍候…</p>
         </div>
     </div>
 
@@ -333,10 +423,10 @@
             };
 
             const LogoImage = ({ className }) => html`<img
-                src="IP標籤.jpg"
-                alt="Logo"
+                src="brand-logo.png"
+                alt=""
                 className=${className}
-                onError=${(e) => { e.target.onerror = null; e.target.src = "https://www.joption.com.tw/IP%E6%A8%99%E7%B1%A4.jpg"; }}
+                onError=${(e) => { e.target.onerror = null; e.target.src = "IP標籤.jpg"; }}
             />`;
 
             const homeCards = [
@@ -347,181 +437,151 @@
                 { emoji: "👨‍🏫", title: "歐大自我介紹", url: "https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E6%AD%90%E5%A4%A7%E7%9A%84%E8%87%AA%E6%88%91%E4%BB%8B%E7%B4%B9", desc: "多年選擇權實戰經驗分享。" }
             ];
 
+            // 跟官網首頁一樣的雙賣損益圖：中間平台賺時間價值，兩邊是 Put、Call 的風險
+            const Payoff = () => html`
+                <svg className="payoff" viewBox="0 0 1200 92" preserveAspectRatio="none" aria-hidden="true">
+                    <path className="payoff-fill" d="M0 92L0 88L400 14H800L1200 88V92Z" />
+                    <path className="payoff-line" d="M0 88L400 14H800L1200 88" />
+                </svg>
+                <span className="payoff-tag put" aria-hidden="true">Put</span>
+                <span className="payoff-tag theta" aria-hidden="true">時間價值</span>
+                <span className="payoff-tag call" aria-hidden="true">Call</span>`;
+
+            const goHome = () => { setActiveChapterId('home'); setActiveSubIndex(null); setIsMenuOpen(false); };
+            const noTest = (id) => id === 'ch7' || id === 'ch8' || id === 'ch9';
+
             const mainContent = activeChapterId === 'home'
                 ? html`
-                    <div key="home" className="animate-fade-in space-y-8 md:space-y-16 max-w-6xl mx-auto w-full pb-10">
-                        <div className="forest-gradient text-white p-8 sm:p-12 md:p-20 rounded-[2rem] md:rounded-[3.5rem] shadow-2xl relative overflow-hidden">
-                            <div className="absolute -top-24 -right-24 w-64 h-64 md:w-96 md:h-96 bg-emerald-400 rounded-full blur-[80px] md:blur-[120px] opacity-20"></div>
-                            <div className="relative z-10 space-y-6 md:space-y-10 text-center md:text-left">
-                                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-emerald-50 text-xs font-bold tracking-widest">
-                                    <${Icons.Leaf} /> JOPTION ACADEMY
-                                </div>
-                                <h1 className="text-3xl sm:text-4xl md:text-6xl font-black leading-[1.15] tracking-tight">
-                                    掌握選擇權：<br/><span className="text-amber-300">獲利與風險的平衡魔法</span>
-                                </h1>
-                                <p className="text-base md:text-xl text-emerald-100/80 font-medium max-w-2xl mx-auto md:mx-0">
-                                    從基礎出發，建立您的專業交易體系，讓數據成為您的指南針。
-                                </p>
-                                <div className="pt-4">
-                                    <button onClick=${() => setActiveChapterId('ch1')} className="btn-premium btn-amber px-8 md:px-12 py-4 md:py-5 rounded-full font-black text-white flex items-center justify-center gap-3 text-lg md:text-xl mx-auto md:mx-0 group">
+                    <div key="home" className="animate-fade-in max-w-6xl mx-auto w-full pb-10 space-y-10 md:space-y-12">
+                        <section className="jo-hero">
+                            <div className="jo-hero-inner">
+                                <div>
+                                    <p className="jo-kicker">JOPTION ACADEMY ・ 選擇權教室</p>
+                                    <h1 className="jo-hero-title"><b>掌握選擇權</b>獲利與風險的平衡魔法</h1>
+                                    <p className="jo-hero-lead">從基礎出發，建立您的專業交易體系，讓數據成為您的指南針。</p>
+                                    <button onClick=${() => setActiveChapterId('ch1')} className="jo-btn jo-btn-coin">
                                         開始學習之旅 <${Icons.ArrowRight} />
                                     </button>
                                 </div>
+                                <div className="jo-hero-art"><img src="joption-art.webp" width="720" height="720" alt="" /></div>
                             </div>
-                        </div>
+                            <${Payoff} />
+                        </section>
 
-                        <div className="glass-card p-6 sm:p-10 md:p-14 rounded-[2rem] md:rounded-[3rem] shadow-sm border border-emerald-100/50">
-                            <div className="space-y-10 md:space-y-14">
-                                <div className="text-center md:text-left space-y-4">
-                                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-emerald-950 leading-tight">
-                                        進入量化交易的世界<br/>
-                                        <span className="text-emerald-700">Joption 雙賣平衡下單機</span>
-                                    </h2>
-                                    <p className="text-stone-500 font-medium text-sm md:text-lg max-w-2xl mx-auto md:mx-0">
-                                        透過專業量化工具，讓交易更具紀律，專注於長期穩健的獲利邏輯。
-                                    </p>
-                                    <a href="https://www.joption.com.tw/" target="_blank" className="btn-premium bg-[#1a2e25] px-8 md:px-10 py-3.5 md:py-4 rounded-full font-bold text-white inline-flex items-center gap-3 text-sm md:text-base mt-4 shadow-xl">
-                                        前往 Joption 官網 <${Icons.ArrowRight} />
-                                    </a>
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-4">
-                                    ${homeCards.map((item, i) => item.internal
-                                        ? html`<button key=${i} onClick=${() => { setActiveChapterId('ch7'); setActiveSubIndex(0); }} className="p-6 bg-white rounded-3xl border border-stone-100 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md hover:-translate-y-1 block group text-left">
-                                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform origin-left">${item.emoji}</div>
-                                            <h4 className="font-black text-emerald-950 mb-1.5 text-base md:text-lg leading-tight">${item.title}</h4>
-                                            <p className="text-stone-400 text-[13px] leading-relaxed font-medium">${item.desc}</p>
-                                          </button>`
-                                        : html`<a key=${i} href=${item.url} target="_blank" className="p-6 bg-white rounded-3xl border border-stone-100 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md hover:-translate-y-1 block group">
-                                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform origin-left">${item.emoji}</div>
-                                            <h4 className="font-black text-emerald-950 mb-1.5 text-base md:text-lg leading-tight">${item.title}</h4>
-                                            <p className="text-stone-400 text-[13px] leading-relaxed font-medium">${item.desc}</p>
-                                          </a>`
-                                    )}
-                                </div>
+                        <section className="jo-panel">
+                            <h2 className="jo-h2">進入量化交易的世界<span>Joption 雙賣平衡下單機</span></h2>
+                            <p className="jo-lead">透過專業量化工具，讓交易更具紀律，專注於長期穩健的獲利邏輯。</p>
+                            <a href="https://www.joption.com.tw/" target="_blank" className="jo-btn jo-btn-indigo">
+                                前往 Joption 官網 <${Icons.ArrowRight} />
+                            </a>
+                            <div className="jo-cards">
+                                ${homeCards.map((item, i) => item.internal
+                                    ? html`<button key=${i} onClick=${() => { setActiveChapterId('ch7'); setActiveSubIndex(0); }} className="jo-card">
+                                        <span className="emoji">${item.emoji}</span>
+                                        <h4>${item.title}</h4>
+                                        <p>${item.desc}</p>
+                                      </button>`
+                                    : html`<a key=${i} href=${item.url} target="_blank" className="jo-card">
+                                        <span className="emoji">${item.emoji}</span>
+                                        <h4>${item.title}</h4>
+                                        <p>${item.desc}</p>
+                                      </a>`
+                                )}
                             </div>
-                        </div>
+                        </section>
 
-                        <div className="flex flex-col items-center gap-6 pt-6">
-                            <div className="flex flex-wrap justify-center gap-3">
-                                <div className="visitor-badge bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                    <${Icons.Users} /> 累積：<span className="font-black">${visitorStats.total !== null ? visitorStats.total.toLocaleString() : '...'}</span>
-                                </div>
-                                <div className="visitor-badge bg-amber-50 text-amber-700 border border-amber-100">
-                                    <${Icons.Clock} /> 今日：<span className="font-black">${visitorStats.daily !== null ? visitorStats.daily.toLocaleString() : '...'}</span>
-                                </div>
+                        <div className="flex flex-col items-center gap-6 pt-2">
+                            <div className="jo-visits" aria-label="訪客人數">
+                                <div className="jo-visit"><b>${visitorStats.daily !== null ? visitorStats.daily.toLocaleString() : '–'}</b><span>今天人數</span></div>
+                                <div className="jo-visit"><b>${visitorStats.total !== null ? visitorStats.total.toLocaleString() : '–'}</b><span>累積人數</span></div>
                             </div>
-                            <p className="text-[10px] font-bold text-stone-300 tracking-[0.2em] uppercase">© JOPTION ACADEMY - Since 2026</p>
+                            <p className="jo-foot">© JOPTION ACADEMY ・ SINCE 2026</p>
                         </div>
                     </div>`
-                : html`
-                    <div key=${activeChapterId} className=${"animate-fade-in flex-1 flex flex-col bg-white overflow-hidden transition-all " + (activeSubIndex !== null ? 'h-full shadow-none border-none' : 'rounded-[2rem] md:rounded-[3rem] border-4 border-white shadow-xl min-h-[500px] mb-8')}>
-                        ${activeSubIndex === null
-                            ? html`<div className="p-8 md:p-16 flex flex-col items-center flex-1 justify-center relative">
-                                <div className="mb-4 text-emerald-500 font-extrabold tracking-[0.3em] text-[10px] uppercase bg-emerald-50 px-4 py-1 rounded-full border border-emerald-100">Joption Chapter</div>
-                                <h2 className="text-2xl md:text-4xl font-black mb-10 text-emerald-950 text-center leading-tight">
-                                    ${currentChapter?.title || "章節內容"}
-                                </h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full max-w-5xl mx-auto">
-                                    ${currentChapter?.subpages.map((sub, i) => html`
-                                        <button key=${i} onClick=${() => handleSubPageClick(i)} className="group p-5 md:p-6 rounded-3xl border-2 border-stone-50 bg-stone-50/50 hover:bg-emerald-50 hover:border-emerald-200 hover:shadow-lg transition-all text-left flex items-start gap-4">
-                                            <span className="w-10 h-10 shrink-0 rounded-2xl bg-white text-emerald-600 flex items-center justify-center font-black text-sm border border-stone-100 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-sm">${i + 1}</span>
-                                            <span className="font-extrabold text-stone-700 text-sm md:text-base pt-2 group-hover:text-emerald-950 leading-snug">${sub.title}</span>
-                                        </button>
-                                    `)}
-                                    ${activeChapterId !== 'ch7' && activeChapterId !== 'ch8' && activeChapterId !== 'ch9' && currentChapter?.testUrl && html`
-                                        <button onClick=${() => handleSubPageClick('test')} className="group p-5 md:p-6 rounded-3xl border-2 border-amber-100 bg-amber-50/30 hover:bg-amber-100 hover:border-amber-300 hover:shadow-lg transition-all text-left flex items-start gap-4">
-                                            <span className="w-10 h-10 shrink-0 rounded-2xl bg-amber-400 text-amber-950 flex items-center justify-center font-black text-sm shadow-sm group-hover:scale-110 transition-transform">?</span>
-                                            <span className="font-extrabold text-amber-900 text-sm md:text-base pt-2 leading-snug">旅途試煉</span>
-                                        </button>
-                                    `}
-                                </div>
-                              </div>`
-                            : html`<div className="iframe-container">
-                                <iframe
-                                    src=${activeSubIndex === 'test' ? currentChapter?.testUrl : currentChapter?.subpages[activeSubIndex].url}
-                                    title="Course Content"
-                                    sandbox="allow-scripts allow-same-origin allow-forms"
-                                    loading="lazy"
-                                ></iframe>
-                              </div>`
-                        }
-                    </div>`;
+                : activeSubIndex === null
+                    ? html`
+                        <div key=${activeChapterId} className="animate-fade-in jo-chapter pb-10">
+                            <span className="jo-tag">JOPTION CHAPTER</span>
+                            <h2 className="jo-chapter-title">${currentChapter?.title || "章節內容"}</h2>
+                            <div className="jo-lessons">
+                                ${currentChapter?.subpages.map((sub, i) => html`
+                                    <button key=${i} onClick=${() => handleSubPageClick(i)} className="jo-lesson">
+                                        <span className="num">${i + 1}</span>
+                                        <span>${sub.title}</span>
+                                    </button>
+                                `)}
+                                ${!noTest(activeChapterId) && currentChapter?.testUrl && html`
+                                    <button onClick=${() => handleSubPageClick('test')} className="jo-lesson jo-lesson-test">
+                                        <span className="num">?</span>
+                                        <span>旅途試煉</span>
+                                    </button>
+                                `}
+                            </div>
+                        </div>`
+                    : html`
+                        <div key=${activeChapterId + '-' + activeSubIndex} className="iframe-container">
+                            <iframe
+                                src=${activeSubIndex === 'test' ? currentChapter?.testUrl : currentChapter?.subpages[activeSubIndex].url}
+                                title="Course Content"
+                                sandbox="allow-scripts allow-same-origin allow-forms"
+                                loading="lazy"
+                            ></iframe>
+                        </div>`;
 
             return html`
-                <div className="h-full flex flex-col md:flex-row bg-[#f7f9f4] overflow-hidden">
-                    <aside className=${"fixed inset-y-0 left-0 z-50 w-[280px] lg:w-[320px] bg-[#fffcf5] border-r border-stone-200 transform transition-transform duration-300 ease-in-out " + (isMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full') + " md:relative md:translate-x-0 md:sticky md:top-0 md:h-screen flex flex-col"}>
-                        <div className="p-6 md:p-8 flex items-center gap-4 cursor-pointer group" onClick=${() => { setActiveChapterId('home'); setActiveSubIndex(null); setIsMenuOpen(false); }}>
-                            <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 overflow-hidden rounded-2xl shadow-lg border-2 border-white group-hover:rotate-3 transition-transform bg-stone-100">
-                                <${LogoImage} className="w-full h-full object-cover" />
-                            </div>
-                            <div className="flex flex-col min-w-0">
-                                <h2 className="text-lg md:text-xl font-black tracking-tight text-emerald-900 leading-tight truncate">歐大選擇權教室</h2>
-                                <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest mt-1 flex items-center gap-1"><${Icons.Leaf} /> JOPTION</span>
-                            </div>
-                        </div>
+                <div className="h-full flex flex-col overflow-hidden">
+                    <header className="jo-topbar">
+                        <button className="jo-menu-btn" aria-label=${isMenuOpen ? '關閉選單' : '打開選單'} aria-expanded=${isMenuOpen} onClick=${() => setIsMenuOpen(!isMenuOpen)}>
+                            <span></span><span></span><span></span>
+                        </button>
+                        <button className="jo-brand" onClick=${goHome}>
+                            <${LogoImage} />
+                            歐大選擇權教室 <small>JOPTION ACADEMY</small>
+                        </button>
+                        <a className="jo-top-link" href="https://www.joption.com.tw/" target="_blank">Joption 官網</a>
+                    </header>
 
-                        <nav className="flex-1 px-3 md:px-4 py-2 space-y-2 overflow-y-auto mb-6">
-                            ${chapters.map((ch) => html`
-                                <div key=${ch.id} className="space-y-1">
-                                    <button
-                                        onClick=${() => handleChapterSelect(ch.id)}
-                                        className=${"w-full flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all " + (activeChapterId === ch.id ? 'bg-emerald-50 text-emerald-800' : 'text-stone-600 hover:bg-stone-50')}
-                                    >
-                                        <div className="flex items-center gap-3 truncate">
-                                            <span className=${"shrink-0 " + (activeChapterId === ch.id ? 'text-emerald-500' : 'text-stone-400')}>${ch.icon}</span>
-                                            <span className="font-extrabold text-sm md:text-[15px] truncate">${ch.title}</span>
-                                        </div>
-                                        <div className=${"transition-transform shrink-0 " + (activeChapterId === ch.id ? 'rotate-180 text-emerald-500' : 'text-stone-300')}>
-                                            <${Icons.ChevronDown} />
-                                        </div>
-                                    </button>
-                                    <div className=${"submenu-enter " + (activeChapterId === ch.id ? 'submenu-open' : '')}>
-                                        <div className="pl-10 pr-2 py-1 space-y-1 border-l-2 border-dashed border-emerald-100 ml-6 my-1">
-                                            ${ch.subpages.map((sub, sIdx) => html`
-                                                <button
-                                                    key=${sIdx}
-                                                    onClick=${() => handleSubPageClick(sIdx)}
-                                                    className=${"w-full text-left py-2 px-3 rounded-xl text-[13px] font-bold transition-all " + (activeChapterId === ch.id && activeSubIndex === sIdx ? 'bg-emerald-100 text-emerald-900' : 'text-stone-500 hover:text-emerald-600 hover:bg-emerald-50')}
-                                                >
-                                                    ${sub.title}
-                                                </button>
-                                            `)}
-                                            ${ch.id !== 'ch7' && ch.id !== 'ch8' && ch.id !== 'ch9' && html`
-                                                <button
-                                                    onClick=${() => handleSubPageClick('test')}
-                                                    className=${"w-full text-left py-2 px-3 rounded-xl text-[13px] font-bold transition-all flex items-center gap-2 mt-1 " + (activeChapterId === ch.id && activeSubIndex === 'test' ? 'bg-amber-400 text-amber-900 shadow-sm' : 'text-amber-600 hover:bg-amber-50')}
-                                                >
-                                                    <${Icons.ClipboardCheck} /> 旅途試煉
-                                                </button>
-                                            `}
+                    <div className="flex-1 flex min-h-0 relative">
+                        <aside className=${"jo-side" + (isMenuOpen ? ' open' : '')}>
+                            <nav className="space-y-1">
+                                ${chapters.map((ch) => html`
+                                    <div key=${ch.id}>
+                                        <button onClick=${() => handleChapterSelect(ch.id)} className=${"jo-ch" + (activeChapterId === ch.id ? ' is-active' : '')}>
+                                            <span className="shrink-0">${ch.icon}</span>
+                                            <span className="truncate">${ch.title}</span>
+                                            <span className="chev"><${Icons.ChevronDown} /></span>
+                                        </button>
+                                        <div className=${"submenu-enter " + (activeChapterId === ch.id ? 'submenu-open' : '')}>
+                                            <div className="jo-subs">
+                                                ${ch.subpages.map((sub, sIdx) => html`
+                                                    <button key=${sIdx} onClick=${() => handleSubPageClick(sIdx)}
+                                                        className=${"jo-sub" + (activeChapterId === ch.id && activeSubIndex === sIdx ? ' is-active' : '')}>
+                                                        ${sub.title}
+                                                    </button>
+                                                `)}
+                                                ${!noTest(ch.id) && html`
+                                                    <button onClick=${() => handleSubPageClick('test')}
+                                                        className=${"jo-sub jo-sub-test" + (activeChapterId === ch.id && activeSubIndex === 'test' ? ' is-active' : '')}>
+                                                        <${Icons.ClipboardCheck} /> 旅途試煉
+                                                    </button>
+                                                `}
+                                            </div>
                                         </div>
                                     </div>
+                                `)}
+                            </nav>
+                        </aside>
+
+                        <main className="flex-1 flex flex-col min-w-0 min-h-0">
+                            <div ref=${scrollRef} className="scroll-container flex flex-col">
+                                <div className=${"flex-1 flex flex-col " + (activeSubIndex !== null ? 'p-0 h-full' : 'p-4 sm:p-6 md:p-10 lg:p-12')}>
+                                    ${mainContent}
                                 </div>
-                            `)}
-                        </nav>
-                    </aside>
-
-                    <main className="flex-1 flex flex-col h-[100dvh] min-w-0 relative">
-                        <header className="md:hidden flex items-center justify-between px-5 py-3.5 bg-white border-stone-100 shrink-0 z-40 sticky top-0 shadow-sm">
-                            <div className="flex items-center gap-3" onClick=${() => setActiveChapterId('home')}>
-                                <div className="w-9 h-9">
-                                    <${LogoImage} className="w-full h-full rounded-lg object-cover shadow-sm border border-stone-100" />
-                                </div>
-                                <span className="font-black text-emerald-950 text-base tracking-tight truncate">歐大選擇權教室</span>
                             </div>
-                            <button onClick=${() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-stone-600 bg-stone-50 rounded-xl">
-                                ${isMenuOpen ? html`<${Icons.X} />` : html`<${Icons.Menu} />`}
-                            </button>
-                        </header>
+                        </main>
 
-                        <div ref=${scrollRef} className="scroll-container bg-[#f7f9f4]">
-                            <div className=${"flex-1 flex flex-col " + (activeSubIndex !== null ? 'p-0 h-full' : 'p-4 sm:p-6 md:p-10 lg:p-16')}>
-                                ${mainContent}
-                            </div>
-                        </div>
-                    </main>
-
-                    ${isMenuOpen && html`<div className="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-40 md:hidden" onClick=${() => setIsMenuOpen(false)}></div>`}
+                        ${isMenuOpen && html`<div className="fixed inset-0 top-[60px] bg-black/30 z-40 md:hidden" onClick=${() => setIsMenuOpen(false)}></div>`}
+                    </div>
                 </div>`;
         };
 
