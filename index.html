@@ -200,6 +200,32 @@
         .jo-lesson-test:hover { background: var(--coin-deep); }
         .jo-lesson-test .num { background: #fff; }
 
+        /* 分享列：跟官網一樣的白色膠囊鈕，LINE 是 LINE 綠 */
+        .jo-share { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; margin: 0; }
+        .jo-chapter .jo-share { justify-content: flex-start; margin: -12px 0 26px; }
+        .jo-share-btn {
+            display: inline-flex; align-items: center; min-height: 40px; padding: 6px 16px;
+            border: var(--edge); border-radius: 999px; background: #fff; box-shadow: 2px 2px 0 var(--ink); cursor: pointer;
+            font: inherit; font-size: 15px; font-weight: 900; line-height: 1.2; color: var(--ink); text-decoration: none; white-space: nowrap;
+            transition: transform .1s, box-shadow .1s;
+        }
+        .jo-share-btn:hover { background: var(--coin); }
+        .jo-share-btn:active { transform: translate(2px, 2px); box-shadow: none; }
+        .jo-share-btn.line { background: #06c755; color: #fff; }
+        .jo-share-btn.line:hover { background: #05b04b; }
+        .jo-share.compact { flex-wrap: nowrap; gap: 8px; margin: 0; }
+        .jo-share.compact .jo-share-btn { min-height: 34px; padding: 4px 12px; font-size: 14px; }
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+        /* 課程頁上方的細條：左邊課名，右邊分享 */
+        .jo-lesson-view { flex: 1; display: flex; flex-direction: column; min-height: 0; height: 100%; }
+        .jo-lesson-view .iframe-container { flex: 1; min-height: 0; height: auto; }
+        .jo-lesson-bar {
+            flex: none; display: flex; align-items: center; gap: 12px; padding: 8px 16px;
+            background: var(--kraft); border-bottom: 2px solid var(--ink);
+        }
+        .jo-lesson-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 900; font-size: 16px; }
+
         @media (min-width: 768px) { .jo-menu-btn { display: none; } }
         @media (max-width: 767px) {
             .jo-side { position: fixed; top: 60px; bottom: 0; left: 0; z-index: 50; width: 280px; transform: translateX(-102%); transition: transform .25s ease; }
@@ -219,6 +245,9 @@
             .jo-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
             .jo-card { padding: 14px; }
             .jo-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+            .jo-lesson-bar { padding: 8px 12px; }
+            .jo-lesson-name { display: none; }
+            .jo-share.compact { flex: 1; justify-content: flex-end; }
         }
         @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation-duration: 0s !important; } }
     </style>
@@ -263,9 +292,150 @@
             MessageQuestion: () => html`<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
         };
 
+        const CHAPTERS = [
+            {
+                id: 'ch1', title: 'CH 1 選擇權入門', icon: html`<${Icons.Book} />`, testUrl: 'chap1-test.html',
+                subpages: [
+                    { title: '什麼是選擇權？', url: './1-1.html' },
+                    { title: '權利與義務的對稱性', url: './1-2.html' },
+                    { title: '買方與賣方的獲利概率', url: './1-3.html' }
+                ]
+            },
+            {
+                id: 'ch2', title: 'CH 2 基礎知識', icon: html`<${Icons.Target} />`, testUrl: 'chap2-test.html',
+                subpages: [
+                    { title: '履約價與權利金', url: './2-1.html' },
+                    { title: '價內、價平與價外', url: './2-2.html' },
+                    { title: '結算機制與到期效應', url: './2-3.html' },
+                    { title: '保證金與權利金', url: './2-4.html' },
+                    { title: '結算日', url: './2-5.html' }
+                ]
+            },
+            {
+                id: 'ch3', title: 'CH 3 權利金的秘密', icon: html`<${Icons.Zap} />`, testUrl: 'chap3-test.html',
+                subpages: [
+                    { title: '內涵價值 vs 時間價值', url: './3-1.html' },
+                    { title: '時間價值的流逝規律', url: './3-2.html' }
+                ]
+            },
+            {
+                id: 'ch4', title: 'CH 4 希臘字母實戰力', icon: html`<${Icons.TrendingUp} />`, testUrl: 'chap4-test.html',
+                subpages: [
+                    { title: 'Delta：方向敏感度', url: './4-1.html' },
+                    { title: 'Gamma：Delta 的加速度', url: './4-2.html' },
+                    { title: 'Theta：時間衰減', url: './4-3.html' },
+                    { title: 'Vega：波動率敏感度', url: './4-4.html' }
+                ]
+            },
+            {
+                id: 'ch5', title: 'CH 5 選擇權九九乘法', icon: html`<${Icons.Zap} />`, testUrl: 'chap5-test.html',
+                subpages: [
+                    { title: '買進買權 (Long Call)', url: './5-1.html' },
+                    { title: '賣出買權 (Short Call)', url: './5-2.html' },
+                    { title: '買進賣權 (Long Put)', url: './5-3.html' },
+                    { title: '賣出賣權 (Short Put)', url: './5-4.html' },
+                    { title: '雙賣組合 (Short Strangle)', url: './5-5.html' },
+                    { title: '雙買組合 (Long Strangle)', url: './5-6.html' },
+                    { title: '多頭價差 (Bull Spread)', url: './5-7.html' },
+                    { title: '空頭價差 (Bear Spread)', url: './5-8.html' },
+                    { title: '鐵禿鷹組合 (Iron Condor)', url: './5-9.html' },
+                    { title: '鐵蝴蝶組合 (Iron Butterfly)', url: './5-10.html' }
+                ]
+            },
+            {
+                id: 'ch6', title: 'CH 6 常見問題集', icon: html`<${Icons.Shield} />`, testUrl: 'chap6-test.html',
+                subpages: [
+                    { title: '保證金計算', url: './6-1.html' },
+                    { title: '歐式與美式選擇權', url: './6-2.html' },
+                    { title: '新手一定要知道的 10 個地雷', url: './6-3.html' },
+                    { title: '新手必須知道的知識', url: './6-4.html' },
+                    { title: '權利金觀念與保證金控管', url: './6-5.html' }
+                ]
+            },
+            {
+                id: 'ch7', title: 'CH 7 Joption 問題集', icon: html`<${Icons.MessageQuestion} />`,
+                subpages: [
+                    { title: '加碼策略 2 的指南', url: 'https://joption-tw.github.io/7-1/' }
+                ]
+            },
+            {
+                id: 'ch8', title: 'CH 8 進階 : Joption 量化', icon: html`<${Icons.Code} />`, testUrl: 'chap7-test.html',
+                subpages: [
+                    { title: 'Joption 是什麼', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E6%98%AF%E4%BB%80%E9%BA%BC' },
+                    { title: '雙賣平衡模擬器', url: './7-2.html' },
+                    { title: 'Joption 策略核心', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E7%AD%96%E7%95%A5%E6%A0%B8%E5%BF%83' },
+                    { title: '訂閱與下載', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E4%B8%8B%E8%BC%89%E5%8F%8A%E5%AE%89%E8%A3%9D%E8%AA%AA%E6%98%8E' },
+                    { title: '歐大的自我介紹', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E6%AD%90%E5%A4%A7%E7%9A%84%E8%87%AA%E6%88%91%E4%BB%8B%E7%B4%B9' }
+                ]
+            },
+            {
+                id: 'ch9', title: 'CH 9 常用的輔助程式', icon: html`<${Icons.Terminal} />`,
+                subpages: [
+                    { title: '富台指轉換器', url: 'https://joption-tw.github.io/FTSE-Taiwan-Index-Futures/' },
+                    { title: '每日震幅追蹤器', url: 'https://joption-tw.github.io/Volatility/' }
+                ]
+            }
+        ];
+
+        // 每一頁有自己的網址：#ch1 是章節頁，#1-1 是課程頁，#chap1-test 是測驗，空的就是首頁
+        const noTest = (id) => id === 'ch7' || id === 'ch8' || id === 'ch9';
+        const pageKey = (url) => url.replace(/^\.\//, '').replace(/\.html$/, '');
+        const isOutside = (url) => /^https?:/.test(url);
+
+        const routeOf = (chId, sub) => {
+            if (chId === 'home') return '';
+            const ch = CHAPTERS.find(c => c.id === chId);
+            if (!ch || sub === null) return chId;
+            const url = sub === 'test' ? ch.testUrl : ch.subpages[sub]?.url;
+            return url && !isOutside(url) ? pageKey(url) : chId;
+        };
+
+        const parseRoute = (hash) => {
+            const key = decodeURIComponent((hash || '').replace(/^#\/?/, ''));
+            if (!key) return ['home', null];
+            for (const ch of CHAPTERS) {
+                if (ch.id === key) return [ch.id, null];
+                if (ch.testUrl && !noTest(ch.id) && pageKey(ch.testUrl) === key) return [ch.id, 'test'];
+                const i = ch.subpages.findIndex(s => !isOutside(s.url) && pageKey(s.url) === key);
+                if (i >= 0) return [ch.id, i];
+            }
+            return ['home', null];
+        };
+
+        const titleOf = (chId, sub) => {
+            const ch = CHAPTERS.find(c => c.id === chId);
+            if (!ch) return '歐大選擇權教室 | Joption Academy';
+            const name = sub === null ? ch.title : sub === 'test' ? ch.title + ' 旅途試煉' : ch.subpages[sub]?.title;
+            return name + ' | 歐大選擇權教室';
+        };
+
+        // 分享列（跟官網一樣）：手機叫出系統分享選單，電腦就複製連結；LINE 另外一顆
+        const ShareBar = ({ route, title, compact }) => {
+            const [copied, setCopied] = useState(false);
+            const url = location.origin + location.pathname + (route ? '#' + route : '');
+            const copy = () => {
+                const ok = () => { setCopied(true); setTimeout(() => setCopied(false), 2500); };
+                if (navigator.clipboard) navigator.clipboard.writeText(url).then(ok, () => prompt('複製這個連結', url));
+                else prompt('複製這個連結', url);
+            };
+            const share = () => {
+                if (navigator.share) navigator.share({ title, url }).catch(() => {});
+                else copy();
+            };
+            return html`
+                <div className=${"jo-share" + (compact ? ' compact' : '')} role="group" aria-label="分享這一頁">
+                    <button type="button" className="jo-share-btn" onClick=${share}>分享這一頁</button>
+                    <a className="jo-share-btn line" href=${'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(url)} target="_blank" rel="noopener">LINE</a>
+                    <button type="button" className="jo-share-btn" onClick=${copy}>${copied ? '已複製 ✓' : '複製連結'}</button>
+                    <span className="sr-only" role="status" aria-live="polite">${copied ? '已複製連結' : ''}</span>
+                </div>`;
+        };
+
+        const firstRoute = parseRoute(location.hash);
+
         const App = () => {
-            const [activeChapterId, setActiveChapterId] = useState('home');
-            const [activeSubIndex, setActiveSubIndex]   = useState(null);
+            const [activeChapterId, setActiveChapterId] = useState(firstRoute[0]);
+            const [activeSubIndex, setActiveSubIndex]   = useState(firstRoute[1]);
             const [isMenuOpen, setIsMenuOpen]           = useState(false);
             const [visitorStats, setVisitorStats]       = useState({ total: null, daily: null });
 
@@ -319,90 +489,31 @@
                 return () => { unsubscribeAuth?.(); unsubscribeTotal?.(); unsubscribeDaily?.(); };
             }, []);
 
-            const chapters = useMemo(() => [
-                {
-                    id: 'ch1', title: 'CH 1 選擇權入門', icon: html`<${Icons.Book} />`, testUrl: 'chap1-test.html',
-                    subpages: [
-                        { title: '什麼是選擇權？', url: './1-1.html' },
-                        { title: '權利與義務的對稱性', url: './1-2.html' },
-                        { title: '買方與賣方的獲利概率', url: './1-3.html' }
-                    ]
-                },
-                {
-                    id: 'ch2', title: 'CH 2 基礎知識', icon: html`<${Icons.Target} />`, testUrl: 'chap2-test.html',
-                    subpages: [
-                        { title: '履約價與權利金', url: './2-1.html' },
-                        { title: '價內、價平與價外', url: './2-2.html' },
-                        { title: '結算機制與到期效應', url: './2-3.html' },
-                        { title: '保證金與權利金', url: './2-4.html' },
-                        { title: '結算日', url: './2-5.html' }
-                    ]
-                },
-                {
-                    id: 'ch3', title: 'CH 3 權利金的秘密', icon: html`<${Icons.Zap} />`, testUrl: 'chap3-test.html',
-                    subpages: [
-                        { title: '內涵價值 vs 時間價值', url: './3-1.html' },
-                        { title: '時間價值的流逝規律', url: './3-2.html' }
-                    ]
-                },
-                {
-                    id: 'ch4', title: 'CH 4 希臘字母實戰力', icon: html`<${Icons.TrendingUp} />`, testUrl: 'chap4-test.html',
-                    subpages: [
-                        { title: 'Delta：方向敏感度', url: './4-1.html' },
-                        { title: 'Gamma：Delta 的加速度', url: './4-2.html' },
-                        { title: 'Theta：時間衰減', url: './4-3.html' },
-                        { title: 'Vega：波動率敏感度', url: './4-4.html' }
-                    ]
-                },
-                {
-                    id: 'ch5', title: 'CH 5 選擇權九九乘法', icon: html`<${Icons.Zap} />`, testUrl: 'chap5-test.html',
-                    subpages: [
-                        { title: '買進買權 (Long Call)', url: './5-1.html' },
-                        { title: '賣出買權 (Short Call)', url: './5-2.html' },
-                        { title: '買進賣權 (Long Put)', url: './5-3.html' },
-                        { title: '賣出賣權 (Short Put)', url: './5-4.html' },
-                        { title: '雙賣組合 (Short Strangle)', url: './5-5.html' },
-                        { title: '雙買組合 (Long Strangle)', url: './5-6.html' },
-                        { title: '多頭價差 (Bull Spread)', url: './5-7.html' },
-                        { title: '空頭價差 (Bear Spread)', url: './5-8.html' },
-                        { title: '鐵禿鷹組合 (Iron Condor)', url: './5-9.html' },
-                        { title: '鐵蝴蝶組合 (Iron Butterfly)', url: './5-10.html' }
-                    ]
-                },
-                {
-                    id: 'ch6', title: 'CH 6 常見問題集', icon: html`<${Icons.Shield} />`, testUrl: 'chap6-test.html',
-                    subpages: [
-                        { title: '保證金計算', url: './6-1.html' },
-                        { title: '歐式與美式選擇權', url: './6-2.html' },
-                        { title: '新手一定要知道的 10 個地雷', url: './6-3.html' },
-                        { title: '新手必須知道的知識', url: './6-4.html' },
-                        { title: '權利金觀念與保證金控管', url: './6-5.html' }
-                    ]
-                },
-                {
-                    id: 'ch7', title: 'CH 7 Joption 問題集', icon: html`<${Icons.MessageQuestion} />`,
-                    subpages: [
-                        { title: '加碼策略 2 的指南', url: 'https://joption-tw.github.io/7-1/' }
-                    ]
-                },
-                {
-                    id: 'ch8', title: 'CH 8 進階 : Joption 量化', icon: html`<${Icons.Code} />`, testUrl: 'chap7-test.html',
-                    subpages: [
-                        { title: 'Joption 是什麼', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E6%98%AF%E4%BB%80%E9%BA%BC' },
-                        { title: '雙賣平衡模擬器', url: './7-2.html' },
-                        { title: 'Joption 策略核心', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/joption%E7%AD%96%E7%95%A5%E6%A0%B8%E5%BF%83' },
-                        { title: '訂閱與下載', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E4%B8%8B%E8%BC%89%E5%8F%8A%E5%AE%89%E8%A3%9D%E8%AA%AA%E6%98%8E' },
-                        { title: '歐大的自我介紹', url: 'https://www.joption.com.tw/%E9%81%B8%E5%96%AE/%E6%AD%90%E5%A4%A7%E7%9A%84%E8%87%AA%E6%88%91%E4%BB%8B%E7%B4%B9' }
-                    ]
-                },
-                {
-                    id: 'ch9', title: 'CH 9 常用的輔助程式', icon: html`<${Icons.Terminal} />`,
-                    subpages: [
-                        { title: '富台指轉換器', url: 'https://joption-tw.github.io/FTSE-Taiwan-Index-Futures/' },
-                        { title: '每日震幅追蹤器', url: 'https://joption-tw.github.io/Volatility/' }
-                    ]
+            const chapters = CHAPTERS;
+
+            // 換頁就更新網址和分頁標題；按瀏覽器上一頁時照網址切回去
+            const route = routeOf(activeChapterId, activeSubIndex);
+            const pageTitle = titleOf(activeChapterId, activeSubIndex);
+            const firstSync = useRef(true);
+            useEffect(() => {
+                const want = route ? '#' + route : '';
+                if (location.hash !== want) {
+                    const next = want || location.pathname + location.search;
+                    if (firstSync.current) history.replaceState(null, '', next);
+                    else history.pushState(null, '', next);
                 }
-            ], []);
+                firstSync.current = false;
+                document.title = pageTitle;
+            }, [route]);
+            useEffect(() => {
+                const apply = () => {
+                    const [c, s] = parseRoute(location.hash);
+                    setActiveChapterId(c);
+                    setActiveSubIndex(s);
+                };
+                window.addEventListener('popstate', apply);
+                return () => window.removeEventListener('popstate', apply);
+            }, []);
 
             const currentChapter = useMemo(() => chapters.find(c => c.id === activeChapterId), [activeChapterId, chapters]);
 
@@ -448,7 +559,6 @@
                 <span className="payoff-tag call" aria-hidden="true">Call</span>`;
 
             const goHome = () => { setActiveChapterId('home'); setActiveSubIndex(null); setIsMenuOpen(false); };
-            const noTest = (id) => id === 'ch7' || id === 'ch8' || id === 'ch9';
 
             const mainContent = activeChapterId === 'home'
                 ? html`
@@ -491,6 +601,7 @@
                         </section>
 
                         <div className="flex flex-col items-center gap-6 pt-2">
+                            <${ShareBar} route="" title="歐大選擇權教室" />
                             <div className="jo-visits" aria-label="訪客人數">
                                 <div className="jo-visit"><b>${visitorStats.daily !== null ? visitorStats.daily.toLocaleString() : '–'}</b><span>今天人數</span></div>
                                 <div className="jo-visit"><b>${visitorStats.total !== null ? visitorStats.total.toLocaleString() : '–'}</b><span>累積人數</span></div>
@@ -503,6 +614,7 @@
                         <div key=${activeChapterId} className="animate-fade-in jo-chapter pb-10">
                             <span className="jo-tag">JOPTION CHAPTER</span>
                             <h2 className="jo-chapter-title">${currentChapter?.title || "章節內容"}</h2>
+                            <${ShareBar} route=${route} title=${pageTitle} />
                             <div className="jo-lessons">
                                 ${currentChapter?.subpages.map((sub, i) => html`
                                     <button key=${i} onClick=${() => handleSubPageClick(i)} className="jo-lesson">
@@ -519,13 +631,19 @@
                             </div>
                         </div>`
                     : html`
-                        <div key=${activeChapterId + '-' + activeSubIndex} className="iframe-container">
+                        <div key=${activeChapterId + '-' + activeSubIndex} className="jo-lesson-view">
+                            <div className="jo-lesson-bar">
+                                <span className="jo-lesson-name">${activeSubIndex === 'test' ? '旅途試煉' : currentChapter?.subpages[activeSubIndex]?.title}</span>
+                                <${ShareBar} route=${route} title=${pageTitle} compact />
+                            </div>
+                            <div className="iframe-container">
                             <iframe
                                 src=${activeSubIndex === 'test' ? currentChapter?.testUrl : currentChapter?.subpages[activeSubIndex].url}
                                 title="Course Content"
                                 sandbox="allow-scripts allow-same-origin allow-forms"
                                 loading="lazy"
                             ></iframe>
+                            </div>
                         </div>`;
 
             return html`
