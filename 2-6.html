@@ -43,6 +43,11 @@
         .rung.wide .gap { background: #403C55; color: #fff; }
         .rung .strike { font-size: 20px; font-weight: 900; text-align: center; letter-spacing: .04em; }
         .rung .tag { font-size: 12px; font-weight: 900; text-align: right; }
+        /* 履約價範圍長條：以昨收為中心往兩邊長 */
+        .range-track { position: relative; height: 26px; border-radius: 999px; background: #F6F1E6; }
+        .range-track::after { content: ""; position: absolute; left: 50%; top: -5px; bottom: -5px; width: 3px; margin-left: -1.5px; background: var(--c-dark); border-radius: 2px; }
+        .range-bar { position: absolute; left: 50%; top: 0; bottom: 0; transform: translateX(-50%); border: 2.5px solid var(--c-dark); border-radius: 999px; }
+        .range-nums { display: flex; justify-content: space-between; margin-left: auto; margin-right: auto; min-width: 150px; }
         @media (max-width: 640px) {
             .capsule-container { border-radius: 1.5rem; padding: .75rem; }
             .rung { grid-template-columns: 52px 1fr 64px; }
@@ -120,6 +125,44 @@
             </div>
         </section>
 
+        <!-- 履約價開到哪裡 -->
+        <section class="px-2 md:px-0 flex flex-col items-center">
+            <h3 class="text-2xl md:text-4xl font-black mb-4">履約價開到哪裡？</h3>
+            <p class="text-center text-base md:text-lg font-bold text-gray-700 max-w-3xl leading-relaxed mb-8">
+                期交所每天以<b>前一營業日的收盤價</b>當基準，從價平往上、往下一檔一檔推出履約價，<br class="hidden md:block">
+                直到<b>最高和最低的履約價蓋到下面這個範圍</b>為止。合約越長，開得越遠。
+            </p>
+            <div class="bg-white pop-card p-5 md:p-10 w-full">
+                <div class="text-sm font-black text-gray-500 mb-5">以昨收 38,427 點為例</div>
+                <div class="flex flex-col gap-5">
+                    <div>
+                        <div class="flex justify-between items-baseline gap-2 font-black mb-1.5"><span>季月契約（接續 2 個）</span><span class="text-[var(--c-indigo)]">上下 20%</span></div>
+                        <div class="range-track"><div class="range-bar bg-[#EEEDFB]" style="width:100%"></div></div>
+                        <div class="flex justify-between text-xs md:text-sm font-bold text-gray-500 mt-1 num"><span>30,742</span><span>46,112</span></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-baseline gap-2 font-black mb-1.5"><span>近月契約（連續 3 個月）</span><span class="text-[var(--c-indigo)]">上下 15%</span></div>
+                        <div class="range-track"><div class="range-bar bg-[var(--c-sky)]" style="width:75%"></div></div>
+                        <div class="range-nums text-xs md:text-sm font-bold text-gray-500 mt-1 num" style="width:75%"><span>32,663</span><span>44,191</span></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-baseline gap-2 font-black mb-1.5"><span>週契約（週三、週五）</span><span class="text-[var(--c-indigo)]">上下 10%</span></div>
+                        <div class="range-track"><div class="range-bar bg-[#FFF1C2]" style="width:50%"></div></div>
+                        <div class="range-nums text-xs md:text-sm font-bold text-gray-500 mt-1 num" style="width:50%"><span>34,584</span><span>42,270</span></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-baseline gap-2 font-black mb-1.5"><span>其中 50 點一檔的加密區</span><span class="text-[var(--c-indigo)]">上下 3%</span></div>
+                        <div class="range-track"><div class="range-bar bg-[var(--c-coin)]" style="width:15%"></div></div>
+                        <div class="range-nums text-xs md:text-sm font-bold text-gray-500 mt-1 num" style="width:15%"><span>37,274</span><span>39,580</span></div>
+                    </div>
+                </div>
+                <div class="rounded-xl border-2 p-4 mt-8 bg-[#FFFCF5] font-bold leading-relaxed">
+                    👉 11/20 盤中跌了約 4%，還在週契約上下 10% 的範圍裡，所以 36,900 附近本來就有履約價可以交易。<br>
+                    👉 新的履約價是每天<b>一般交易時段</b>依前一天收盤價推出的。如果哪天盤中跌超過 10%，更低的履約價要等<b>下一個交易日</b>才會掛出來。
+                </div>
+            </div>
+        </section>
+
         <!-- 互動模擬器 -->
         <section class="flex flex-col items-center">
             <h3 class="text-2xl md:text-4xl font-black mb-6">🎮 履約價刻度模擬器</h3>
@@ -129,6 +172,7 @@
                     <button type="button" data-prev="38427" data-today="36903" class="preset rounded-full border-2 bg-white text-[var(--c-dark)] px-4 py-2 text-sm">📉 11/20 開盤大跌</button>
                     <button type="button" data-prev="38427" data-today="38520" class="preset rounded-full border-2 bg-white text-[var(--c-dark)] px-4 py-2 text-sm">😌 平常小漲小跌</button>
                     <button type="button" data-prev="38427" data-today="39900" class="preset rounded-full border-2 bg-white text-[var(--c-dark)] px-4 py-2 text-sm">🚀 大漲超過 3%</button>
+                    <button type="button" data-prev="38427" data-today="34000" class="preset rounded-full border-2 bg-white text-[var(--c-dark)] px-4 py-2 text-sm">💥 暴跌超過 10%</button>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -147,12 +191,13 @@
                                 <span id="chgOut" class="num block text-sm font-black">-1,524（-3.97%）</span>
                             </span>
                         </div>
-                        <input type="range" id="move" min="-3500" max="3500" step="1" value="-1524">
+                        <input type="range" id="move" min="-5000" max="5000" step="1" value="-1524">
                     </div>
                 </div>
 
                 <div class="bg-white text-[var(--c-dark)] rounded-2xl border-2 p-4 mb-6 font-bold leading-relaxed">
                     <div>加密區（昨收上下 3%）：<b id="bandOut" class="num">37,274 ～ 39,580</b></div>
+                    <div>週契約最遠開到（昨收上下 10%）：<b id="rangeOut" class="num">34,584 ～ 42,270</b></div>
                     <div id="verdict" class="mt-1"></div>
                 </div>
 
@@ -160,7 +205,7 @@
                     <span>和上一檔差</span><span>履約價</span><span>所在區域</span>
                 </div>
                 <div id="ladder" class="flex flex-col gap-1.5"></div>
-                <p class="text-xs font-bold text-gray-400 mt-4">黃底 = 50 點一檔的加密區；深色 = 100 點一檔；黃框 = 最接近現在指數的價平。這裡畫的是週契約的情況。</p>
+                <p class="text-xs font-bold text-gray-400 mt-4">黃底 = 50 點一檔的加密區；深色 = 100 點一檔；黃框 = 最接近現在指數的履約價。這裡畫的是週契約的情況，最遠開到昨收上下 10%。</p>
             </div>
         </section>
 
@@ -231,7 +276,7 @@
         <section class="flex flex-col items-center">
             <h3 class="text-2xl md:text-4xl font-black mb-6">📚 一張表記起來</h3>
             <div class="w-full overflow-x-auto px-2">
-                <div class="min-w-[560px] bg-white pop-card p-0 overflow-hidden">
+                <div class="min-w-[680px] bg-white pop-card p-0 overflow-hidden">
                     <table class="w-full text-left">
                         <thead>
                             <tr class="bg-[var(--c-dark)] text-white">
@@ -239,6 +284,7 @@
                                 <th class="p-4 font-black">一般間距</th>
                                 <th class="p-4 font-black">昨收 ±3% 內</th>
                                 <th class="p-4 font-black">加密從何時開始</th>
+                                <th class="p-4 font-black">最遠開到</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm md:text-base font-bold divide-y-2">
@@ -247,24 +293,27 @@
                                 <td class="p-4 num">100 點</td>
                                 <td class="p-4 num bg-[#FFF1C2]">50 點</td>
                                 <td class="p-4">一開始交易就有</td>
+                                <td class="p-4 num">昨收 ±10%</td>
                             </tr>
                             <tr>
                                 <td class="p-4">近月契約</td>
                                 <td class="p-4 num">100 點</td>
                                 <td class="p-4 num bg-[#FFF1C2]">50 點</td>
                                 <td class="p-4">到期日前兩週的星期三起</td>
+                                <td class="p-4 num">昨收 ±15%</td>
                             </tr>
                             <tr>
                                 <td class="p-4">季月契約</td>
                                 <td class="p-4 num">200 點</td>
                                 <td class="p-4 text-gray-400">不加密</td>
                                 <td class="p-4 text-gray-400">－</td>
+                                <td class="p-4 num">昨收 ±20%</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-            <p class="text-xs font-bold text-gray-500 mt-4 px-2">以上是台指在 3,000 點以上的規則，資料來源：臺灣期貨交易所臺指選擇權契約規格。</p>
+            <p class="text-xs font-bold text-gray-500 mt-4 px-2">以上是台指在 3,000 點以上的規則，資料來源：臺灣期貨交易所臺指選擇權契約規格（履約價格間距、契約序列）。</p>
         </section>
     </main>
 
@@ -300,17 +349,28 @@
                 chgOut.style.color = chg > 0 ? 'var(--c-up)' : chg < 0 ? 'var(--c-down)' : '#5c5870';
                 document.getElementById('bandOut').textContent = fmt(lo) + ' ～ ' + fmt(hi);
 
+                const far = prev * 0.10;
+                document.getElementById('rangeOut').textContent = fmt(prev - far) + ' ～ ' + fmt(prev + far);
+
                 const inside = today >= lo && today <= hi;
-                document.getElementById('verdict').innerHTML = inside
+                const beyond = Math.abs(today - prev) > far;
+                document.getElementById('verdict').innerHTML = beyond
+                    ? '⚠️ 已經超過上下 10%！今天盤中不會再加掛更遠的履約價，要等下一個交易日用新的收盤價推出。'
+                    : inside
                     ? '✅ 現在指數在加密區裡面，價平附近是 <b>50 點一檔</b>。'
                     : (today < lo ? '📉 跌出加密區了！' : '🚀 漲出加密區了！') + '價平附近只剩 <b>100 點一檔</b>，要等隔天用新的收盤價重算。';
 
                 // 價平上下各 600 點的履約價：100 的倍數一定有；加密區裡另外有 50 的倍數
-                const from = Math.floor((today - 600) / 100) * 100;
-                const to = Math.ceil((today + 600) / 100) * 100;
+                // 超過 10% 時，梯子停在最外面那一檔附近
+                const center = Math.min(Math.max(today, prev - far), prev + far);
+                const from = Math.floor((center - 600) / 100) * 100;
+                const to = Math.ceil((center + 600) / 100) * 100;
                 const list = [];
                 for (let s = from; s <= to; s += 50) {
                     const fine = s >= lo && s <= hi;
+                    // 週契約只開到昨收上下 10%（最外面那一檔要蓋過 10% 的位置）
+                    const edgeLo = Math.floor((prev - far) / 100) * 100, edgeHi = Math.ceil((prev + far) / 100) * 100;
+                    if (s < edgeLo || s > edgeHi) continue;
                     if (s % 100 === 0 || fine) list.push({ s, fine });
                 }
                 let atm = list[0].s;
@@ -319,7 +379,7 @@
                 document.getElementById('ladder').innerHTML = list.map((r, i) => {
                     const gap = i === 0 ? '' : '+' + (r.s - list[i - 1].s);
                     const cls = 'rung ' + (r.fine ? 'fine' : 'wide') + (r.s === atm ? ' atm' : '');
-                    const tag = r.s === atm ? '價平' : (r.fine ? '50 點區' : '100 點區');
+                    const tag = r.s === atm ? (beyond ? '最外一檔' : '價平') : (r.fine ? '50 點區' : '100 點區');
                     return '<div class="' + cls + '"><span class="gap num">' + (gap || '－') + '</span>'
                         + '<span class="strike num">' + fmt(r.s) + '</span><span class="tag">' + tag + '</span></div>';
                 }).join('');
